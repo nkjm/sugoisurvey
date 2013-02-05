@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Translations xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customApplications>
+        <label>Sugoi Survey</label>
+        <name>sugoisurvey</name>
+    </customApplications>
+    <customLabels>
+        <label>add option</label>
+        <name>add_option</name>
+    </customLabels>
+    <customLabels>
+        <label>Application has already been initialized.</label>
+        <name>already_initialized</name>
+    </customLabels>
+    <customLabels>
+        <label>You&apos;ve already submitted the survey.</label>
+        <name>already_submitted</name>
+    </customLabels>
+    <customLabels>
+        <label>Are you sure?</label>
+        <name>are_you_sure</name>
+    </customLabels>
+    <customLabels>
+        <label>Attachment</label>
+        <name>attachment</name>
+    </customLabels>
+    <customLabels>
+        <label>A Handout of the seminar you attended is now available. Please find attached.</label>
+        <name>body_of_deck_delivery_mail</name>
+    </customLabels>
+    <customLabels>
+        <label>Cancel</label>
+        <name>cancel</name>
+    </customLabels>
+    <customLabels>
+        <label>Going to clone this event.</label>
+        <name>cloning_event</name>
+    </customLabels>
+    <customLabels>
+        <label>close</label>
+        <name>close</name>
+    </customLabels>
+    <customLabels>
+        <label>Going to close this survey.</label>
+        <name>closing_survey</name>
+    </customLabels>
+    <customLabels>
+        <label>Comment</label>
+        <name>comment</name>
+    </customLabels>
+    <customLabels>
+        <label>Complete</label>
+        <name>complete</name>
+    </customLabels>
+    <customLabels>
+        <label>Create Lead</label>
+        <name>create_lead</name>
+    </customLabels>
+    <customLabels>
+        <label>Options</label>
+        <name>customSurveyOption</name>
+    </customLabels>
+    <customLabels>
+        <label>Question</label>
+        <name>customSurveyQuestion</name>
+    </customLabels>
+    <customLabels>
+        <label>Going to delete this event.</label>
+        <name>deleting_event</name>
+    </customLabels>
+    <customLabels>
+        <label>Deleting Survey</label>
+        <name>deleting_survey</name>
+    </customLabels>
+    <customLabels>
+        <label>Destinations</label>
+        <name>deliver_destinations</name>
+    </customLabels>
+    <customLabels>
+        <label>Mail will not be delivered to guests who have already been sent handout</label>
+        <name>delivered_guest_will_not_be_delivered_again</name>
+    </customLabels>
+    <customLabels>
+        <label>Delivery has been completed.</label>
+        <name>delivery_complete</name>
+    </customLabels>
+    <customLabels>
+        <label>Dummy</label>
+        <name>dummy</name>
+    </customLabels>
+    <customLabels>
+        <label>Edit</label>
+        <name>edit</name>
+    </customLabels>
+    <customLabels>
+        <label>Edit Survey</label>
+        <name>edit_survey</name>
+    </customLabels>
+    <customLabels>
+        <label>Email</label>
+        <name>email</name>
+    </customLabels>
+    <customLabels>
+        <label>Your Email is not registered to this session.</label>
+        <name>email_not_registered</name>
+    </customLabels>
+    <customLabels>
+        <label>Enable free answer</label>
+        <name>enable_free_form</name>
+    </customLabels>
+    <customLabels>
+        <label>Error</label>
+        <name>error</name>
+    </customLabels>
+    <customLabels>
+        <label>Event</label>
+        <name>event</name>
+    </customLabels>
+    <customLabels>
+        <label>Failed to create Chatter Feed.</label>
+        <name>failed_to_create_feedItem</name>
+    </customLabels>
+    <customLabels>
+        <label>Free Answers</label>
+        <name>free_answers</name>
+    </customLabels>
+    <customLabels>
+        <label>Guest Id is not set.</label>
+        <name>guest_id_is_not_set</name>
+    </customLabels>
+    <customLabels>
+        <label>Guest List</label>
+        <name>guest_list</name>
+    </customLabels>
+    <customLabels>
+        <label>Handout Download URL</label>
+        <name>handout_download_url</name>
+    </customLabels>
+    <customLabels>
+        <label>mail has been delivered.</label>
+        <name>has_been_delivered</name>
+    </customLabels>
+    <customLabels>
+        <label>High</label>
+        <name>high</name>
+    </customLabels>
+    <customLabels>
+        <label>Entered Email is not valid format.</label>
+        <name>invalid_email</name>
+    </customLabels>
+    <customLabels>
+        <label>Low</label>
+        <name>low</name>
+    </customLabels>
+    <customLabels>
+        <label>Mail Preview</label>
+        <name>mail_preview</name>
+    </customLabels>
+    <customLabels>
+        <label>New Survey Title</label>
+        <name>new_survey_name</name>
+    </customLabels>
+    <customLabels>
+        <label>No</label>
+        <name>no</name>
+    </customLabels>
+    <customLabels>
+        <label>Option</label>
+        <name>option</name>
+    </customLabels>
+    <customLabels>
+        <label>Other</label>
+        <name>other</name>
+    </customLabels>
+    <customLabels>
+        <label>Password</label>
+        <name>password</name>
+    </customLabels>
+    <customLabels>
+        <label>Phone</label>
+        <name>phone</name>
+    </customLabels>
+    <customLabels>
+        <label>Please enter your answer by 255 letters.</label>
+        <name>pls_enter_by_255_letters</name>
+    </customLabels>
+    <customLabels>
+        <label>Please enter question.</label>
+        <name>pls_enter_question</name>
+    </customLabels>
+    <customLabels>
+        <label>Please enter required field -</label>
+        <name>pls_enter_required_field</name>
+    </customLabels>
+    <customLabels>
+        <label>Please enter Session Title.</label>
+        <name>pls_enter_session_name</name>
+    </customLabels>
+    <customLabels>
+        <label>Please enter your Email.</label>
+        <name>pls_input_email</name>
+    </customLabels>
+    <customLabels>
+        <label>Please tell me detail (up to 255 letters).</label>
+        <name>pls_tell_me_detail</name>
+    </customLabels>
+    <customLabels>
+        <label>Please wait for a while</label>
+        <name>pls_wait_for_a_while</name>
+    </customLabels>
+    <customLabels>
+        <label>Processing</label>
+        <name>processing</name>
+    </customLabels>
+    <customLabels>
+        <label>Property</label>
+        <name>property</name>
+    </customLabels>
+    <customLabels>
+        <label>rate</label>
+        <name>rate</name>
+    </customLabels>
+    <customLabels>
+        <label>Rating</label>
+        <name>rating</name>
+    </customLabels>
+    <customLabels>
+        <label>Report</label>
+        <name>report</name>
+    </customLabels>
+    <customLabels>
+        <label>Requested_number_of_questions_does_not_match_to_database.</label>
+        <name>requested_number_of_question_is_not_valid</name>
+    </customLabels>
+    <customLabels>
+        <label>Save</label>
+        <name>save</name>
+    </customLabels>
+    <customLabels>
+        <label>Send Mail</label>
+        <name>send_mail</name>
+    </customLabels>
+    <customLabels>
+        <label>Session has been saved.</label>
+        <name>session_has_been_saved</name>
+    </customLabels>
+    <customLabels>
+        <label>Session Id has not been set.</label>
+        <name>session_id_is_not_set</name>
+    </customLabels>
+    <customLabels>
+        <label>Session is not configured properly. Please contact system administrator.</label>
+        <name>session_is_not_configured_correctly</name>
+    </customLabels>
+    <customLabels>
+        <label>Sites has not been activated.</label>
+        <name>sites_not_activated</name>
+    </customLabels>
+    <customLabels>
+        <label>Permission Sets for Sites is not found.</label>
+        <name>sites_permission_set_not_found</name>
+    </customLabels>
+    <customLabels>
+        <label>User for Sites is not found.</label>
+        <name>sites_user_not_found</name>
+    </customLabels>
+    <customLabels>
+        <label>Specified question was not found.</label>
+        <name>specified_question_not_found</name>
+    </customLabels>
+    <customLabels>
+        <label>Specified session does not exist.</label>
+        <name>specified_session_does_not_exist</name>
+    </customLabels>
+    <customLabels>
+        <label>Specified Survey does not exist.</label>
+        <name>specified_survey_does_not_exist</name>
+    </customLabels>
+    <customLabels>
+        <label>Start</label>
+        <name>start</name>
+    </customLabels>
+    <customLabels>
+        <label>Handout Attached</label>
+        <name>subject_of_deck_delivery_mail</name>
+    </customLabels>
+    <customLabels>
+        <label>submit</label>
+        <name>submit</name>
+    </customLabels>
+    <customLabels>
+        <label>Sugoi Survey</label>
+        <name>sugoiSurvey</name>
+    </customLabels>
+    <customLabels>
+        <label>Sum</label>
+        <name>sum</name>
+    </customLabels>
+    <customLabels>
+        <label>Survey</label>
+        <name>survey</name>
+    </customLabels>
+    <customLabels>
+        <label>Collection Rate</label>
+        <name>survey_collection_rate</name>
+    </customLabels>
+    <customLabels>
+        <label>Survey has been deleted.</label>
+        <name>survey_has_been_deleted</name>
+    </customLabels>
+    <customLabels>
+        <label>Survey has been saved.</label>
+        <name>survey_has_been_saved</name>
+    </customLabels>
+    <customLabels>
+        <label>Survey has been submitted.</label>
+        <name>survey_has_been_submitted</name>
+    </customLabels>
+    <customLabels>
+        <label>Survey Id has not been set.</label>
+        <name>survey_id_is_not_set</name>
+    </customLabels>
+    <customLabels>
+        <label>This survey is over.</label>
+        <name>survey_is_over</name>
+    </customLabels>
+    <customLabels>
+        <label>Survey List</label>
+        <name>survey_list</name>
+    </customLabels>
+    <customLabels>
+        <label>Selectable (Multi)</label>
+        <name>survey_type_checkbox</name>
+    </customLabels>
+    <customLabels>
+        <label>Free Form</label>
+        <name>survey_type_free</name>
+    </customLabels>
+    <customLabels>
+        <label>Selectable (Single)</label>
+        <name>survey_type_radio</name>
+    </customLabels>
+    <customLabels>
+        <label>There are not enough number of question to sort.</label>
+        <name>there_are_not_enough_number_of_question_to_sort</name>
+    </customLabels>
+    <customLabels>
+        <label>Deliver Handout</label>
+        <name>title_of_deliverDeck</name>
+    </customLabels>
+    <customLabels>
+        <label>Unknown Company</label>
+        <name>unknown_company</name>
+    </customLabels>
+    <customLabels>
+        <label>Unregistered Guest</label>
+        <name>unregistered_guest</name>
+    </customLabels>
+    <customLabels>
+        <label>Up to 255 letters</label>
+        <name>up_to_255_letter</name>
+    </customLabels>
+    <customLabels>
+        <label>Rating (5 Point)</label>
+        <name>xPointScale</name>
+    </customLabels>
+    <customLabels>
+        <label>Yes</label>
+        <name>yes</name>
+    </customLabels>
+    <customTabs>
+        <label>Surveys</label>
+        <name>session_list</name>
+    </customTabs>
+</Translations>

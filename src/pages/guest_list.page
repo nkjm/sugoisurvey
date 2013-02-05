@@ -1,0 +1,45 @@
+<apex:page standardController="Guest__c" extensions="guest_list" sidebar="false" standardStyleSheets="false" doctype="html-5.0">
+<apex:styleSheet value="https://fonts.googleapis.com/css?family=Cuprum&subset=latin" />
+<apex:styleSheet value="{!URLFOR($Resource.jqueryui_1_9_2_custom_zip, 'jquery-ui-1.9.2.custom/css/smoothness/jquery-ui-1.9.2.custom.min.css')}" />
+<apex:styleSheet value="{!URLFOR($Resource.reusable_class_css)}" />
+<apex:styleSheet value="{!URLFOR($Resource.session_list_css)}" />
+<apex:styleSheet value="{!URLFOR($Resource.jquery_confirm_zip, 'jquery.confirm/jquery.confirm.css')}" />
+<apex:includeScript value="{!URLFOR($Resource.jqueryui_1_9_2_custom_zip, 'jquery-ui-1.9.2.custom/js/jquery-1.8.3.js')}" />
+<apex:includeScript value="{!URLFOR($Resource.jqueryui_1_9_2_custom_zip, 'jquery-ui-1.9.2.custom/js/jquery-ui-1.9.2.custom.min.js')}" />
+<apex:includeScript value="{!URLFOR($Resource.jquery_confirm_zip, 'jquery.confirm/jquery.activity-indicator-1.0.0.js')}" />
+<apex:includeScript value="{!URLFOR($Resource.jquery_confirm_zip, 'jquery.confirm/jquery.confirm.js')}" />
+
+<script type="text/javascript">
+j$ = jQuery.noConflict();
+</script>
+
+<div id="content">
+    <div id="left">
+        <div class="column_header">
+            {!$Label.guest_list}
+        </div>
+        <div class="column_content">
+            <div id="existing_session_list">
+                <apex:repeat value="{!guests}" var="g">
+                    <a href="?session_id={!session_id}&search_by={!search_by}&answer_id={!answer_id}&rate={!rate}&option_id={!option_id}&id={!g.id}">
+                        <div class="session_row">
+                            <apex:outputpanel layout="block" styleClass="session_name">
+                                <apex:outputText value="{!g.Company__c}" />
+                            </apex:outputpanel>
+                            <apex:outputpanel layout="block" styleClass="session_presenter">
+                                <apex:outputText value="{!g.Name__c}" /><br/>
+                                <apex:outputText value="{!g.Email__c}" />
+                            </apex:outputpanel>
+                        </div>
+                    </a>
+                </apex:repeat>
+            </div>
+        </div>
+    </div>
+    <div id="right">
+        <apex:outputtext rendered="{! !ISNULL($CurrentPage.parameters.id)}">
+            <apex:include pageName="guest_profile"></apex:include>
+        </apex:outputtext>
+    </div>
+</div>
+</apex:page>

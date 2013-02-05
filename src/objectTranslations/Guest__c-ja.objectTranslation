@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObjectTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <caseValues>
+        <plural>false</plural>
+        <value>ゲスト</value>
+    </caseValues>
+    <fields>
+        <label><!-- 会社 --></label>
+        <name>Company__c</name>
+    </fields>
+    <fields>
+        <label><!-- Email --></label>
+        <name>Email__c</name>
+    </fields>
+    <fields>
+        <label><!-- 名 --></label>
+        <name>First_Name__c</name>
+    </fields>
+    <fields>
+        <label><!-- 資料配信済み --></label>
+        <name>Handout_Delivered__c</name>
+    </fields>
+    <fields>
+        <label><!-- 姓 --></label>
+        <name>Last_Name__c</name>
+    </fields>
+    <fields>
+        <label><!-- 名前 --></label>
+        <name>Name__c</name>
+    </fields>
+    <fields>
+        <label><!-- 電話番号 --></label>
+        <name>Phone__c</name>
+    </fields>
+    <fields>
+        <label><!-- プロフィール写真URL --></label>
+        <name>Profile_Photo__c</name>
+    </fields>
+    <fields>
+        <label><!-- イベント --></label>
+        <name>Session__c</name>
+        <relationshipLabel><!-- ゲスト --></relationshipLabel>
+    </fields>
+    <fields>
+        <label><!-- 役職 --></label>
+        <name>Title__c</name>
+    </fields>
+    <layouts>
+        <layout>ゲストレイアウト</layout>
+        <sections>
+            <label><!-- カスタムリンク --></label>
+            <section>カスタムリンク</section>
+        </sections>
+    </layouts>
+</CustomObjectTranslation>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObjectTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <caseValues>
+        <plural>false</plural>
+        <value>アンケート</value>
+    </caseValues>
+    <fields>
+        <label><!-- ゲスト --></label>
+        <name>Guest__c</name>
+        <relationshipLabel><!-- アンケート --></relationshipLabel>
+    </fields>
+    <fields>
+        <label><!-- 評価 --></label>
+        <name>Rate__c</name>
+    </fields>
+    <fields>
+        <label><!-- セッション --></label>
+        <name>Session__c</name>
+        <relationshipLabel><!-- アンケート --></relationshipLabel>
+    </fields>
+</CustomObjectTranslation>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObjectTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <caseValues>
+        <plural>false</plural>
+        <value>Guest</value>
+    </caseValues>
+    <caseValues>
+        <plural>true</plural>
+        <value>Guests</value>
+    </caseValues>
+    <fields>
+        <label>Company</label>
+        <name>Company__c</name>
+    </fields>
+    <fields>
+        <label>Email</label>
+        <name>Email__c</name>
+    </fields>
+    <fields>
+        <label>Firstname</label>
+        <name>First_Name__c</name>
+    </fields>
+    <fields>
+        <label>Handout delivered</label>
+        <name>Handout_Delivered__c</name>
+    </fields>
+    <fields>
+        <label>Lastname</label>
+        <name>Last_Name__c</name>
+    </fields>
+    <fields>
+        <label>Name</label>
+        <name>Name__c</name>
+    </fields>
+    <fields>
+        <label>Phone</label>
+        <name>Phone__c</name>
+    </fields>
+    <fields>
+        <label>Profile Picture URL</label>
+        <name>Profile_Photo__c</name>
+    </fields>
+    <fields>
+        <label>Session</label>
+        <name>Session__c</name>
+        <relationshipLabel>Guest</relationshipLabel>
+    </fields>
+    <fields>
+        <label>Title</label>
+        <name>Title__c</name>
+    </fields>
+    <layouts>
+        <layout>ゲストレイアウト</layout>
+        <sections>
+            <label>Custom Link</label>
+            <section>カスタムリンク</section>
+        </sections>
+    </layouts>
+    <nameFieldLabel>Guest Number</nameFieldLabel>
+    <startsWith>Consonant</startsWith>
+</CustomObjectTranslation>

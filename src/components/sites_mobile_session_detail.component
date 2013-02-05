@@ -1,0 +1,154 @@
+<apex:component controller="sites_mobile_session_detail">
+<apex:attribute name="session_id" type="id" required="true" assignTo="{!session_id}" description="Session Id"/>
+
+<apex:variable value="d" var="jqm_theme" />
+<apex:variable value="c" var="jqm_divider_theme" />
+<apex:variable value="{!session_detail}" var="s" />
+
+<apex:outputText escape="false" value="</span>" />
+
+<script>
+j$ = jQuery.noConflict();
+
+j$(document).ready(function(){
+    j$(".enable_free_form").on("change", function(){
+        var id_for_target_list = "#list_for_free_form_" + j$(this).attr('id');
+        if (j$(this).prop("checked")){
+            j$(id_for_target_list).show();
+        } else {
+            j$(id_for_target_list).hide();
+        }
+    });
+    
+    j$(".cso_container input[type='radio']").not(".enable_free_form").on("change", function(){
+        var id_for_free_form = j$(this).parent().parent().find(".enable_free_form").attr('id');
+        if (id_for_free_form) {
+            var id_for_target_list = "#list_for_free_form_" + id_for_free_form;
+            j$(id_for_target_list).hide();
+        }
+    })
+
+    j$("#page_session_detail_{!s.Id}").on("tap", ".button_submit_survey", function(){
+        var session__c = "{!s.Id}";
+        var rate__c = j$("#page_session_detail_{!s.Id} input[name='rate']:checked").val();
+        if (rate__c != null){
+            rate__c = Number(rate__c);
+        }
+        var survey = {
+            "session__c":session__c,
+            "rate__c":rate__c
+        }
+        
+        var comment__c = j$("#page_session_detail_{!s.Id} #comment").val();
+        if (comment__c != null && comment__c.length > 255){
+            alert('{!$label.pls_enter_by_255_letters}');
+            return false;
+        }
+        
+        var comment = {
+            "comment__c":comment__c
+        }
+    
+        var csas = [];
+        j$("#page_session_detail_{!s.Id} .cso_container input[type='checkbox']:checked, #page_session_detail_{!s.Id} .cso_container input[type='radio']:checked").each(function(){
+            var custom_survey_option__c = this.value;
+            var target_id_for_free_form = "#free_form_" + custom_survey_option__c;
+            var free_form__c = '';
+            var free_form__c = j$(target_id_for_free_form).val();
+            if (free_form__c != null && free_form__c.length > 255){
+                alert('{!$label.pls_enter_by_255_letters}');
+                return false;
+            }
+            var csa = {
+                "custom_survey_option__c":custom_survey_option__c,
+                "free_form__c":free_form__c
+            }
+            csas.push(csa);
+        });
+    
+        var guest_email = j$("#page_session_detail_{!s.Id} #guest_email").val();
+
+        j$.mobile.showPageLoadingMsg();
+        sugoisurvey4.jr_session.submit_survey(survey, comment, csas, guest_email,
+            function(result, event){
+                j$.mobile.hidePageLoadingMsg();
+                if (event.status){
+                    if (result.status == false){
+                        alert(result.message);
+                    } else {
+                        j$('#page_session_detail_{!s.Id} input,textarea').not('input[type="radio"],input[type="checkbox"],:hidden, :button, :submit, :reset').val('');
+                        
+                        j$('#page_session_detail_{!s.Id} input[type="radio"]').removeProp('checked');
+                        j$('#page_session_detail_{!s.Id} input[type="checkbox"]').removeProp('checked');
+                        
+                        j$('#page_session_detail_{!s.Id} input[type="checkbox"]').checkboxradio('refresh');
+                        j$('#page_session_detail_{!s.Id} input[type="radio"]').checkboxradio('refresh');
+                        
+                        j$('#page_session_detail_{!s.Id} .hide_on_submit').hide();
+                        
+                        alert("{!$label.survey_has_been_submitted}");
+                    }
+                } else {
+                    alert(event.message);
+                }
+            },{escape:true}
+        );
+    });
+});
+
+</script>
+
+<div data-role="page" id="page_session_detail_{!s.id}" data-theme="{!jqm_theme}" data-add-back-btn="true" >
+    <div data-role="header" data-theme="{!jqm_theme}">
+        <h1><apex:outputText value="{!s.name}" /></h1>
+    </div>
+    <div data-role="content" class="content">
+        <ul data-role="listview" data-inset="false" id="list_survey" data-divider-theme="{!jqm_divider_theme}">
+            <apex:outputText rendered="{!s.Enable_Rate__c}">
+                <li id="label_for_rate" data-role="list-divider">
+                    <apex:outputText value="{! IF(ISNULL(s.label_for_rate__c),$label.xPointScale,s.label_for_rate__c) }" />
+                </li>
+                <li id="list_5_point_scale">
+                    <div data-role="fieldcontain">
+                        <fieldset data-role="controlgroup">
+                            <input type="radio" name="rate" id="rate5" value="5" />
+                            <label for="rate5">5 {!$label.high}</label>
+                            <input type="radio" name="rate" id="rate4" value="4" />
+                            <label for="rate4">4</label>
+                            <input type="radio" name="rate" id="rate3" value="3" />
+                            <label for="rate3">3</label>
+                            <input type="radio" name="rate" id="rate2" value="2" />
+                            <label for="rate2">2</label>
+                            <input type="radio" name="rate" id="rate1" value="1" />
+                            <label for="rate1">1 {!$label.low}</label>
+                        </fieldset>
+                    </div>
+                </li>
+            </apex:outputText>
+            
+            <apex:repeat value="{!s.custom_survey_question__r}" var="csq">
+                <c:sites_mobile_custom_survey_container csq="{!csq}" csos="{!s.custom_survey_option__r}" />
+            </apex:repeat>
+            
+            <li data-role="list-divider">
+                {!$label.comment}
+            </li>
+            <li>
+                <textarea id="comment" placeholder="{!$label.up_to_255_letter}"></textarea>
+            </li>
+
+            <li data-role="list-divider">
+                {!$label.email}
+            </li>
+            <li>
+                <input type="email" id="guest_email" value=""></input>
+            </li>
+            
+            <li>
+                <input data-icon="check" type="submit" class="button_submit_survey" value="{!$label.submit}"/>
+            </li>
+        </ul>
+    </div>
+</div>
+<apex:outputText escape="false" value="<span>" />
+</apex:component>

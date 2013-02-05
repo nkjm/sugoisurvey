@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObjectTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <caseValues>
+        <plural>false</plural>
+        <value>Survey</value>
+    </caseValues>
+    <caseValues>
+        <plural>true</plural>
+        <value>Surveys</value>
+    </caseValues>
+    <fields>
+        <label>Email for Chatter Reply</label>
+        <name>Chatter_Email__c</name>
+    </fields>
+    <fields>
+        <label>Date</label>
+        <name>Date__c</name>
+    </fields>
+    <fields>
+        <label>Overview</label>
+        <name>Description__c</name>
+    </fields>
+    <fields>
+        <label>Enable Rating</label>
+        <name>Enable_Rate__c</name>
+    </fields>
+    <fields>
+        <label>Number of guest</label>
+        <name>Guest_Sum__c</name>
+    </fields>
+    <fields>
+        <label>Password for Handout</label>
+        <name>Handout_Password__c</name>
+    </fields>
+    <fields>
+        <label>Handout Download URL</label>
+        <name>Handout_URL__c</name>
+    </fields>
+    <fields>
+        <label>Hash Tag</label>
+        <name>Hash_Tag__c</name>
+    </fields>
+    <fields>
+        <label>Label for Rating</label>
+        <name>Label_For_Rate__c</name>
+    </fields>
+    <fields>
+        <label>Body for Handout mail</label>
+        <name>Mass_Mail_Additional_Body__c</name>
+    </fields>
+    <fields>
+        <label>Sender Email for Handout mail</label>
+        <name>Mass_Mail_Sender__c</name>
+    </fields>
+    <fields>
+        <label>Open</label>
+        <name>Open__c</name>
+    </fields>
+    <fields>
+        <label>Presenter</label>
+        <name>Presenter__c</name>
+        <relationshipLabel>Event</relationshipLabel>
+    </fields>
+    <fields>
+        <label>Avg of Rate</label>
+        <name>Rate_Avg__c</name>
+    </fields>
+    <fields>
+        <label>Number of Rate</label>
+        <name>Rate_Count__c</name>
+    </fields>
+    <fields>
+        <label>Sum of Rate</label>
+        <name>Rate_Sum__c</name>
+    </fields>
+    <fields>
+        <label>Report is public</label>
+        <name>Report_Public__c</name>
+    </fields>
+    <fields>
+        <label>Percentage of submitted survey</label>
+        <name>Survey_Collection_Rate__c</name>
+    </fields>
+    <fields>
+        <label>Number of submitted survey</label>
+        <name>Survey_Sum__c</name>
+    </fields>
+    <fields>
+        <label>Who is delivered handout</label>
+        <name>Who_Can_Get_Handout__c</name>
+        <picklistValues>
+            <masterLabel>アンケートの入力が必要</masterLabel>
+            <translation>Require Survey Submission</translation>
+        </picklistValues>
+        <picklistValues>
+            <masterLabel>全員</masterLabel>
+            <translation>Anyone</translation>
+        </picklistValues>
+    </fields>
+    <fields>
+        <label>Who can submit survey</label>
+        <name>Who_Can_Submit_Survey__c</name>
+        <picklistValues>
+            <masterLabel>Eメールの入力が必要</masterLabel>
+            <translation>Require Email</translation>
+        </picklistValues>
+        <picklistValues>
+            <masterLabel>事前登録者のみ</masterLabel>
+            <translation>Registered Guests Only</translation>
+        </picklistValues>
+        <picklistValues>
+            <masterLabel>無条件</masterLabel>
+            <translation>Anyone</translation>
+        </picklistValues>
+    </fields>
+    <layouts>
+        <layout>イベントレイアウト</layout>
+        <sections>
+            <label>Survey Site</label>
+            <section>アンケートサイト</section>
+        </sections>
+        <sections>
+            <label>Custom Link</label>
+            <section>カスタムリンク</section>
+        </sections>
+        <sections>
+            <label>Handout Distribution Setting</label>
+            <section>資料設定</section>
+        </sections>
+    </layouts>
+    <nameFieldLabel>Event Name</nameFieldLabel>
+    <startsWith>Vowel</startsWith>
+    <webLinks>
+        <label>Copy Event</label>
+        <name>clone_session</name>
+    </webLinks>
+    <webLinks>
+        <label>Close Survey</label>
+        <name>close_survey</name>
+    </webLinks>
+    <webLinks>
+        <label>Delete Event</label>
+        <name>delete_session</name>
+    </webLinks>
+    <webLinks>
+        <label>Deliver Handout</label>
+        <name>deliver_handout</name>
+    </webLinks>
+</CustomObjectTranslation>

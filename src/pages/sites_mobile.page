@@ -1,0 +1,45 @@
+<apex:page standardController="Session__c" extensions="session_v2,jr_session" sidebar="false" showHeader="false" standardStylesheets="false" doctype="html-5.0" cache="false">
+<apex:styleSheet value="{!URLFOR($Resource.jquery_mobile_1_2_0, 'jquery.mobile-1.2.0/jquery.mobile-1.2.0.min.css')}" />
+<apex:includeScript value="{!URLFOR($Resource.jqueryui_1_9_2_custom_zip, 'jquery-ui-1.9.2.custom/js/jquery-1.8.3.js')}" />
+<apex:includeScript value="{!URLFOR($Resource.jquery_mobile_1_2_0, 'jquery.mobile-1.2.0/jquery.mobile-1.2.0.min.js')}" />
+<apex:variable value="d" var="jqm_theme" />
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1"></meta>
+</head>
+
+<div data-role="page" id="page_session_list" data-theme="{!jqm_theme}">
+    <div data-role="header" data-backbtn="false" data-theme="{!jqm_theme}">
+        <h1>{!$label.survey_list}</h1>
+    </div>
+    <div data-role="content">
+        <ul data-role="listview" data-inset="true" data-filter="true" data-split-icon="gear" id="list_session">
+            <apex:repeat value="{!sessions}" var="session">
+                <apex:outputText rendered="{!session.Open__c}">
+                    <li>
+                        <a href="#page_session_detail_{!session.id}" class="button_session" id="' + record.Id + '" data-transition="slide">
+                            <h3><apex:outputText value="{!session.Name}" /></h3>
+                            <p>
+                            	<apex:outputText value="{!session.presenter__r.Company__c}" /><br/>
+                                <apex:outputText value="{!session.presenter__r.Title__c}" />
+                                &nbsp;
+                                <apex:outputText value="{!session.presenter__r.name}" /><br/>
+                            </p>
+                            <apex:outputText rendered="{! !ISNULL(session.date__c) }">
+                                <span class="ui-li-count"><apex:outputText value="{!YEAR(session.Date__c)}.{!MONTH(session.Date__c)}.{!DAY(session.Date__c)}" /></span>
+                            </apex:outputText>
+                        </a>
+                    </li>
+                </apex:outputText>
+            </apex:repeat>
+        </ul>
+    </div>
+</div>
+
+<!-- Survey Form for each session -->
+<apex:repeat value="{!sessions}" var="session">
+    <apex:outputText rendered="{!session.Open__c}">
+        <c:sites_mobile_session_detail session_id="{!session.id}"></c:sites_mobile_session_detail>
+    </apex:outputText>
+</apex:repeat>
+</apex:page>

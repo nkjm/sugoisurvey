@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObjectTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <caseValues>
+        <plural>false</plural>
+        <value>Comment</value>
+    </caseValues>
+    <caseValues>
+        <plural>true</plural>
+        <value>Comments</value>
+    </caseValues>
+    <fields>
+        <label>Comment</label>
+        <name>Comment__c</name>
+    </fields>
+    <fields>
+        <label>Copied to Chatter</label>
+        <name>Copied_To_FeedItem__c</name>
+    </fields>
+    <fields>
+        <label>Guest</label>
+        <name>Guest__c</name>
+        <relationshipLabel>Comment</relationshipLabel>
+    </fields>
+    <fields>
+        <label>Session</label>
+        <name>Session__c</name>
+        <relationshipLabel>Comment</relationshipLabel>
+    </fields>
+    <nameFieldLabel>Comment Number</nameFieldLabel>
+    <startsWith>Consonant</startsWith>
+</CustomObjectTranslation>

@@ -1,0 +1,109 @@
+<apex:page standardController="Session__c" extensions="session_v2,jr_session">
+<apex:styleSheet value="https://fonts.googleapis.com/css?family=Cuprum&subset=latin" />
+<apex:styleSheet value="{!URLFOR($Resource.jqueryui_1_9_2_custom_zip, 'jquery-ui-1.9.2.custom/css/smoothness/jquery-ui-1.9.2.custom.min.css')}" />
+<apex:styleSheet value="{!URLFOR($Resource.reusable_class_css)}" />
+<apex:styleSheet value="{!URLFOR($Resource.session_list_css)}" />
+<apex:styleSheet value="{!URLFOR($Resource.jquery_confirm_zip, 'jquery.confirm/jquery.confirm.css')}" />
+<apex:includeScript value="{!URLFOR($Resource.jqueryui_1_9_2_custom_zip, 'jquery-ui-1.9.2.custom/js/jquery-1.8.3.js')}" />
+<apex:includeScript value="{!URLFOR($Resource.jqueryui_1_9_2_custom_zip, 'jquery-ui-1.9.2.custom/js/jquery-ui-1.9.2.custom.min.js')}" />
+<apex:includeScript value="{!URLFOR($Resource.jquery_confirm_zip, 'jquery.confirm/jquery.activity-indicator-1.0.0.js')}" />
+<apex:includeScript value="{!URLFOR($Resource.jquery_confirm_zip, 'jquery.confirm/jquery.confirm.js')}" />
+
+<script type="text/javascript">
+j$ = jQuery.noConflict();
+
+function invokeDeliverDeck(){
+    j$.confirm.status({
+        'title' : '{!$Label.processing}',
+        'message' : '{!$Label.pls_wait_for_a_while}'
+    });
+    deliverDeck();
+}
+
+function invoke_deliver_deck(session_id){
+    if (session_id == null || session_id == ''){
+        j$.confirm.alert({
+            'title' : '{!$Label.error}',
+            'message' : '{!$Label.session_id_is_not_set}',
+            'color' : '#ff0000',
+            'button_label' : '{!$Label.close}'
+        });
+        return;
+    }
+    j$.confirm.status({
+        'title' : '{!$Label.processing}',
+        'message' : '{!$Label.pls_wait_for_a_while}'
+    });
+    sugoisurvey4.jr_session.deliver_deck(session_id,
+        function(result, event){
+            if (event.status){
+                if (result.status == false){
+                    j$.confirm.alert({
+                        'title' : '{!$Label.error}',
+                        'message' : result.message,
+                        'color' : '#ff0000',
+                        'button_label' : '{!$Label.close}'
+                    });
+                } else {
+                    j$.confirm.alert({
+                        'title' : '{!$Label.complete}',
+                        'message' : result.message + ' {!$Label.has_been_delivered}',
+                        'color' : '#888888',
+                        'button_label' : '{!$Label.close}'
+                    });
+                    j$("#deliveryList").load("{!JSENCODE($CurrentPage.url)} #deliveryList");
+                }
+            } else {
+                j$.confirm.alert({
+                    'title' : '{!$Label.error}',
+                    'message' : event.message,
+                    'color' : '#ff0000',
+                    'button_label' : '{!$Label.close}'
+                });
+            }
+        },{escape:true}
+    );
+}
+
+function showCompleteMsg(){
+    j$.confirm.alert({
+        'title' : '{!$Label.complete}',
+        'message' : '{!$Label.delivery_complete}',
+        'color' : '#888888',
+        'button_label' : '{!$Label.close}'
+    });
+}
+</script>
+
+<apex:pageBlock title="{!$Label.title_of_deliverDeck}" mode="edit">
+    <apex:pageBlockSection title="{!$Label.mail_preview}" collapsible="false" columns="1">
+        <div class="mail_preview">
+            <div class="mail_subject">
+                <apex:outputText value="{!$Label.subject_of_deck_delivery_mail + ' : ' + session.name}" />
+            </div>
+            <div class="mail_body">
+                <apex:outputtext escape="false" value="{!MailBody}"></apex:outputtext>
+            </div>
+        </div>
+    </apex:pageBlockSection>
+    <apex:pageBlockSection title="{!$Label.attachment}" collapsible="false" columns="1">
+        <apex:dataList value="{!Session__c.attachments}" var="attachment">
+            <apex:outputText value="{!attachment.name}" />
+        </apex:dataList>
+    </apex:pageBlockSection>
+    <div id="deliveryList">
+        <apex:pageBlockSection title="{!$Label.deliver_destinations} ({!$Label.delivered_guest_will_not_be_delivered_again})" collapsible="false" columns="1">
+            <apex:pageBlockTable value="{!deliveryDestinations}" var="guest">
+                <apex:column value="{!guest.Company__c}"></apex:column>
+                <apex:column value="{!guest.Title__c}"></apex:column>
+                <apex:column value="{!guest.Name__c}"></apex:column>
+                <apex:column value="{!guest.Email__c}"></apex:column>
+                <apex:column value="{!guest.Handout_Delivered__c}"></apex:column>
+            </apex:pageBlockTable>
+        </apex:pageBlockSection>
+    </div>
+</apex:pageBlock>
+<apex:outputpanel layout="block" style="text-align:center; padding:10px 0px;">
+    <button class="green_button" onclick="invoke_deliver_deck('{!session.id}')">{!$Label.send_mail}</button>
+</apex:outputpanel>
+</apex:page>

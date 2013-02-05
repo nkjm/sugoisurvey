@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObjectTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <caseValues>
+        <plural>false</plural>
+        <value>カスタムアンケート 質問</value>
+    </caseValues>
+    <fields>
+        <label><!-- 自由回答欄 --></label>
+        <name>Enable_Free_Form__c</name>
+    </fields>
+    <fields>
+        <label><!-- 質問 --></label>
+        <name>Question__c</name>
+    </fields>
+    <fields>
+        <label><!-- セッション --></label>
+        <name>Session__c</name>
+        <relationshipLabel><!-- カスタムアンケート 質問 --></relationshipLabel>
+    </fields>
+    <fields>
+        <label><!-- 並び順 --></label>
+        <name>Sort_Order__c</name>
+    </fields>
+    <fields>
+        <label><!-- アンケートタイプ --></label>
+        <name>Survey_Type__c</name>
+        <picklistValues>
+            <masterLabel>checkbox</masterLabel>
+            <translation><!-- checkbox --></translation>
+        </picklistValues>
+        <picklistValues>
+            <masterLabel>free</masterLabel>
+            <translation><!-- free --></translation>
+        </picklistValues>
+        <picklistValues>
+            <masterLabel>radio</masterLabel>
+            <translation><!-- radio --></translation>
+        </picklistValues>
+    </fields>
+    <layouts>
+        <layout>カスタムアンケート 質問レイアウト</layout>
+        <sections>
+            <label><!-- カスタムリンク --></label>
+            <section>カスタムリンク</section>
+        </sections>
+    </layouts>
+</CustomObjectTranslation>

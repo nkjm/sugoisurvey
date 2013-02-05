@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObjectTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <caseValues>
+        <plural>false</plural>
+        <value>カスタムアンケート 回答</value>
+    </caseValues>
+    <fields>
+        <label><!-- 選択肢 --></label>
+        <name>Custom_Survey_Option__c</name>
+        <relationshipLabel><!-- カスタムアンケート 回答 --></relationshipLabel>
+    </fields>
+    <fields>
+        <label><!-- 自由回答欄 --></label>
+        <name>Free_Form__c</name>
+    </fields>
+    <fields>
+        <label><!-- ゲスト --></label>
+        <name>Guest__c</name>
+        <relationshipLabel><!-- カスタムアンケート 回答 --></relationshipLabel>
+    </fields>
+    <fields>
+        <label><!-- セッション --></label>
+        <name>Session__c</name>
+        <relationshipLabel><!-- カスタムアンケート 回答 --></relationshipLabel>
+    </fields>
+    <validationRules>
+        <errorMessage><!-- Session does not match parent&apos;s session. --></errorMessage>
+        <name>session_must_match_parent</name>
+    </validationRules>
+</CustomObjectTranslation>

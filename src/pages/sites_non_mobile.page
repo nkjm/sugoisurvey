@@ -1,0 +1,221 @@
+<apex:page standardController="Session__c" extensions="session_v2,jr_session" sidebar="false" showHeader="false" standardStylesheets="false" doctype="html-5.0" cache="false">
+<apex:styleSheet value="{!URLFOR($Resource.reusable_class_css)}" />
+<apex:stylesheet value="{!$Resource.sites_non_mobile_css}" />
+<apex:styleSheet value="{!URLFOR($Resource.jquery_confirm_zip, 'jquery.confirm/jquery.confirm.css')}" />
+<apex:includeScript value="{!URLFOR($Resource.jqueryui_1_9_2_custom_zip, 'jquery-ui-1.9.2.custom/js/jquery-1.8.3.js')}" />
+<apex:includeScript value="{!URLFOR($Resource.jquery_confirm_zip, 'jquery.confirm/jquery.activity-indicator-1.0.0.js')}" />
+<apex:includeScript value="{!URLFOR($Resource.jquery_confirm_zip, 'jquery.confirm/jquery.confirm.js')}" />
+
+<script>
+j$ = jQuery.noConflict();
+
+j$("document").ready(function(){
+    j$("#survey_form .enable_free_form").on("change", function(){
+        var id_for_target_survey_free_form = "#survey_free_form_container_for_" + j$(this).attr('id');
+        if (j$(this).prop("checked")){
+            j$(id_for_target_survey_free_form).show();
+        } else {
+            j$(id_for_target_survey_free_form).hide();
+        }
+    });
+
+    j$("#survey_form input[type='radio']").not(".enable_free_form").on("change", function(){
+        var cso_id = j$(this).parent().parent().find(".enable_free_form").attr('id');
+        if (cso_id) {
+            var id_for_target_survey_free_form = "#survey_free_form_container_for_" + cso_id;
+            j$(id_for_target_survey_free_form).hide();
+        }
+    })
+
+    j$("#survey_submit_button").click(function(){
+        var session__c = "{!session.Id}";
+        var rate__c = j$("#survey_form input[name='rate']:checked").val();
+        if (rate__c != null){
+        	rate__c = Number(rate__c);
+       	}
+        var survey = {
+            "session__c":session__c,
+            "rate__c":rate__c
+        }
+
+		// Check if length of comment =< 255
+		var comment__c = j$("#survey_comment").val();
+		if (comment__c != null && comment__c.length > 255){
+			j$.confirm.alert({
+			    'title' : '{!$Label.error}',
+			    'message' : '{!$label.pls_enter_by_255_letters}',
+			    'color' : '#ff0000',
+			    'button_label' : '{!$Label.close}'
+			});
+			return false;
+		}
+		
+        var comment = {
+            "comment__c":comment__c
+        }
+    
+        var csas = [];
+        j$("#survey_form .custom_survey_container input[type='checkbox']:checked, #survey_form .custom_survey_container input[type='radio']:checked").each(function(){
+            var custom_survey_option__c = this.value;
+            var target_id_for_free_form = "#survey_free_form_for_" + custom_survey_option__c;
+            var free_form__c = j$(target_id_for_free_form).val();
+	        if (free_form__c != null && free_form__c.length > 255){
+				j$.confirm.alert({
+				    'title' : '{!$Label.error}',
+				    'message' : '{!$label.pls_enter_by_255_letters}',
+				    'color' : '#ff0000',
+				    'button_label' : '{!$Label.close}'
+				});
+				return false;
+			}
+            var csa = {
+                "custom_survey_option__c":custom_survey_option__c,
+                "free_form__c":free_form__c
+            }
+            csas.push(csa);
+        });
+    
+        var guest_email = j$("#survey_email").val();
+
+        j$.confirm.status({
+            'title' : '{!$Label.processing}',
+            'message' : '{!$Label.pls_wait_for_a_while}'
+        });
+        
+        submit_survey(survey, comment, csas, guest_email);
+    });
+});
+
+function submit_survey(survey, comment, csas, guest_email){
+    sugoisurvey4.jr_session.submit_survey(survey, comment, csas, guest_email,
+        function(result, event){
+            if (event.status){
+                if (result.status == false){
+                    j$.confirm.alert({
+                        'title' : '{!$Label.error}',
+                        'message' : result.message,
+                        'color' : '#ff0000',
+                        'button_label' : '{!$Label.close}'
+                    });
+                } else {
+                    j$('#survey_form input,textarea').not('input[type="radio"],input[type="checkbox"],:hidden, :button, :submit, :reset').val('');
+                    j$('#survey_form input[type="radio"], input[type="checkbox"], select').removeAttr('checked').removeAttr('selected');
+                    j$('#survey_form .survey_free_form').not(".non-multi-choice").hide();
+                    j$.confirm.alert({
+                        'title' : '{!$Label.complete}',
+                        'message' : '{!$Label.survey_has_been_submitted}',
+                        'color' : '#888888',
+                        'button_label' : '{!$Label.close}'
+                    });
+                }
+            } else {
+                j$.confirm.alert({
+                    'title' : '{!$Label.error}',
+                    'message' : 'Event Error: ' + event.message,
+                    'color' : '#ff0000',
+                    'button_label' : '{!$Label.close}'
+                });
+                console.log(event);
+            }
+        },{escape:true}
+    );
+}
+</script>
+
+<div id="page">
+    <div id="session_list">
+        <div class="column_header">
+            <div class="column_header_string">
+                {!$Label.survey_list}
+            </div>
+        </div>
+        <div class="column_content" id="open_sessions">
+            <apex:repeat value="{!sessions}" var="session">
+                <apex:outputPanel layout="block" styleClass="session_container" rendered="{!session.Open__c}">
+                    <a href="?id={!session.id}">
+                        <div class="session_name">
+                            <apex:outputText value="{!session.name}" />
+                        </div>
+                        <div class="session_presenter">
+                            <apex:outputText rendered="{! !ISNULL(session.presenter__r.company__c)}" value="{!session.presenter__r.Company__c} " />
+                            <apex:outputText rendered="{! !ISNULL(session.presenter__r.title__c)}" value="{!session.presenter__r.Title__c} " />
+                            <apex:outputText rendered="{! !ISNULL(session.presenter__r.name)}" value="{!session.presenter__r.name} " />
+                        </div>
+                        <div class="session_date">
+                            <apex:outputText rendered="{! !ISNULL(session.date__c)}" value="{!session.Date__c} " />
+                        </div>
+                    </a>
+                </apex:outputPanel>
+            </apex:repeat>
+        </div>
+    </div>
+    <div id="survey_form">
+        <apex:outputText rendered="{! !ISNULL(session.id) && (session.open__c == false)}">
+            {!$Label.survey_is_over}
+        </apex:outputText>
+        <apex:outputText rendered="{! !ISNULL(session.id) && (session.open__c == true)}">
+            <div class="column_header">
+                <div id="session_name" class="column_header_string">
+                    <apex:outputText value="{!session.name}" />
+                </div>
+            </div>
+            <div class="column_content">
+                <apex:outputPanel layout="block" styleClass="survey_container" id="survey_rate_container" rendered="{!session.Enable_Rate__c}">
+                    <div class="survey_question" id="label_for_rate" >
+                        <apex:outputText value="{! IF(ISNULL(session.label_for_rate__c),$label.xPointScale,session.label_for_rate__c) }" />
+                    </div>
+                    <div class="survey_options">
+                        <div class="survey_option_container">
+                            <input class="survey_option" type="radio" name="rate" id="rate5" value="5" />
+                            <label for="rate5">5 {!$label.high}</label>
+                        </div>
+                        <div class="survey_option_container">
+                            <input class="survey_option" type="radio" name="rate" id="rate4" value="4" />
+                            <label for="rate4">4</label>
+                        </div>
+                        <div class="survey_option_container">
+                            <input class="survey_option" type="radio" name="rate" id="rate3" value="3" />
+                            <label for="rate3">3</label>
+                        </div>
+                        <div class="survey_option_container">
+                            <input class="survey_option" type="radio" name="rate" id="rate2" value="2" />
+                            <label for="rate2">2</label>
+                        </div>
+                        <div class="survey_option_container">
+                            <input class="survey_option" type="radio" name="rate" id="rate1" value="1" />
+                            <label for="rate1">1 {!$label.low}</label>
+                        </div>
+                    </div>
+                </apex:outputPanel>
+                <apex:repeat value="{!session.custom_survey_question__r}" var="csq">
+                    <c:sites_non_mobile_custom_survey_container csq="{!csq}" csos="{!session.custom_survey_option__r}" />
+                </apex:repeat>
+                <div class="survey_container" id="survey_comment_container">
+                    <div class="survey_question">
+                        {!$label.comment}
+                    </div>
+                    <div class="survey_options">
+                        <div>
+                            <textarea id="survey_comment" rows="4" placeholder="{!$label.up_to_255_letter}"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div id="survey_email_container" class="survey_container">
+                    <div class="survey_question">
+                        {!$label.email}
+                    </div>
+                    <div class="survey_options">
+                        <div>
+                            <input type="text" id="survey_email"></input>
+                        </div>
+                    </div>
+                </div>
+                <div id="survey_submit_button_container" style="text-align:center;">
+                    <input id="survey_submit_button" type="button" class="green_button" style="width:85%;" value="{!$label.submit}" />
+                </div>
+            </div>
+        </apex:outputText>
+    </div>
+</div>
+
+</apex:page>

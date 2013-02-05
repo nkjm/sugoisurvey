@@ -1,0 +1,522 @@
+<apex:page standardController="Session__c" extensions="session_v2,jr_session" standardStyleSheets="false" sidebar="false" showheader="false" doctype="html-5.0">
+
+<script>
+j$ = jQuery.noConflict();
+default_num_of_option = 2;
+
+j$("document").ready(function(){
+	// Apply survey_type_container_selected class to .survey_type_checkbox since it is default
+	j$(".survey_type_checkbox").addClass("survey_type_container_selected");
+	
+	// Generate and Insert option form with checkbox type since it is default
+    var html_options = generate_html_options("checkbox", 0, default_num_of_option);
+    j$("#new_survey_form .custom_survey_options_container").html(html_options);
+
+    map_all_event(document);
+    j$('#existing_survey_list').sortable({
+		update: function(event, ui) {
+			var survey_container_ids = j$(this).sortable('toArray');
+			var question_ids = [];
+			j$.each(survey_container_ids, function(i, survey_container_id){
+				var question_id = survey_container_id.replace('existing_survey_container_', '');
+				question_ids.push(question_id);
+			});
+
+			j$.confirm.status({
+	            'title' : '{!$label.processing}',
+	            'message' : '{!$label.pls_wait_for_a_while}'
+        	});
+        	sugoisurvey4.jr_session.reorder_question("{!session.Id}", question_ids,
+	            function(result, event){
+	                if (event.status){
+	                    if (result.status == false){
+	                        j$.confirm.alert({
+	                            'title' : '{!$label.error}',
+	                            'message' : result.message,
+	                            'color' : '#ff0000',
+	                            'button_label' : '{!$label.close}'
+	                        });
+	                    } else {
+                            j$.confirm.hide();
+	                    }
+	                } else {
+	                    j$.confirm.alert({
+	                        'title' : '{!$label.error}',
+	                        'message' : event.message,
+	                        'color' : '#ff0000',
+	                        'button_label' : '{!$label.close}'
+	                    });
+	                }
+	            },{escape:true}
+	        );
+		}
+    });
+});
+
+function map_all_event(selector){
+    j$(selector).on('click', '.survey_type_container', function(){
+    	j$('.survey_type_container').removeClass('survey_type_container_selected');
+    	j$(this).addClass('survey_type_container_selected');
+    });
+    
+    j$(selector).on('mousedown', '.survey_container', function(){
+    	j$(this).addClass('survey_container_mousedown');
+   	});
+   	
+   	j$(selector).on('mouseup', '.survey_container', function(){
+    	j$(this).removeClass('survey_container_mousedown');
+   	});
+    
+    j$(selector).on('click', '.survey_type_checkbox', function(){
+    	j$("input[name='survey_type']").val('checkbox');
+
+        j$('#option_in_selectable_survey').show();
+        j$(this).parent().parent().find('.custom_survey_options_container').show();
+        j$(this).parent().parent().find('.custom_survey_option').show();
+        j$(this).parent().parent().find('.free_form_container').hide();
+        
+        j$(this).parent().parent().find('.checkbox_img').show();
+        j$(this).parent().parent().find('.radio_img').hide();
+        
+        if (j$('#enable_free_form_new').prop('checked')){
+        	j$(this).parent().parent().find('.custom_survey_options_other_container').show();
+        } else {
+        	j$(this).parent().parent().find('.custom_survey_options_other_container').hide();
+       	}
+   	});
+   	
+   	j$(selector).on('click', '.survey_type_radio', function(){
+    	j$("input[name='survey_type']").val('radio');
+
+        j$('#option_in_selectable_survey').show();
+        j$(this).parent().parent().find('.custom_survey_options_container').show();
+        j$(this).parent().parent().find('.custom_survey_option').show();
+        j$(this).parent().parent().find('.free_form_container').hide();
+        
+        j$(this).parent().parent().find('.checkbox_img').hide();
+        j$(this).parent().parent().find('.radio_img').show();
+        
+        if (j$('#enable_free_form_new').prop('checked')){
+        	j$(this).parent().parent().find('.custom_survey_options_other_container').show();
+        } else {
+        	j$(this).parent().parent().find('.custom_survey_options_other_container').hide();
+       	}
+   	});
+   	
+   	j$(selector).on('click', '.survey_type_free', function(){
+    	j$("input[name='survey_type']").val('free');
+        j$('#option_in_selectable_survey').hide();
+        j$(this).parent().parent().find('.custom_survey_options_container').hide();
+        j$(this).parent().parent().find('.custom_survey_option').hide();
+        j$(this).parent().parent().find('.free_form_container').show();
+        
+        j$(this).parent().parent().find('.custom_survey_options_other_container').hide();
+   	});
+
+    j$(selector).on('change', '#enable_free_form_new', function(){
+        if (j$(this).prop('checked')){
+        	var survey_type = j$(this).parent().parent().parent().find("survey_type").val();
+            j$('.custom_survey_options_other_container').show();
+        } else {
+            j$('.custom_survey_options_other_container').hide();
+        }
+    });
+    
+    j$(selector).on('change', '.enable_free_form_existing', function(){
+    	if (j$(this).prop('checked')){
+    		j$(this).parent().parent().find('.custom_survey_options_other_container').show();
+   		} else {
+   			j$(this).parent().parent().find('.custom_survey_options_other_container').hide();
+  		}
+   	});
+    
+    j$(selector).on('click', '.delete_option_button', function(){
+        j$(this).parent().remove();
+    });
+
+    j$(selector).on('click', '.add_option_button', function(){
+        var num_of_existing_option = j$(this).parent().parent().find(".custom_survey_options_container .custom_survey_option").length;
+        var survey_type = j$(this).parent().parent().parent().find("input[name='survey_type']").val();
+        var html_options = generate_html_options(survey_type, num_of_existing_option, 1);
+        j$(this).parent().parent().find(".custom_survey_options_container").append(html_options);
+        j$(this).parent().parent().find(".custom_survey_options_container .delete_option_button").on("click", function(){
+            j$(this).parent().remove();
+        });
+    });
+
+    j$(selector).on('click', '.add_survey_button', function(){
+        var custom_survey_question = {
+            'session__c':'{!session__c.id}',
+            'question__c':j$(this).parent().parent().find("input[name='question']").val(),
+            'survey_type__c':j$(this).parent().parent().find("input[name='survey_type']").val(),
+            'enable_free_form__c':j$(this).parent().parent().find("input[name='enable_free_form']").prop("checked")
+        };
+
+        var custom_survey_options = [];
+        j$.each(j$(this).parent().parent().find("input[name='option[]']"), function(key, input){
+            if (input.value != ''){
+                var custom_survey_option = {
+                    'option__c':input.value
+                };
+                custom_survey_options.push(custom_survey_option);
+            }
+        });
+        
+        j$.confirm.status({
+            'title' : '{!$label.processing}',
+            'message' : '{!$label.pls_wait_for_a_while}'
+        });
+        sugoisurvey4.jr_session.create_survey(custom_survey_question, custom_survey_options,
+            function(result, event){
+                if (event.status){
+                    if (result.status == false){
+                        j$.confirm.alert({
+                            'title' : '{!$label.error}',
+                            'message' : result.message,
+                            'color' : '#ff0000',
+                            'button_label' : '{!$label.close}'
+                        });
+                    } else {
+                        // clear values from new survey form
+                        j$('input').not('input[type="radio"],input[type="checkbox"],:hidden, :button, :submit, :reset').val('');
+                        j$('input[name="enable_free_form"]').removeAttr('checked');
+                        
+                        // add empty container
+                        j$("#existing_survey_list").append("<div id='existing_survey_container_" + result.message + "'></div>");
+                        
+                        // load and insert added survey at the end of existing survey list
+                        load_target_id = "#existing_survey_container_" + result.message;
+                        j$(load_target_id).load("{!JSENCODE($currentPage.url)} " + load_target_id, function(){
+                            j$.confirm.alert({
+                                'title' : '{!$label.complete}',
+                                'message' : '{!$label.survey_has_been_saved}',
+                                'color' : '#888888',
+                                'button_label' : '{!$label.close}'
+                            });
+                        });
+                    }
+                } else {
+                    j$.confirm.alert({
+                        'title' : '{!$label.error}',
+                        'message' : event.message,
+                        'color' : '#ff0000',
+                        'button_label' : '{!$label.close}'
+                    });
+                }
+            },{escape:true}
+        );
+    });
+    
+    j$(selector).on('click', '.edit_survey_button', function(){
+        var custom_survey_question = {
+            'session__c':'{!session__c.id}',
+            'id':j$(this).parent().parent().find("input[name='question']").attr("id"),
+            'question__c':j$(this).parent().parent().find("input[name='question']").val(),
+            'survey_type__c':j$(this).parent().parent().find("input[name='survey_type']").val(),
+            'enable_free_form__c':j$(this).parent().parent().find("input[name='enable_free_form']").prop("checked")
+        };
+        var custom_survey_options = [];
+        j$.each(j$(this).parent().parent().find("input[name='option[]']"), function(key, input){
+            if (input.value != ''){
+                var custom_survey_option = {
+                    'id':j$(this).attr("option_id"),
+                    'option__c':input.value
+                };
+                custom_survey_options.push(custom_survey_option);
+            }
+        });
+        
+        j$.confirm.status({
+            'title' : '{!$label.processing}',
+            'message' : '{!$label.pls_wait_for_a_while}'
+        });
+        sugoisurvey4.jr_session.edit_survey(custom_survey_question, custom_survey_options,
+            function(result, event){
+                if (event.status){
+                    if (result.status == false){
+                        j$.confirm.alert({
+                            'title' : '{!$label.error}',
+                            'message' : result.message,
+                            'color' : '#ff0000',
+                            'button_label' : '{!$label.close}'
+                        });
+                    } else {
+                        j$('input').not('input[type="radio"],input[type="checkbox"],:hidden, :button, :submit, :reset').val('');
+                        load_target_id = "#existing_survey_container_" + result.message;
+                        j$(load_target_id).load("{!JSENCODE($currentPage.url)} " + load_target_id, function(){
+                            j$.confirm.alert({
+                                'title' : '{!$label.complete}',
+                                'message' : '{!$label.survey_has_been_saved}',
+                                'color' : '#888888',
+                                'button_label' : '{!$label.close}'
+                            });
+                        });
+                    }
+                } else {
+                    j$.confirm.alert({
+                        'title' : '{!$label.error}',
+                        'message' : event.message,
+                        'color' : '#ff0000',
+                        'button_label' : '{!$label.close}'
+                    });
+                }
+            },{escape:true}
+        );
+    });
+    
+    j$(selector).on('click', '.delete_survey_button', function(){
+        survey_id = j$(this).attr("survey_id");
+        j$.confirm({
+            'title' : '{!$label.deleting_survey}',
+            'message' : '{!$label.are_you_sure}',
+            'button_yes_label' : '{!$label.yes}',
+            'button_no_label' : '{!$label.no}',
+            'processing_title' : '{!$label.processing}',
+            'processing_message' : '{!$label.pls_wait_for_a_while}',
+            'action' : function(){
+                sugoisurvey4.jr_session.delete_survey(survey_id,
+                    function(result, event){
+                        if (event.status){
+                            if (result.status == false){
+                                j$.confirm.alert({
+                                    'title' : '{!$label.error}',
+                                    'message' : result.message,
+                                    'color' : '#ff0000',
+                                    'button_label' : '{!$label.close}'
+                                });
+                            } else {
+                                j$.confirm.alert({
+                                    'title' : '{!$label.complete}',
+                                    'message' : '{!$label.survey_has_been_deleted}',
+                                    'color' : '#888888',
+                                    'button_label' : '{!$label.close}'
+                                });
+                                var list_survey_container_id = "#list_survey_container_" + survey_id;
+                                var edit_survey_container_id = "#edit_survey_container_" + survey_id;
+                                j$(list_survey_container_id).fadeOut(3000, function(){
+                                    j$(list_survey_container_id).remove();
+                                    j$(edit_survey_container_id).remove();
+                                });
+                            }
+                        } else {
+                            j$.confirm.alert({
+                                'title' : '{!$label.error}',
+                                'message' : event.message,
+                                'color' : '#ff0000',
+                                'button_label' : '{!$label.close}'
+                            });
+                        }
+                    },{escape:true}
+                );
+            }
+        });
+    });
+}
+
+function toggle_list_to_edit(csq_id){
+    list_survey_container_id = '#list_survey_container_' + csq_id;
+    edit_survey_container_id = '#edit_survey_container_' + csq_id;
+    j$(list_survey_container_id).hide();
+    j$(edit_survey_container_id).show();
+}
+
+function toggle_edit_to_list(csq_id){
+    list_survey_container_id = '#list_survey_container_' + csq_id;
+    edit_survey_container_id = '#edit_survey_container_' + csq_id;
+    j$(edit_survey_container_id).hide();
+    j$(list_survey_container_id).show();
+}
+
+function generate_html_options(type, num_of_existing_option, num_of_creating_option){
+    var html_options = "";
+    var total_num_of_option = num_of_existing_option + num_of_creating_option;
+    for (var i = num_of_existing_option; i < total_num_of_option; i++){
+        option_num = i + 1;
+        html_options += '<div class="custom_survey_option">';
+        if (type == "checkbox"){
+        	html_options += '<img height="20px" class="checkbox_img" src="{!$resource.checkbox_png}" style="position:absolute;top:5px;"></img>';
+        	html_options += '<img height="20px" class="radio_img" src="{!$resource.radio_png}" style="position:absolute;top:5px;display:none;"></img>';
+       	} else if (type == "radio"){
+       		html_options += '<img height="20px" class="checkbox_img" src="{!$resource.checkbox_png}" style="position:absolute;top:5px;display:none;"></img>';
+       		html_options += '<img height="20px" class="radio_img" src="{!$resource.radio_png}" style="position:absolute;top:5px;"></img>';
+       	}
+        html_options += '<div style="margin-left:30px;"><input type="text" name="option[]" placeholder="{!$label.customSurveyOption}' + option_num + '"></input></div>';
+        if (option_num > 2){
+            html_options += '<img class="button_img delete_option_button" style="position:absolute; top:3px; right:-30px;" height="30px" src="{!URLFOR($resource.delete_png)}" />';
+        }
+        html_options += '</div>';
+    }
+    return html_options;
+}
+</script>
+
+<div id="new_survey_form" class="survey_container survey_form">
+    <div class="inner">
+    	<div class="section" style="border-bottom:solid 1px #F4E2ED; overflow:hidden; padding-bottom: 25px;">
+    		<div class="survey_type_container survey_type_checkbox">
+    			<img width="100%" src="{!$resource.survey_type_checkbox_png}"></img>
+    			{!$label.survey_type_checkbox}
+    		</div>
+    		<div class="survey_type_container survey_type_radio">
+    			<img width="100%" src="{!$resource.survey_type_radio_png}"></img>
+    			{!$label.survey_type_radio}
+    		</div>
+    		<div class="survey_type_container survey_type_free">
+    			<img width="100%" src="{!$resource.survey_type_free_png}"></img>
+    			{!$label.survey_type_free}
+    		</div>
+    		<input type="hidden" name="survey_type" value="checkbox"></input>
+    	</div>
+        <div class="section">
+            <input type="text" name="question" placeholder="{!$label.customSurveyQuestion}"></input>
+        </div>
+        <div class="section">
+            <span id="option_in_selectable_survey">
+                <input type="checkbox" name="enable_free_form" id="enable_free_form_new"></input>
+                <label for="enable_free_form_new">{!$label.enable_free_form}</label>
+            </span>
+        </div>
+        <div class="section">
+            <div class="custom_survey_options_container">
+            </div>
+            <div class="custom_survey_options_other_container" style="position:relative; display:none;">
+                <img height="20px" class="checkbox_img" src="{!$resource.checkbox_png}" style="position:absolute;top:5px"></img>
+        		<img height="20px" class="radio_img" src="{!$resource.radio_png}" style="position:absolute;top:5px;display:none;"></img>
+            	<div class="custom_survey_option_other dummy_form">
+					{!$label.other}
+                </div>
+                <div style="margin-top:10px; height:60px;" class="dummy_form">
+					&nbsp;
+                </div>
+            </div>
+            <div class="custom_survey_option" style="text-align:right;">
+                <button type="submit" class="white_button add_option_button" style="position:relative; padding-left:40px; text-align:right;">
+                    <img style="position:absolute; top: 5px; left: 5px;" height="30px" src="{!URLFOR($resource.add_png)}"/>
+                    {!$label.add_option}
+                </button>
+            </div>
+            <div class="free_form_container" style="display:none;">
+            	<div style="margin-top:10px; height:60px;" class="dummy_form">
+					&nbsp;
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <button type="submit" class="green_button add_survey_button" style="width:100%;">{!$label.save}</button>
+        </div>
+    </div>
+</div>
+
+<div id="existing_survey_list">
+    <apex:outputText rendered="{! !ISNULL(session.custom_survey_question__r) }">
+        <apex:repeat value="{!Session.custom_survey_question__r}" var="csq">
+            <!-- Static List -->
+            <div id="existing_survey_container_{!csq.id}">
+                <div id="list_survey_container_{!csq.id}" class="survey_container">
+                    <img class="button_img delete_survey_button" style="position:absolute; top:7px; right:7px;" height="30px" src="{!URLFOR($resource.delete_png)}" survey_id="{!csq.id}" />
+                    <div class="inner">
+                        <div class="section" style="font-weight:bold; font-size:13pt;">
+                            <apex:outputText value="{!csq.Question__c}" />
+                        </div>  
+                        <div class="section">
+                            <apex:repeat value="{!Session.custom_survey_option__r}" var="cso" rendered="{! (csq.survey_type__c != 'free')}">
+                                <apex:outputpanel layout="block" styleClass="custom_survey_option" style="padding: 5px 0px; border-bottom: solid 1px #F4E2ED; font-size: 12pt;" rendered="{!(cso.Custom_Survey_Question__c == csq.id) && !(cso.Enable_Free_Form__c)}">
+                                    <img height="20px" src="{! IF(csq.survey_type__c == 'checkbox',$resource.checkbox_png,$resource.radio_png) }" style="position:absolute;top:5px;"></img>
+                                    <div style="margin-left: 30px;">
+                                        <apex:outputText value="{!cso.Option__c}" />
+                                    </div>
+                                </apex:outputpanel>
+                            </apex:repeat>
+                            <apex:outputpanel layout="block" styleClass="custom_survey_option" style="padding: 5px 0px;font-size: 12pt;" rendered="{! (csq.survey_type__c != 'free') && (csq.Enable_Free_Form__c)}">
+                                <img height="20px" src="{! IF(csq.survey_type__c == 'checkbox',$resource.checkbox_png,$resource.radio_png) }" style="position:absolute;top:5px;"></img>
+                                <div style="margin-left: 30px;">
+                                    {!$Label.other}
+                                </div>
+                                <div style="margin-top:10px; height:60px;" class="dummy_form">
+                                    &nbsp;
+                                </div>
+                            </apex:outputpanel>
+                            <apex:outputpanel layout="block" styleClass="custom_survey_option" style="padding: 5px 0px;font-size: 12pt;" rendered="{! (csq.survey_type__c == 'free')}">
+                                <div style="margin-top:10px; height:60px;" class="dummy_form">
+                                    &nbsp;
+                                </div>
+                            </apex:outputpanel>
+                        </div>
+                        <div class="section">
+                            <button type="submit" class="white_button" style="width:100%;" onclick="toggle_list_to_edit('{!csq.id}')">
+                                {!$label.edit}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+        
+                <!-- Edit Form -->
+                <div id="edit_survey_container_{!csq.id}" class="survey_container survey_form" style="display:none;">
+                    <div class="inner">
+                        <apex:outputPanel layout="block" styleClass="section">
+                        	<input type="hidden" name="survey_type" value="{! csq.survey_type__c }"></input>
+                            <input type="text" id="{!csq.Id}" name="question" value="{!csq.Question__c}"></input>
+                        </apex:outputPanel>
+                        <apex:outputtext rendered="{! (csq.survey_type__c != 'free')}">
+                            <div class="section">
+                                <apex:outputText rendered="{!csq.Enable_Free_Form__c}">
+                                    <input type="checkbox" name="enable_free_form" id="enable_free_form_{!csq.Id}" class="enable_free_form_existing" checked="true"></input>
+                                </apex:outputText>
+                                <apex:outputText rendered="{! !csq.Enable_Free_Form__c}">
+                                    <input type="checkbox" name="enable_free_form" id="enable_free_form_{!csq.Id}" class="enable_free_form_existing"></input>
+                                </apex:outputText>
+                                <label for="enable_free_form_{!csq.Id}">{!$Label.enable_free_form}</label>
+                            </div>
+                            <div class="section">
+                                <div class="custom_survey_options_container">
+                                    <apex:repeat value="{!Session.custom_survey_option__r}" var="cso">
+                                        <apex:outputText rendered="{!(cso.Custom_Survey_Question__c == csq.id) && !(cso.Enable_Free_Form__c)}">
+                                            <div class="custom_survey_option">
+                                            	<apex:outputText rendered="{! (csq.survey_type__c == 'checkbox') }">
+                                            		<img height="20px" src="{!$resource.checkbox_png}" style="position:absolute;top:5px;" />
+                                           		</apex:outputText>
+                                           		<apex:outputText rendered="{! (csq.survey_type__c == 'radio') }">
+                                           			<img height="20px" src="{!$resource.radio_png}" style="position:absolute;top:5px;" />
+                                           		</apex:outputText>
+                                           		<apex:outputPanel layout="block" style="margin-left:30px;">
+                                                	<input type="text" option_id="{!cso.Id}" name="option[]" value="{!cso.Option__c}"></input>
+                                                </apex:outputPanel>
+                                                <img class="button_img delete_option_button" style="position:absolute; top:3px; right:-30px;" height="30px" src="{!URLFOR($resource.delete_png)}" />
+                                            </div>
+                                        </apex:outputText>
+                                    </apex:repeat>
+                                </div>
+					            <div class="custom_survey_options_other_container" style="position:relative; {! IF(csq.enable_free_form__c,'','display:none;') }">
+					                <img height="20px" class="checkbox_img" src="{! IF(csq.survey_type__c == 'checkbox',$resource.checkbox_png,$resource.radio_png) }" style="position:absolute;top:5px"></img>
+					            	<div class="custom_survey_option_other dummy_form">
+										{!$label.other}
+					                </div>
+					                <div style="margin-top:10px; height:60px;" class="dummy_form">
+										&nbsp;
+					                </div>
+					            </div>
+                                <div class="custom_survey_option" style="text-align:right;">
+                                    <button type="submit" class="white_button add_option_button" style="position:relative; padding-left:40px; text-align:right;">
+                                        <img style="position:absolute; top: 5px; left: 5px;" height="30px" src="{!URLFOR($resource.add_png)}"/>
+                                        {!$label.add_option}
+                                    </button>
+                                </div>
+                            </div>
+                        </apex:outputtext>
+                        <apex:outputpanel layout="block" styleClass="custom_survey_option" style="padding: 5px 0px;font-size: 12pt;" rendered="{! (csq.survey_type__c == 'free') }">
+	                        <div style="margin-top:10px; height:60px;" class="dummy_form">
+	                            &nbsp;
+	                        </div>
+	                    </apex:outputpanel>
+                        <div class="section">
+                            <button type="submit" class="green_button edit_survey_button" style="width:49%;">{!$label.save}</button>
+                            <button type="submit" onclick="toggle_edit_to_list('{!csq.id}')" class="white_button" style="width:49%;">{!$label.cancel}</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </apex:repeat>
+    </apex:outputText>
+</div>
+
+</apex:page>

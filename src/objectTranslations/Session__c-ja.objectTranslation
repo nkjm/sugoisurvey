@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObjectTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <caseValues>
+        <plural>false</plural>
+        <value>イベント</value>
+    </caseValues>
+    <fields>
+        <label><!-- Chatter用Eメールアドレス --></label>
+        <name>Chatter_Email__c</name>
+    </fields>
+    <fields>
+        <label><!-- 開催日 --></label>
+        <name>Date__c</name>
+    </fields>
+    <fields>
+        <label><!-- 概要 --></label>
+        <name>Description__c</name>
+    </fields>
+    <fields>
+        <label><!-- 5段階評価を実施 --></label>
+        <name>Enable_Rate__c</name>
+    </fields>
+    <fields>
+        <label><!-- ゲスト数 --></label>
+        <name>Guest_Sum__c</name>
+    </fields>
+    <fields>
+        <label><!-- 資料開封パスワード --></label>
+        <name>Handout_Password__c</name>
+    </fields>
+    <fields>
+        <label><!-- 資料ダウンロードURL --></label>
+        <name>Handout_URL__c</name>
+    </fields>
+    <fields>
+        <label><!-- ハッシュタグ --></label>
+        <name>Hash_Tag__c</name>
+    </fields>
+    <fields>
+        <label><!-- 5段階評価のラベル --></label>
+        <name>Label_For_Rate__c</name>
+    </fields>
+    <fields>
+        <label><!-- 資料配信メール本文(HTML) --></label>
+        <name>Mass_Mail_Additional_Body__c</name>
+    </fields>
+    <fields>
+        <label><!-- 資料配信メール送信元アドレス --></label>
+        <name>Mass_Mail_Sender__c</name>
+    </fields>
+    <fields>
+        <label><!-- オープン --></label>
+        <name>Open__c</name>
+    </fields>
+    <fields>
+        <label><!-- プレゼンター --></label>
+        <name>Presenter__c</name>
+        <relationshipLabel><!-- イベント --></relationshipLabel>
+    </fields>
+    <fields>
+        <label><!-- 評価平均 --></label>
+        <name>Rate_Avg__c</name>
+    </fields>
+    <fields>
+        <label><!-- 評価数 --></label>
+        <name>Rate_Count__c</name>
+    </fields>
+    <fields>
+        <label><!-- 評価合計 --></label>
+        <name>Rate_Sum__c</name>
+    </fields>
+    <fields>
+        <label><!-- レポートを公開する --></label>
+        <name>Report_Public__c</name>
+    </fields>
+    <fields>
+        <label><!-- アンケート回答率 --></label>
+        <name>Survey_Collection_Rate__c</name>
+    </fields>
+    <fields>
+        <label><!-- アンケート回答数 --></label>
+        <name>Survey_Sum__c</name>
+    </fields>
+    <fields>
+        <label><!-- 資料を配信される人 --></label>
+        <name>Who_Can_Get_Handout__c</name>
+        <picklistValues>
+            <masterLabel>アンケートの入力が必要</masterLabel>
+            <translation><!-- アンケートの入力が必要 --></translation>
+        </picklistValues>
+        <picklistValues>
+            <masterLabel>全員</masterLabel>
+            <translation><!-- 全員 --></translation>
+        </picklistValues>
+    </fields>
+    <fields>
+        <label><!-- アンケートを入力できる人 --></label>
+        <name>Who_Can_Submit_Survey__c</name>
+        <picklistValues>
+            <masterLabel>Eメールの入力が必要</masterLabel>
+            <translation><!-- Eメールの入力が必要 --></translation>
+        </picklistValues>
+        <picklistValues>
+            <masterLabel>事前登録者のみ</masterLabel>
+            <translation><!-- 事前登録者のみ --></translation>
+        </picklistValues>
+        <picklistValues>
+            <masterLabel>無条件</masterLabel>
+            <translation><!-- 無条件 --></translation>
+        </picklistValues>
+    </fields>
+    <layouts>
+        <layout>イベントレイアウト</layout>
+        <sections>
+            <label><!-- アンケートサイト --></label>
+            <section>アンケートサイト</section>
+        </sections>
+        <sections>
+            <label><!-- カスタムリンク --></label>
+            <section>カスタムリンク</section>
+        </sections>
+        <sections>
+            <label><!-- 資料設定 --></label>
+            <section>資料設定</section>
+        </sections>
+    </layouts>
+    <webLinks>
+        <label><!-- clone_session --></label>
+        <name>clone_session</name>
+    </webLinks>
+    <webLinks>
+        <label><!-- close_survey --></label>
+        <name>close_survey</name>
+    </webLinks>
+    <webLinks>
+        <label><!-- delete_session --></label>
+        <name>delete_session</name>
+    </webLinks>
+    <webLinks>
+        <label><!-- deliver_handout --></label>
+        <name>deliver_handout</name>
+    </webLinks>
+</CustomObjectTranslation>

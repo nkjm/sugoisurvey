@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObjectTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <caseValues>
+        <plural>false</plural>
+        <value>プレゼンター</value>
+    </caseValues>
+    <fields>
+        <label><!-- 会社 --></label>
+        <name>Company__c</name>
+    </fields>
+    <fields>
+        <label><!-- 役職 --></label>
+        <name>Title__c</name>
+    </fields>
+    <layouts>
+        <layout>プレゼンターレイアウト</layout>
+        <sections>
+            <label><!-- カスタムリンク --></label>
+            <section>カスタムリンク</section>
+        </sections>
+    </layouts>
+</CustomObjectTranslation>

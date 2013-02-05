@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObjectTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <caseValues>
+        <plural>false</plural>
+        <value><!-- すごいアンケート設定 --></value>
+    </caseValues>
+    <caseValues>
+        <plural>true</plural>
+        <value><!-- すごいアンケート設定 --></value>
+    </caseValues>
+    <fields>
+        <label>Email for Chatter reply</label>
+        <name>chatter_email_reply_to__c</name>
+    </fields>
+    <fields>
+        <label>Initialized</label>
+        <name>initialized__c</name>
+    </fields>
+    <fields>
+        <label>Survey Site Domain</label>
+        <name>survey_sites_domain__c</name>
+    </fields>
+    <fields>
+        <label>Survey Site URL</label>
+        <name>survey_sites_url__c</name>
+    </fields>
+    <startsWith><!-- Consonant --></startsWith>
+</CustomObjectTranslation>

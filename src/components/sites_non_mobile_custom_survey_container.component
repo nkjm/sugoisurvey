@@ -1,0 +1,54 @@
+<apex:component >
+<apex:attribute name="csq" required="true" type="Custom_Survey_Question__c" description="Custom Survey Question Object" />
+<apex:attribute name="csos" required="true" type="Custom_Survey_Option__c[]" description="List of Custom Survey Option Object" />
+
+<apex:variable value="{!csq.Survey_Type__c}" var="input_type" />
+<apex:variable value="" var="cso_id_for_enable_free_form" />
+<apex:variable value="" var="cso_option_for_enable_free_form" />
+<apex:variable value="" var="cso_id_for_non_multi_choice" />
+
+<div class="survey_container custom_survey_container">
+    <div class="survey_question">
+        <apex:outputText value="{!csq.Question__c}" />
+    </div>
+    <div class="survey_options">
+        <apex:repeat value="{!csos}" var="cso">
+            <apex:outputText rendered="{! csq.Id == cso.custom_survey_question__c }">
+                <apex:outputText rendered="{!cso.Dummy__c}">
+                    <apex:outputPanel layout="block" styleClass="survey_option_container" style="display:none;">
+                        <input class="survey_option" type="radio" name="custom_survey_option_ids_for_{!csq.Id}[]" id="{!cso.Id}" value="{!cso.Id}" checked="true"></input>
+                        <label for="{!cso.Id}">{!cso.Option__c}</label>
+                    </apex:outputPanel>
+                    <apex:variable value="{!cso.Id}" var="cso_id_for_non_multi_choice" />
+                </apex:outputText>
+                <apex:outputText rendered="{!cso.Enable_Free_Form__c}">
+                    <apex:variable value="{!cso.Id}" var="cso_id_for_enable_free_form" />
+                    <apex:variable value="{!cso.Option__c}" var="cso_option_for_enable_free_form" />
+                </apex:outputText>
+                <apex:outputText rendered="{! !cso.Dummy__c && !cso.Enable_Free_Form__c}">
+                    <apex:outputPanel layout="block" styleClass="survey_option_container">
+                        <input class="survey_option" type="{!input_type}" name="custom_survey_option_ids_for_{!csq.Id}[]" id="{!cso.Id}" value="{!cso.Id}"></input>
+                        <label for="{!cso.Id}">{!cso.Option__c}</label>
+                    </apex:outputPanel>
+                </apex:outputText>
+            </apex:outputText>
+        </apex:repeat>
+        <apex:outputPanel layout="block" styleClass="survey_option_container" rendered="{!csq.Enable_Free_Form__c}">
+            <input class="survey_option enable_free_form" type="{!input_type}" name="custom_survey_option_ids_for_{!csq.Id}[]" id="{!cso_id_for_enable_free_form}" value="{!cso_id_for_enable_free_form}"></input>
+            <label for="{!cso_id_for_enable_free_form}">{!cso_option_for_enable_free_form}</label>
+        </apex:outputPanel>
+    </div>
+    
+    <apex:outputText rendered="{!csq.Enable_Free_Form__c}">
+        <div class="survey_free_form" id="survey_free_form_container_for_{!cso_id_for_enable_free_form}" style="display:none;">
+            <textarea id="survey_free_form_for_{!cso_id_for_enable_free_form}" placeholder="{!$label.pls_tell_me_detail}" rows="4"></textarea>
+        </div>
+    </apex:outputText>
+    
+    <apex:outputText rendered="{! (csq.survey_type__c == 'free') }">
+        <div class="survey_free_form non-multi-choice" id="survey_free_form_container_for_{!cso_id_for_non_multi_choice}">
+            <textarea id="survey_free_form_for_{!cso_id_for_non_multi_choice}" placeholder="{!$label.up_to_255_letter}" rows="4"></textarea>
+        </div>
+    </apex:outputText>
+</div>
+</apex:component>

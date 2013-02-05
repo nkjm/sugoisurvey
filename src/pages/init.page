@@ -1,0 +1,115 @@
+<apex:page standardController="Session__c" extensions="jr_session" sidebar="false" showheader="true" standardStylesheets="false" docType="html-5.0">
+<apex:styleSheet value="{!URLFOR($Resource.reusable_class_css)}" />
+<apex:styleSheet value="{!URLFOR($Resource.jquery_confirm_zip, 'jquery.confirm/jquery.confirm.css')}" />
+<apex:stylesheet value="{!$Resource.init_css}" />
+<apex:includeScript value="{!URLFOR($Resource.jqueryui_1_9_2_custom_zip, 'jquery-ui-1.9.2.custom/js/jquery-1.8.3.js')}" />
+<apex:includeScript value="{!URLFOR($Resource.jquery_confirm_zip, 'jquery.confirm/jquery.activity-indicator-1.0.0.js')}" />
+<apex:includeScript value="{!URLFOR($Resource.jquery_confirm_zip, 'jquery.confirm/jquery.confirm.js')}" />
+
+<script type="text/javascript">
+j$ = jQuery.noConflict();
+
+function init(){
+    j$.confirm.status({
+        'title' : '{!$label.processing}...',
+        'message' : '{!$label.pls_wait_for_a_while}'
+    });
+	start_init();
+}
+
+function start_init(){
+    sugoisurvey4.jr_session.start_init(
+        function(result, event){
+            if (event.status){
+                if (result.status == false){
+                    j$.confirm.alert({
+                        'title':'{!$label.error}',
+                        'message':result.message,
+                        'color':'#ff0000',
+                        'button_label':'{!$label.close}'
+                    });
+                    return;
+                } else {
+					assign_permission_set();
+                }
+            } else {
+                j$.confirm.alert({
+                    'title':'{!$label.error}',
+                    'message':event.message,
+                    'color':'#ff0000',
+                    'button_label':'{!$label.close}'
+                });
+                return;
+            }
+        },{escape:true}
+    );
+}
+
+function assign_permission_set(){
+	sugoisurvey4.jr_session.assign_permission_set(
+        function(result, event){
+            if (event.status){
+                if (result.status == false){
+                    j$.confirm.alert({
+                        'title':'{!$label.error}',
+                        'message':result.message,
+                        'color':'#ff0000',
+                        'button_label':'{!$label.close}'
+                    });
+                    return;
+                } else {
+					finish_init();
+                }
+            } else {
+                j$.confirm.alert({
+                    'title':'{!$label.error}',
+                    'message':event.message,
+                    'color':'#ff0000',
+                    'button_label':'{!$label.close}'
+                });
+                return;
+            }
+        },{escape:true}
+	); 
+}
+
+function finish_init(){
+	sugoisurvey4.jr_session.finish_init(
+        function(result, event){
+            if (event.status){
+                if (result.status == false){
+                    j$.confirm.alert({
+                        'title':'{!$label.error}',
+                        'message':result.message,
+                        'color':'#ff0000',
+                        'button_label':'{!$label.close}'
+                    });
+                    return;
+                } else {
+					window.location = '/apex/sugoisurvey4__session_list';
+                }
+            } else {
+                j$.confirm.alert({
+                    'title':'{!$label.error}',
+                    'message':event.message,
+                    'color':'#ff0000',
+                    'button_label':'{!$label.close}'
+                });
+                return;
+            }
+        },{escape:true}
+	);  
+}
+
+</script>
+
+<div id="top">
+    <span class="gradient_tagline">{!$label.sugoisurvey}</span>
+</div>
+<div id="middle">
+    <input type="button" onclick="init()" class="green_button" value="{!$label.start}" style="width:100%;"/>
+</div>
+<div id="bottom">
+    <span class="copyright">All Rights Reserved. Copy Right Kazuki Nakajima, 2012</span>
+</div>
+</apex:page>
