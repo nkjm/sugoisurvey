@@ -13,8 +13,40 @@
         <name>chatter_email_reply_to__c</name>
     </fields>
     <fields>
+        <label>Scheduled Job ID</label>
+        <name>cron_trigger_id__c</name>
+    </fields>
+    <fields>
         <label>Initialized</label>
         <name>initialized__c</name>
+    </fields>
+    <fields>
+        <label>Instance</label>
+        <name>instance__c</name>
+    </fields>
+    <fields>
+        <label><!-- My Domain --></label>
+        <name>my_domain__c</name>
+    </fields>
+    <fields>
+        <label><!-- My Domainが有効 --></label>
+        <name>my_domain_enabled__c</name>
+    </fields>
+    <fields>
+        <label>Need Re-Initialization</label>
+        <name>need_re_initialization__c</name>
+    </fields>
+    <fields>
+        <label>Sandbox</label>
+        <name>sandbox__c</name>
+    </fields>
+    <fields>
+        <label>Sandbox Name</label>
+        <name>sandbox_name__c</name>
+    </fields>
+    <fields>
+        <label>Sites Username</label>
+        <name>sites_username__c</name>
     </fields>
     <fields>
         <label>Survey Site Domain</label>

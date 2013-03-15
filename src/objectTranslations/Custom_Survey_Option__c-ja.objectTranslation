@@ -30,6 +30,13 @@
         <label><!-- 合計 --></label>
         <name>Sum__c</name>
     </fields>
+    <layouts>
+        <layout>カスタムアンケート 選択肢レイアウト</layout>
+        <sections>
+            <label><!-- カスタムリンク --></label>
+            <section>カスタムリンク</section>
+        </sections>
+    </layouts>
     <validationRules>
         <errorMessage><!-- Session does not match parent question&apos;s session. --></errorMessage>
         <name>session_must_match_parent</name>

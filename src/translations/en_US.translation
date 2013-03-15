@@ -25,6 +25,26 @@
         <name>attachment</name>
     </customLabels>
     <customLabels>
+        <label>attended</label>
+        <name>attended_the_event_and_submitted_survey1</name>
+    </customLabels>
+    <customLabels>
+        <label>and submitted a survey.</label>
+        <name>attended_the_event_and_submitted_survey2</name>
+    </customLabels>
+    <customLabels>
+        <label>is attending</label>
+        <name>attending_the_event1</name>
+    </customLabels>
+    <customLabels>
+        <label>.</label>
+        <name>attending_the_event2</name>
+    </customLabels>
+    <customLabels>
+        <label>Best Event</label>
+        <name>best_event</name>
+    </customLabels>
+    <customLabels>
         <label>A Handout of the seminar you attended is now available. Please find attached.</label>
         <name>body_of_deck_delivery_mail</name>
     </customLabels>
@@ -51,6 +71,10 @@
     <customLabels>
         <label>Complete</label>
         <name>complete</name>
+    </customLabels>
+    <customLabels>
+        <label>Create</label>
+        <name>create</name>
     </customLabels>
     <customLabels>
         <label>Create Lead</label>
@@ -117,12 +141,24 @@
         <name>event</name>
     </customLabels>
     <customLabels>
+        <label>Date</label>
+        <name>event_date</name>
+    </customLabels>
+    <customLabels>
+        <label>Event History</label>
+        <name>event_history</name>
+    </customLabels>
+    <customLabels>
         <label>Failed to create Chatter Feed.</label>
         <name>failed_to_create_feedItem</name>
     </customLabels>
     <customLabels>
         <label>Free Answers</label>
         <name>free_answers</name>
+    </customLabels>
+    <customLabels>
+        <label>Go to Contact</label>
+        <name>go_to_contact</name>
     </customLabels>
     <customLabels>
         <label>Guest Id is not set.</label>
@@ -165,6 +201,10 @@
         <name>no</name>
     </customLabels>
     <customLabels>
+        <label>NO DATA</label>
+        <name>no_data</name>
+    </customLabels>
+    <customLabels>
         <label>Option</label>
         <name>option</name>
     </customLabels>
@@ -177,8 +217,36 @@
         <name>password</name>
     </customLabels>
     <customLabels>
+        <label>people</label>
+        <name>people</name>
+    </customLabels>
+    <customLabels>
+        <label>Performance Summary</label>
+        <name>performance_summary</name>
+    </customLabels>
+    <customLabels>
         <label>Phone</label>
         <name>phone</name>
+    </customLabels>
+    <customLabels>
+        <label>Anyone</label>
+        <name>picklist_anyone</name>
+    </customLabels>
+    <customLabels>
+        <label>Anyone</label>
+        <name>picklist_no_condition</name>
+    </customLabels>
+    <customLabels>
+        <label>Registered Guests Only</label>
+        <name>picklist_registered_guests_only</name>
+    </customLabels>
+    <customLabels>
+        <label>Require Email</label>
+        <name>picklist_require_email</name>
+    </customLabels>
+    <customLabels>
+        <label>Require Survey Submission</label>
+        <name>picklist_require_survey_submission</name>
     </customLabels>
     <customLabels>
         <label>Please enter your answer by 255 letters.</label>
@@ -217,12 +285,28 @@
         <name>property</name>
     </customLabels>
     <customLabels>
-        <label>rate</label>
+        <label>Rate</label>
         <name>rate</name>
+    </customLabels>
+    <customLabels>
+        <label>Rate Avg.</label>
+        <name>rate_avg</name>
+    </customLabels>
+    <customLabels>
+        <label>Transition of Rate Avg.</label>
+        <name>rate_avg_transition</name>
     </customLabels>
     <customLabels>
         <label>Rating</label>
         <name>rating</name>
+    </customLabels>
+    <customLabels>
+        <label>Update Configuration</label>
+        <name>re_initialize</name>
+    </customLabels>
+    <customLabels>
+        <label>Reload</label>
+        <name>reload</name>
     </customLabels>
     <customLabels>
         <label>Report</label>
@@ -301,8 +385,16 @@
         <name>survey</name>
     </customLabels>
     <customLabels>
+        <label>Submitted Survey</label>
+        <name>survey_answer</name>
+    </customLabels>
+    <customLabels>
         <label>Collection Rate</label>
         <name>survey_collection_rate</name>
+    </customLabels>
+    <customLabels>
+        <label>Your survey has been created.</label>
+        <name>survey_has_been_created</name>
     </customLabels>
     <customLabels>
         <label>Survey has been deleted.</label>
@@ -349,6 +441,14 @@
         <name>title_of_deliverDeck</name>
     </customLabels>
     <customLabels>
+        <label>Total Events</label>
+        <name>total_events</name>
+    </customLabels>
+    <customLabels>
+        <label>Total Guests</label>
+        <name>total_guests</name>
+    </customLabels>
+    <customLabels>
         <label>Unknown Company</label>
         <name>unknown_company</name>
     </customLabels>
@@ -368,6 +468,10 @@
         <label>Yes</label>
         <name>yes</name>
     </customLabels>
+    <customTabs>
+        <label>Surveys</label>
+        <name>event_and_session</name>
+    </customTabs>
     <customTabs>
         <label>Surveys</label>
         <name>session_list</name>

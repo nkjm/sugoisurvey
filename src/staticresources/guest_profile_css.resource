@@ -28,6 +28,9 @@ text-align: center;
 .block {
 position: relative;
 float: left;
+-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
 }
 
 .block_header {
@@ -38,27 +41,60 @@ text-align: left;
 }
 
 #photo_block {
-width: 180px;
+width: 50%;
 height: 180px;
 }
 
-#name_block {
-width: 250px;
-height: 180px;
-}
-
-#profile_block {
+#communication_bar {
 position: absolute;
-right: 0px;
-bottom: 0px;
-width: 400px;
-text-align: right;
-font-size: 14pt;
+width: 100%;
+bottom: 60px;
+padding: 5px 10px;
+color: #333333;
+text-align:right;
+-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
 }
 
-#profile_block .profile_row {
-position:relative;
-margin-top: 10px;
+#profile_bar {
+position: absolute;
+bottom: 0;
+height: 50px;
+width: 50%;
+color: #ffffff;
+text-align: left;
+padding: 5px 10px;
+-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
+}
+
+#name_bar {
+position: absolute;
+bottom: 0;
+height: 55px;
+width: 100%;
+color: #ffffff;
+text-align: right;
+padding: 5px 10px;
+-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
+
+background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzAwMDAwMCIgc3RvcC1vcGFjaXR5PSIwLjUiLz4KICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzAwMDAwMCIgc3RvcC1vcGFjaXR5PSIwLjciLz4KICA8L2xpbmVhckdyYWRpZW50PgogIDxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9InVybCgjZ3JhZC11Y2dnLWdlbmVyYXRlZCkiIC8+Cjwvc3ZnPg==);
+background: -moz-linear-gradient(left,  rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.7) 100%);
+background: -webkit-gradient(linear, left top, right top, color-stop(0%,rgba(0,0,0,0.5)), color-stop(100%,rgba(0,0,0,0.7)));
+background: -webkit-linear-gradient(left,  rgba(0,0,0,0.5) 0%,rgba(0,0,0,0.7) 100%);
+background: -o-linear-gradient(left,  rgba(0,0,0,0.5) 0%,rgba(0,0,0,0.7) 100%);
+background: -ms-linear-gradient(left,  rgba(0,0,0,0.5) 0%,rgba(0,0,0,0.7) 100%);
+background: linear-gradient(to right,  rgba(0,0,0,0.5) 0%,rgba(0,0,0,0.7) 100%);
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#80000000', endColorstr='#b3000000',GradientType=1 );
+}
+
+#name_bar a {
+color: #ffffff;
+font-size: 0.9em;
 }
 
 #rate_block {

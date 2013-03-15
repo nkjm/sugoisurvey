@@ -79,14 +79,14 @@ public class validate_session {
     }
     
     static testmethod void validate_getSession(){
-    	Session__c session1 = createDummySession('test session1', 'Eメールの入力が必要', 'アンケートの入力が必要');
+    	Session__c session1 = createDummySession('test session1', system.label.picklist_require_email, system.label.picklist_require_survey_submission);
     	ApexPages.StandardController sc1 = new ApexPages.StandardController(session1);
         session_v2 sugoi_session1 = new session_v2(sc1);
         system.assertEquals('test session1', sugoi_session1.getSession().name);
     }
     
     static testmethod void validate_getSessions(){
-    	Session__c session1 = createDummySession('test session1', 'Eメールの入力が必要', 'アンケートの入力が必要');
+    	Session__c session1 = createDummySession('test session1', system.label.picklist_require_email, system.label.picklist_require_survey_submission);
     	ApexPages.StandardController sc1 = new ApexPages.StandardController(session1);
         session_v2 sugoi_session1 = new session_v2(sc1);
         system.assertEquals(1, sugoi_session1.getSessions().size());
@@ -100,13 +100,13 @@ public class validate_session {
     	PageReference pr;
     	list<guest__c> guests;
     	
-    	session = createDummySession('test session', 'Eメールの入力が必要', 'アンケートの入力が必要');
+    	session = createDummySession('test session', system.label.picklist_require_email, system.label.picklist_require_survey_submission);
         sc = new ApexPages.StandardController(session);
         i_session = new session_v2(sc);
         guests = i_session.getDeliveryDestinations();
         system.assertEquals(5, guests.size());
         
-        session = createDummySession('test session', 'Eメールの入力が必要', '全員');
+        session = createDummySession('test session', system.label.picklist_require_email, system.label.picklist_anyone);
         sc = new ApexPages.StandardController(session);
         i_session = new session_v2(sc);
         guests = i_session.getDeliveryDestinations();
@@ -119,7 +119,7 @@ public class validate_session {
     	session_v2 i_session;
     	PageReference pr;
     	
-    	session = createDummySession('jfuvdedikfkvmd', 'Eメールの入力が必要', 'アンケートの入力が必要');
+    	session = createDummySession('jfuvdedikfkvmd', system.label.picklist_require_email, system.label.picklist_require_survey_submission);
         session.mass_mail_additional_body__c = 'ksldhfoihoedfjosdklf';
         session.handout_url__c = 'https://woieur.woeifjoeiwjfow.com';
         session.handout_password__c = 'kriigjeifnief';

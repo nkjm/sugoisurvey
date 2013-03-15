@@ -1,0 +1,10 @@
+<apex:component controller="session_report">
+<apex:attribute name="session_id" type="Id" assignTo="{!c_session_id}" description="Record Id of Session__c"/>
+<apex:attribute name="csq_id" type="Id" assignTo="{!c_csq_id}" description="Record Id of Custom_Survey_Question__c"/>
+
+<ul>
+    <apex:repeat value="{!free_answers}" var="fa">
+        <li class='free_answer_row'><a href='/apex/guest_list?session_id={!session_id}&search_by=answer_id&answer_id={!fa.id}'>{!fa.free_form__c}</a></li>
+    </apex:repeat>
+</ul>
+</apex:component>

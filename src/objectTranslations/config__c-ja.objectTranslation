@@ -9,8 +9,40 @@
         <name>chatter_email_reply_to__c</name>
     </fields>
     <fields>
+        <label><!-- スケジュール済みジョブID --></label>
+        <name>cron_trigger_id__c</name>
+    </fields>
+    <fields>
         <label><!-- 初期化 --></label>
         <name>initialized__c</name>
+    </fields>
+    <fields>
+        <label><!-- インスタンス --></label>
+        <name>instance__c</name>
+    </fields>
+    <fields>
+        <label><!-- My Domain --></label>
+        <name>my_domain__c</name>
+    </fields>
+    <fields>
+        <label><!-- My Domainが有効 --></label>
+        <name>my_domain_enabled__c</name>
+    </fields>
+    <fields>
+        <label><!-- 再初期化が必要 --></label>
+        <name>need_re_initialization__c</name>
+    </fields>
+    <fields>
+        <label><!-- Sandbox --></label>
+        <name>sandbox__c</name>
+    </fields>
+    <fields>
+        <label><!-- Sandbox名 --></label>
+        <name>sandbox_name__c</name>
+    </fields>
+    <fields>
+        <label><!-- サイト ユーザー名 --></label>
+        <name>sites_username__c</name>
     </fields>
     <fields>
         <label><!-- アンケートサイトドメイン --></label>

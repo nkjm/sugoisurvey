@@ -23,6 +23,13 @@
         <name>Session__c</name>
         <relationshipLabel><!-- カスタムアンケート 回答 --></relationshipLabel>
     </fields>
+    <layouts>
+        <layout>カスタムアンケート 回答レイアウト</layout>
+        <sections>
+            <label><!-- カスタムリンク --></label>
+            <section>カスタムリンク</section>
+        </sections>
+    </layouts>
     <validationRules>
         <errorMessage><!-- Session does not match parent&apos;s session. --></errorMessage>
         <name>session_must_match_parent</name>

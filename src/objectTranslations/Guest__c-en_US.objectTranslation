@@ -13,6 +13,11 @@
         <name>Company__c</name>
     </fields>
     <fields>
+        <label>Contact</label>
+        <name>Contact__c</name>
+        <relationshipLabel><!-- ゲスト --></relationshipLabel>
+    </fields>
+    <fields>
         <label>Email</label>
         <name>Email__c</name>
     </fields>
@@ -27,6 +32,10 @@
     <fields>
         <label>Lastname</label>
         <name>Last_Name__c</name>
+    </fields>
+    <fields>
+        <label>Found Multiple Contacts</label>
+        <name>Multiple_Contacts__c</name>
     </fields>
     <fields>
         <label>Name</label>
@@ -48,6 +57,10 @@
     <fields>
         <label>Title</label>
         <name>Title__c</name>
+    </fields>
+    <fields>
+        <label>To be posted by chatter notification</label>
+        <name>To_Be_Posted_To_Record_Feed__c</name>
     </fields>
     <layouts>
         <layout>ゲストレイアウト</layout>

@@ -1,7 +1,11 @@
 @isTest
 private class validate_survey_for_guest {
+    static testMethod void validate_getLanguage_locale_key(){
+        system.assertEquals([select languageLocaleKey from user where id = :Userinfo.getUserId()].languageLocaleKey, survey_for_guest.getLanguage_locale_key());
+    }
+    
     static testMethod void validate_getGuest(){
-        session__c session = validate_session.createDummySession('test session1', 'Eメールの入力が必要', 'アンケートの入力が必要');
+        session__c session = validate_session.createDummySession('test session1', system.label.picklist_require_email, system.label.picklist_require_survey_submission);
         guest__c guest = new guest__c(last_name__c = 'Nakajima for validate', session__c = session.id);
         insert guest;
         ApexPages.StandardController sc = new ApexPages.StandardController(guest);
@@ -12,7 +16,7 @@ private class validate_survey_for_guest {
     }
     
     static testmethod void validate_getCustom_Survey_Questions(){
-        session__c session = validate_session.createDummySession('test session1', 'Eメールの入力が必要', 'アンケートの入力が必要');
+        session__c session = validate_session.createDummySession('test session1', system.label.picklist_require_email, system.label.picklist_require_survey_submission);
         guest__c guest = new guest__c(last_name__c = 'Nakajima for validate', session__c = session.id);
         insert guest;
         ApexPages.StandardController sc = new ApexPages.StandardController(guest);
@@ -24,7 +28,7 @@ private class validate_survey_for_guest {
     
     /*
     static testmethod void validate_loadTweet(){
-        session__c session = validate_session.createDummySession('test session1', 'Eメールの入力が必要', 'アンケートの入力が必要');
+        session__c session = validate_session.createDummySession('test session1', system.label.picklist_require_email, system.label.picklist_require_survey_submission);
         guest__c guest = new guest__c(last_name__c = 'Nakajima for validate', session__c = session.id);
         insert guest;
         ApexPages.StandardController sc = new ApexPages.StandardController(guest);
@@ -35,7 +39,7 @@ private class validate_survey_for_guest {
     }
     
     static testMethod void validate_parseAndInsertTweetInJSON() {
-        session__c session = validate_session.createDummySession('test session1', 'Eメールの入力が必要', 'アンケートの入力が必要');
+        session__c session = validate_session.createDummySession('test session1', system.label.picklist_require_email, system.label.picklist_require_survey_submission);
         guest__c guest = new guest__c(last_name__c = 'Nakajima for validate', session__c = session.id);
         insert guest;
         ApexPages.StandardController sc = new ApexPages.StandardController(guest);
@@ -57,7 +61,7 @@ private class validate_survey_for_guest {
     */
     
     static testmethod void validate_createLead(){
-        session__c session = validate_session.createDummySession('test session1', 'Eメールの入力が必要', 'アンケートの入力が必要');
+        session__c session = validate_session.createDummySession('test session1', system.label.picklist_require_email, system.label.picklist_require_survey_submission);
         guest__c guest = new guest__c(last_name__c = 'Nakajima for lead', first_name__c = 'Kazuki for lead', title__c = 'ISV Architect', company__c = 'Salesforce.com', email__c = 'knakajima@salesforce.com', phone__c = '0000000000', session__c = session.id);
         insert guest;
         ApexPages.StandardController sc = new ApexPages.StandardController(guest);

@@ -31,25 +31,25 @@ j$("document").ready(function(){
         var session__c = "{!session.Id}";
         var rate__c = j$("#survey_form input[name='rate']:checked").val();
         if (rate__c != null){
-        	rate__c = Number(rate__c);
-       	}
+            rate__c = Number(rate__c);
+        }
         var survey = {
             "session__c":session__c,
             "rate__c":rate__c
         }
 
-		// Check if length of comment =< 255
-		var comment__c = j$("#survey_comment").val();
-		if (comment__c != null && comment__c.length > 255){
-			j$.confirm.alert({
-			    'title' : '{!$Label.error}',
-			    'message' : '{!$label.pls_enter_by_255_letters}',
-			    'color' : '#ff0000',
-			    'button_label' : '{!$Label.close}'
-			});
-			return false;
-		}
-		
+        // Check if length of comment =< 255
+        var comment__c = j$("#survey_comment").val();
+        if (comment__c != null && comment__c.length > 255){
+            j$.confirm.alert({
+                'title' : '{!$Label.error}',
+                'message' : '{!$Label.pls_enter_by_255_letters}',
+                'color' : '#ff0000',
+                'button_label' : '{!$Label.close}'
+            });
+            return false;
+        }
+        
         var comment = {
             "comment__c":comment__c
         }
@@ -59,15 +59,15 @@ j$("document").ready(function(){
             var custom_survey_option__c = this.value;
             var target_id_for_free_form = "#survey_free_form_for_" + custom_survey_option__c;
             var free_form__c = j$(target_id_for_free_form).val();
-	        if (free_form__c != null && free_form__c.length > 255){
-				j$.confirm.alert({
-				    'title' : '{!$Label.error}',
-				    'message' : '{!$label.pls_enter_by_255_letters}',
-				    'color' : '#ff0000',
-				    'button_label' : '{!$Label.close}'
-				});
-				return false;
-			}
+            if (free_form__c != null && free_form__c.length > 255){
+                j$.confirm.alert({
+                    'title' : '{!$Label.error}',
+                    'message' : '{!$Label.pls_enter_by_255_letters}',
+                    'color' : '#ff0000',
+                    'button_label' : '{!$Label.close}'
+                });
+                return false;
+            }
             var csa = {
                 "custom_survey_option__c":custom_survey_option__c,
                 "free_form__c":free_form__c
@@ -99,7 +99,7 @@ function submit_survey(survey, comment, csas, guest_email){
                     });
                 } else {
                     j$('#survey_form input,textarea').not('input[type="radio"],input[type="checkbox"],:hidden, :button, :submit, :reset').val('');
-                    j$('#survey_form input[type="radio"], input[type="checkbox"], select').removeAttr('checked').removeAttr('selected');
+                    j$('#survey_form input[type="radio"], input[type="checkbox"]').not('.dummy').removeAttr('checked');
                     j$('#survey_form .survey_free_form').not(".non-multi-choice").hide();
                     j$.confirm.alert({
                         'title' : '{!$Label.complete}',

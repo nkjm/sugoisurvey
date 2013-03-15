@@ -27,6 +27,13 @@
         <name>Session__c</name>
         <relationshipLabel>Custom Survey Answer</relationshipLabel>
     </fields>
+    <layouts>
+        <layout>カスタムアンケート 回答レイアウト</layout>
+        <sections>
+            <label><!-- カスタムリンク --></label>
+            <section>カスタムリンク</section>
+        </sections>
+    </layouts>
     <nameFieldLabel>Custom Survey Answer Number</nameFieldLabel>
     <startsWith>Consonant</startsWith>
     <validationRules>

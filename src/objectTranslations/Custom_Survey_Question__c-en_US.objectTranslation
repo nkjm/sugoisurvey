@@ -26,7 +26,7 @@
         <name>Sort_Order__c</name>
     </fields>
     <fields>
-        <label><!-- アンケートタイプ --></label>
+        <label>Survey Type</label>
         <name>Survey_Type__c</name>
         <picklistValues>
             <masterLabel>checkbox</masterLabel>

@@ -15,12 +15,86 @@
         <unique>false</unique>
     </fields>
     <fields>
+        <fullName>cron_trigger_id__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>スケジュール済みジョブID</label>
+        <length>18</length>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
         <fullName>initialized__c</fullName>
         <defaultValue>false</defaultValue>
         <deprecated>false</deprecated>
         <externalId>false</externalId>
         <label>初期化</label>
         <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>instance__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>インスタンス</label>
+        <length>8</length>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>my_domain__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>My Domain</label>
+        <length>255</length>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>my_domain_enabled__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>My Domainが有効</label>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>need_re_initialization__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>再初期化が必要</label>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>sandbox__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Sandbox</label>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>sandbox_name__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Sandbox名</label>
+        <length>255</length>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>sites_username__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>サイト ユーザー名</label>
+        <length>255</length>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
     </fields>
     <fields>
         <fullName>survey_sites_domain__c</fullName>

@@ -16,7 +16,7 @@
             <apex:outputText rendered="{! csq.Id == cso.custom_survey_question__c }">
                 <apex:outputText rendered="{!cso.Dummy__c}">
                     <apex:outputPanel layout="block" styleClass="survey_option_container" style="display:none;">
-                        <input class="survey_option" type="radio" name="custom_survey_option_ids_for_{!csq.Id}[]" id="{!cso.Id}" value="{!cso.Id}" checked="true"></input>
+                        <input class="survey_option dummy" type="radio" name="custom_survey_option_ids_for_{!csq.Id}[]" id="{!cso.Id}" value="{!cso.Id}" checked="true"></input>
                         <label for="{!cso.Id}">{!cso.Option__c}</label>
                     </apex:outputPanel>
                     <apex:variable value="{!cso.Id}" var="cso_id_for_non_multi_choice" />

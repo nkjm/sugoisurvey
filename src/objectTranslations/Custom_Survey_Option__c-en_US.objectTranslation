@@ -34,6 +34,13 @@
         <label>Sum</label>
         <name>Sum__c</name>
     </fields>
+    <layouts>
+        <layout>カスタムアンケート 選択肢レイアウト</layout>
+        <sections>
+            <label><!-- カスタムリンク --></label>
+            <section>カスタムリンク</section>
+        </sections>
+    </layouts>
     <nameFieldLabel>Custom Survey Option Number</nameFieldLabel>
     <startsWith>Consonant</startsWith>
     <validationRules>

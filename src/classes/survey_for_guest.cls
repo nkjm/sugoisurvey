@@ -1,15 +1,36 @@
 public with sharing class survey_for_guest {
     public guest__c guest;
+    
     /*
     private OAuth oa;
     */
+    
+    public static string getLanguage_locale_key(){
+        return [select languageLocaleKey from user where id = :Userinfo.getUserId()].languageLocaleKey;
+    }
 
     public survey_for_guest(ApexPages.StandardController controller) {
         guest__c guest_tmp = (guest__c)controller.getRecord();
         if (guest_tmp.id == null){
             return;
         }
-        this.guest = [select id, name__c, last_name__c, first_name__c, title__c, company__c, email__c, phone__c, profile_photo__c, session__c, session__r.name, session__r.date__c from guest__c where id = :guest_tmp.id];
+        this.guest = [
+            select 
+                id, 
+                name__c, 
+                last_name__c, 
+                first_name__c, 
+                title__c, 
+                company__c, 
+                email__c, 
+                phone__c, 
+                profile_photo__c, 
+                session__c, 
+                session__r.name, 
+                session__r.date__c,
+                contact__c
+            from guest__c where id = :guest_tmp.id
+        ];
         /*
         if (!Test.isRunningTest()){
             oa = OAuth.newInstance('Twitter');

@@ -66,51 +66,42 @@ function redirectToEditPage(guest_id){
     <div style="position:absolute; top:0px; right:0px; font-size: 11pt; font-weight:bold;">
         <span style="color:#666666;">{!$label.event} : </span>
         <a href="/{!guest.session__r.id}" style="color:#A70101; text-decoration:none;">
-            <apex:outputText rendered="{! !ISNULL(guest.session__r.Date__c) }">
-                {!YEAR(guest.session__r.Date__c)}/{!MONTH(guest.session__r.Date__c)}/{!DAY(guest.session__r.Date__c)} - 
-            </apex:outputText>
-            <apex:outputText value="{!guest.session__r.name}" />
+            {!guest.session__r.name}
         </a>
     </div>
     <div id="photo_block" class="block">
-        <apex:image height="180px" url="{!Guest.Profile_Photo__c}" rendered="{! !ISNULL(Guest.Profile_Photo__c)}"></apex:image>
-        <apex:image height="180px" url="{!$Resource.anonymous_photo_png}" rendered="{! ISNULL(Guest.Profile_Photo__c)}"></apex:image>
+        <apex:image height="180" url="{!Guest.Profile_Photo__c}" rendered="{! !ISNULL(Guest.Profile_Photo__c)}"></apex:image>
+        <apex:image height="180" url="{!$Resource.anonymous_photo_png}" rendered="{! ISNULL(Guest.Profile_Photo__c)}"></apex:image>
+    </div>  
+    <div id="communication_bar">
+        <apex:outputText value="{!guest.Email__c}" /><br/>
+        <apex:outputText value="{!guest.Phone__c}" />
     </div>
-    <div id="name_block" class="block">
-        <div style="position:absolute; bottom:0px; left: 20px; font-size:28pt;">
-            <span style="font-weight:bold; background: -webkit-gradient(linear, left top, left bottom, from(#aaa), to(#000)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-                <apex:outputText value="{!guest.Name__c}" />
-            </span>
-        </div>
+    <div id="name_bar">
+        <apex:outputPanel rendered="{! !ISNULL(guest.contact__c) }">
+            <a href="/{!guest.Contact__c}">{!$Label.go_to_contact} >> </a>
+        </apex:outputPanel>
+        <span style="font-size:24pt;">
+            <apex:outputText rendered="{!language_locale_key == 'ja'}" value="{!guest.Name__c}" />
+            <apex:outputText rendered="{!language_locale_key != 'ja'}" value="{!guest.First_Name__c} {!guest.Last_Name__c}" />
+        </span>
     </div>
-    <div id="profile_block" class="block">
-        <div class="profile_row">
-            <div>
-            	<apex:outputText value="{!guest.Company__c}" />
-           	</div>
-            <div style="margin-top: 3px;">
-            	<apex:outputText value="{!guest.Title__c}" />
-           	</div>
+    <div id="profile_bar">
+        <div>
+            <apex:outputText value="{!guest.Company__c}" />
         </div>
-        <div class="profile_row">
-            <div>
-            	<span style="color:#666666;">{!$Label.email} : </span>
-            	<apex:outputText value="{!guest.Email__c}" />
-           	</div>
-            <div style="margin-top: 3px;">
-            	<span style="color:#666666;">{!$Label.phone} : </span>
-            	<apex:outputText value="{!guest.Phone__c}" />
-           	</div>
+        <div>
+            <apex:outputText value="{!guest.Title__c}" />
         </div>
-    </div>
+    </div>  
 </div>
 <div id="survey_data_container" class="container">
     <div id="rate_block" class="block">
         <div class="block_header">{!$Label.rate}</div>
         <apex:repeat value="{!Guest__c.survey__r}" var="survey">
             <div style="font-weight: bold; font-size: 96pt; text-align:center;">
-            	<apex:outputText value="{! round(survey.Rate__c,0)}" />
-           	</div>
+                <apex:outputText value="{! round(survey.Rate__c,0)}" />
+            </div>
         </apex:repeat>
     </div>
     <div class="block spacer">
@@ -186,7 +177,7 @@ function redirectToEditPage(guest_id){
 </div>
 <div id="button_container" class="container">
     <button style="width:170px;" class="white_button" onclick="redirectToEditPage('{!guest__c.id}')">{!$Label.edit}</button>
-    <button style="width:170px;" class="green_button" onclick="invokeCreateLead()">{!$Label.create_lead}</button>
+    <apex:outputText rendered="{! ISNULL(guest.contact__c) }"><button style="width:170px;" class="green_button" onclick="invokeCreateLead()">{!$Label.create_lead}</button></apex:outputText>
 </div>
 
 </apex:page>

@@ -53,9 +53,19 @@
         <name>Open__c</name>
     </fields>
     <fields>
+        <help><!-- チェックすると、ゲストが登録された時またはアンケートを回答した時に、そのゲストに該当する取引先レコードがあれば、そのレコードフィードに活動が投稿されます。 --></help>
+        <label><!-- 取引先のレコードフィードにゲストの活動を投稿 --></label>
+        <name>Post_To_Account_Record_Feed__c</name>
+    </fields>
+    <fields>
+        <help><!-- チェックすると、ゲストが登録された時またはアンケートを回答した時に、そのゲストに該当する取引先責任者レコードがあれば、そのレコードフィードに活動が投稿されます。 --></help>
+        <label><!-- 取引先責任者のレコードフィードにゲストの活動を投稿 --></label>
+        <name>Post_To_Contact_Record_Feed__c</name>
+    </fields>
+    <fields>
         <label><!-- プレゼンター --></label>
         <name>Presenter__c</name>
-        <relationshipLabel><!-- イベント --></relationshipLabel>
+        <relationshipLabel><!-- Surveys --></relationshipLabel>
     </fields>
     <fields>
         <label><!-- 評価平均 --></label>
@@ -111,6 +121,10 @@
     </fields>
     <layouts>
         <layout>イベントレイアウト</layout>
+        <sections>
+            <label><!-- Chatter設定 --></label>
+            <section>Chatter設定</section>
+        </sections>
         <sections>
             <label><!-- アンケートサイト --></label>
             <section>アンケートサイト</section>

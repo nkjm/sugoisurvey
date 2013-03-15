@@ -1,4 +1,4 @@
-<apex:page standardController="Guest__c" extensions="guest_list" sidebar="false" standardStyleSheets="false" doctype="html-5.0">
+<apex:page standardController="Guest__c" extensions="survey_for_guest,guest_list" sidebar="false" standardStyleSheets="false" doctype="html-5.0">
 <apex:styleSheet value="https://fonts.googleapis.com/css?family=Cuprum&subset=latin" />
 <apex:styleSheet value="{!URLFOR($Resource.jqueryui_1_9_2_custom_zip, 'jquery-ui-1.9.2.custom/css/smoothness/jquery-ui-1.9.2.custom.min.css')}" />
 <apex:styleSheet value="{!URLFOR($Resource.reusable_class_css)}" />
@@ -22,12 +22,14 @@ j$ = jQuery.noConflict();
             <div id="existing_session_list">
                 <apex:repeat value="{!guests}" var="g">
                     <a href="?session_id={!session_id}&search_by={!search_by}&answer_id={!answer_id}&rate={!rate}&option_id={!option_id}&id={!g.id}">
-                        <div class="session_row">
+                        <div class="session_row" style="padding: 10px 5px; height:55px;">
                             <apex:outputpanel layout="block" styleClass="session_name">
                                 <apex:outputText value="{!g.Company__c}" />
                             </apex:outputpanel>
                             <apex:outputpanel layout="block" styleClass="session_presenter">
-                                <apex:outputText value="{!g.Name__c}" /><br/>
+                                <apex:outputText rendered="{!language_locale_key == 'ja'}" value="{!g.Name__c}" />
+                                <apex:outputText rendered="{!language_locale_key != 'ja'}" value="{!g.First_Name__c} {!g.Last_Name__c}" />
+                                <br/>
                                 <apex:outputText value="{!g.Email__c}" />
                             </apex:outputpanel>
                         </div>

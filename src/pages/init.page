@@ -1,4 +1,4 @@
-<apex:page standardController="Session__c" extensions="jr_session" sidebar="false" showheader="true" standardStylesheets="false" docType="html-5.0">
+<apex:page standardController="Session__c" extensions="session_v2,jr_session" sidebar="false" showheader="true" standardStylesheets="false" docType="html-5.0">
 <apex:styleSheet value="{!URLFOR($Resource.reusable_class_css)}" />
 <apex:styleSheet value="{!URLFOR($Resource.jquery_confirm_zip, 'jquery.confirm/jquery.confirm.css')}" />
 <apex:stylesheet value="{!$Resource.init_css}" />
@@ -14,11 +14,11 @@ function init(){
         'title' : '{!$label.processing}...',
         'message' : '{!$label.pls_wait_for_a_while}'
     });
-	start_init();
+    start_init();
 }
 
 function start_init(){
-    sugoisurvey4.jr_session.start_init(
+    sugoisurvey4.jr_session.start_init("{!JSENCODE($currentPage.Url)}",
         function(result, event){
             if (event.status){
                 if (result.status == false){
@@ -30,7 +30,7 @@ function start_init(){
                     });
                     return;
                 } else {
-					assign_permission_set();
+                    assign_permission_set();
                 }
             } else {
                 j$.confirm.alert({
@@ -46,7 +46,7 @@ function start_init(){
 }
 
 function assign_permission_set(){
-	sugoisurvey4.jr_session.assign_permission_set(
+    sugoisurvey4.jr_session.assign_permission_set(
         function(result, event){
             if (event.status){
                 if (result.status == false){
@@ -58,7 +58,7 @@ function assign_permission_set(){
                     });
                     return;
                 } else {
-					finish_init();
+                    finish_init();
                 }
             } else {
                 j$.confirm.alert({
@@ -70,11 +70,11 @@ function assign_permission_set(){
                 return;
             }
         },{escape:true}
-	); 
+    ); 
 }
 
 function finish_init(){
-	sugoisurvey4.jr_session.finish_init(
+    sugoisurvey4.jr_session.finish_init(
         function(result, event){
             if (event.status){
                 if (result.status == false){
@@ -86,7 +86,7 @@ function finish_init(){
                     });
                     return;
                 } else {
-					window.location = '/apex/sugoisurvey4__session_list';
+                    window.location = '/apex/sugoisurvey4__session_list';
                 }
             } else {
                 j$.confirm.alert({
@@ -98,7 +98,7 @@ function finish_init(){
                 return;
             }
         },{escape:true}
-	);  
+    );  
 }
 
 </script>
@@ -107,9 +107,9 @@ function finish_init(){
     <span class="gradient_tagline">{!$label.sugoisurvey}</span>
 </div>
 <div id="middle">
-    <input type="button" onclick="init()" class="green_button" value="{!$label.start}" style="width:100%;"/>
+    <input type="button" onclick="init()" class="green_button" value="{!IF(config.need_re_initialization__c,$label.re_initialize,$label.start)}" style="width:100%;"/>
 </div>
 <div id="bottom">
-    <span class="copyright">All Rights Reserved. Copy Right Kazuki Nakajima, 2012</span>
+    <span class="copyright">All Rights Reserved. Copy Right Kazuki Nakajima, 2013</span>
 </div>
 </apex:page>

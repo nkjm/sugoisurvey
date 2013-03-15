@@ -174,6 +174,28 @@
         <type>Checkbox</type>
     </fields>
     <fields>
+        <fullName>Post_To_Account_Record_Feed__c</fullName>
+        <defaultValue>true</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <inlineHelpText>チェックすると、ゲストが登録された時またはアンケートを回答した時に、そのゲストに該当する取引先レコードがあれば、そのレコードフィードに活動が投稿されます。</inlineHelpText>
+        <label>取引先のレコードフィードにゲストの活動を投稿</label>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Post_To_Contact_Record_Feed__c</fullName>
+        <defaultValue>true</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <inlineHelpText>チェックすると、ゲストが登録された時またはアンケートを回答した時に、そのゲストに該当する取引先責任者レコードがあれば、そのレコードフィードに活動が投稿されます。</inlineHelpText>
+        <label>取引先責任者のレコードフィードにゲストの活動を投稿</label>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
         <fullName>Presenter__c</fullName>
         <deleteConstraint>SetNull</deleteConstraint>
         <deprecated>false</deprecated>

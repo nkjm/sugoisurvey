@@ -6,104 +6,87 @@ google.load('visualization', '1.0', {'packages':['corechart']});
 j$ = jQuery.noConflict();
 
 j$("document").ready(function(){
-    if ("{!session.id}" != ""){
-        sugoisurvey4.jr_session.get_session("{!session.id}",
-            function(session, event){
-                if (event.status){
-                    // for Pie Chart
-                    if (session.sugoisurvey4__Enable_Rate__c == true && session.sugoisurvey4__Rate_Avg__c != ''){
-                        var rate_data = getRateData(session.sugoisurvey4__Survey__r);
-                        drawPieChart(rate_data, session.Id);
-                    }
-                    
-                    // for Bar Chart
-                    // build container for custom survey
-                    var html_custom_survey = '<div class="section_header">{!$Label.survey}</div>';
-                    if (session.sugoisurvey4__Custom_Survey_Question__r != null){
-                        j$.each(session.sugoisurvey4__Custom_Survey_Question__r, function(i, csq){
-                            html_custom_survey += '<div class="barchart_container">';
-                            html_custom_survey += '<div class="barchart_header">';
-                            html_custom_survey += csq.sugoisurvey4__Question__c;
-                            html_custom_survey += '</div>';
-                            html_custom_survey += '<div id="barchart_' + csq.Id + '" class="barchart_graph">';
-                            html_custom_survey += '</div>';
-                            if (csq.sugoisurvey4__Enable_Free_Form__c){
-                                html_custom_survey += '<div class="free_answer_container">';
-                                html_custom_survey += '<div class="free_answer_header">';
-                                html_custom_survey += '{!$Label.free_answers}';
-                                html_custom_survey += '</div>';
-                                html_custom_survey += '<div class="free_answer" id="free_answer_for_' + csq.Id + '">';
-                                html_custom_survey += '</div>';
-                                html_custom_survey += '</div>';
-                            }
-                            if (csq.sugoisurvey4__Survey_Type__c == 'free'){
-                                html_custom_survey += '<div class="free_answer_container">';
-                                html_custom_survey += '<div class="free_answer" id="free_answer_for_' + csq.Id + '">';
-                                html_custom_survey += '</div>';
-                                html_custom_survey += '</div>';
-                            }
-                            html_custom_survey += '</div>';
-                        
-                        });
-                    }
-                    j$("#custom_survey").html(html_custom_survey);
-                    
-                    // draw bar chart
-                    if (session.sugoisurvey4__Custom_Survey_Question__r != null){
-                        j$.each(session.sugoisurvey4__Custom_Survey_Question__r, function(i, csq){
-                        	if (csq.sugoisurvey4__Survey_Type__c != 'free'){
-	                            var custom_survey_data = getCustomSurveyData(csq.Id, session.sugoisurvey4__Custom_Survey_Option__r);
-	                            var custom_survey_option_ids = getCustomSurveyOptionIds(csq.Id, session.sugoisurvey4__Custom_Survey_Option__r);
-	                            drawBarChart(csq.Id, custom_survey_data, session.Id, custom_survey_option_ids);
-                            }
-                        });
-                    }
-                    
-                    // for free answer
-                    if (session.sugoisurvey4__Custom_Survey_Question__r != null){
-                        j$.each(session.sugoisurvey4__Custom_Survey_Question__r, function(i, csq){
-                            if (csq.sugoisurvey4__Enable_Free_Form__c || (csq.sugoisurvey4__Survey_Type__c == 'free')){
-                                sugoisurvey4.jr_session.get_free_answers(csq.Id,
-                                    function(csas, event){
-                                        if (event.status){
-                                        	if (csas == null){
-                                        		return;
-                                       		}
-                                            html_free_answer = '<ul>';
-                                            j$.each(csas, function(i, csa){
-                                                html_free_answer += "<li class='free_answer_row'><a href='/apex/guest_list?session_id=" + csa.sugoisurvey4__Session__c + "&search_by=answer_id&answer_id=" + csa.Id + "'>" + csa.sugoisurvey4__Free_Form__c + "</a></li>";
-                                            });
-                                            html_free_answer += '</ul>';
-                                            // insert generated html right after the chart
-                                            var target_container_id = '#free_answer_for_' + csq.Id;
-                                            j$(target_container_id).html(html_free_answer);
-                                        } else {
-                                            j$.confirm.alert({
-                                                'title' : '{!$Label.error}',
-                                                'message' : event.message,
-                                                'color' : '#ff0000',
-                                                'button_label' : '{!$Label.close}'
-                                            });
-                                        }
-                                    },{escape:true}
-                                );
-                            }
-                        });
-                    }
-                } else {
+    report__map_all_event(document);
+    get_session("{!session.id}", function(session){
+        if (session.sugoisurvey4__Enable_Rate__c == true && session.sugoisurvey4__Rate_Avg__c != null && session.sugoisurvey4__Rate_Avg__c != 0.00){
+            report__generate_report_rating(session.Id, session.sugoisurvey4__Survey__r);
+        }
+        if (session.sugoisurvey4__Custom_Survey_Question__r != null && session.sugoisurvey4__Custom_Survey_Option__r != null){
+            j$.each(session.sugoisurvey4__Custom_Survey_Question__r, function(i, csq){
+                if (csq.sugoisurvey4__Survey_Type__c != 'free'){
+                    report__generate_report_survey(csq.sugoisurvey4__Session__c, csq.Id, session.sugoisurvey4__Custom_Survey_Option__r);
+                }
+            });
+        }
+    });
+});
+
+function report__map_all_event(selector){  
+    j$(selector).on('click', '.button_reload_report_container', function(){
+        report__reload_report_container();
+    });
+}
+
+function get_session(session_id, callback){
+    sugoisurvey4.jr_session.get_session(session_id,
+        function(result, event){
+            if (event.status){
+                if (result.status == false){
                     j$.confirm.alert({
                         'title' : '{!$Label.error}',
-                        'message' : event.message,
+                        'message' : result.message,
                         'color' : '#ff0000',
                         'button_label' : '{!$Label.close}'
                     });
+                } else {
+                    callback(result);
                 }
-            },{escape:true}
-        );
-    }
-});
+            } else {
+                j$.confirm.alert({
+                    'title' : '{!$Label.error}',
+                    'message' : event.message,
+                    'color' : '#ff0000',
+                    'button_label' : '{!$Label.close}'
+                });
+            }
+        },{escape:true}
+    );
+}
 
-function getRateData(survey_list){
+function report__reload_report_container(){
+    j$.confirm.status({
+        'title' : '{!$Label.processing}',
+        'message' : '{!$Label.pls_wait_for_a_while}'
+    });
+    j$("#report_container").load("{!JSENCODE($CurrentPage.url)} #report_container", function(){
+        get_session("{!session.id}", function(session){
+            if (session.sugoisurvey4__Enable_Rate__c == true && session.sugoisurvey4__Rate_Avg__c != null && session.sugoisurvey4__Rate_Avg__c != 0.00){
+                report__generate_report_rating(session.Id, session.sugoisurvey4__Survey__r);
+            }
+            if (session.sugoisurvey4__Custom_Survey_Question__r != null && session.sugoisurvey4__Custom_Survey_Option__r != null){
+                j$.each(session.sugoisurvey4__Custom_Survey_Question__r, function(i, csq){
+                    if (csq.sugoisurvey4__Survey_Type__c != 'free'){
+                        report__generate_report_survey(session.Id, csq.Id, session.sugoisurvey4__Custom_Survey_Option__r);
+                    }
+                });
+            }
+            j$.confirm.hide();
+        });
+    });
+}
+
+function report__generate_report_rating(session_id, surveys){
+    var rate_data = report__get_rate_data(surveys);
+    report__draw_pie_chart(rate_data, session_id);
+}
+
+function report__generate_report_survey(session_id, csq_id, csos){
+    var custom_survey_data = report__get_custom_survey_data(csq_id, csos);
+    var custom_survey_option_ids = report__get_custom_survey_option_ids(csq_id, csos);
+    report__draw_bar_chart(csq_id, custom_survey_data, session_id, custom_survey_option_ids);
+}
+
+function report__get_rate_data(survey_list){
     var rate_data = [];
     var sum = [];
     //initialize rate_data
@@ -127,10 +110,10 @@ function getRateData(survey_list){
     return(rate_data);
 }
 
-function drawPieChart(rate_data, session_id){
+function report__draw_pie_chart(rate_data, session_id){
     var data = new google.visualization.DataTable();
-    data.addColumn('string', '{!$label.rate}');
-    data.addColumn('number', '{!$label.sum}');
+    data.addColumn('string', '{!$Label.rate}');
+    data.addColumn('number', '{!$Label.sum}');
     data.addRows(rate_data);
     var options = {
         'width':250,
@@ -142,26 +125,26 @@ function drawPieChart(rate_data, session_id){
     var chart = new google.visualization.PieChart(document.getElementById('rating_right'));
     chart.draw(data, options);
 
-	google.visualization.events.addListener(chart, 'select', function(){
+    google.visualization.events.addListener(chart, 'select', function(){
         var selectedData = chart.getSelection(), row, item;
         row = selectedData[0].row;
         if (row == 0){
-        	rate = 5;
-       	} else if (row == 1){
-       	    rate = 4;
-       	} else if (row == 2){
-       		rate = 3;
-       	} else if (row == 3){
-       		rate = 2;
-       	} else if (row == 4){
-       		rate = 1;
-		}
+            rate = 5;
+        } else if (row == 1){
+            rate = 4;
+        } else if (row == 2){
+            rate = 3;
+        } else if (row == 3){
+            rate = 2;
+        } else if (row == 4){
+            rate = 1;
+        }
         //item = data.getValue(row,0);
         window.location = "/apex/guest_list?session_id=" + session_id + "&search_by=rate&rate=" + rate;
-	});
+    });
 }
 
-function getCustomSurveyData(csq_id, cso_list){
+function report__get_custom_survey_data(csq_id, cso_list){
     var custom_survey_data = [];
     if (typeof(cso_list) == 'object'){
         j$.each(cso_list, function(i, cso){
@@ -173,7 +156,7 @@ function getCustomSurveyData(csq_id, cso_list){
     return(custom_survey_data);
 }
 
-function getCustomSurveyOptionIds(csq_id, cso_list){
+function report__get_custom_survey_option_ids(csq_id, cso_list){
     var custom_survey_option_ids = [];
     if (typeof(cso_list) == 'object'){
         j$.each(cso_list, function(i, cso){
@@ -185,18 +168,18 @@ function getCustomSurveyOptionIds(csq_id, cso_list){
     return(custom_survey_option_ids);
 }
 
-function drawBarChart(csq_id, custom_survey_data, session_id, custom_survey_option_ids){
+function report__draw_bar_chart(csq_id, custom_survey_data, session_id, custom_survey_option_ids){
     var data = new google.visualization.DataTable();
-    data.addColumn('string', '{!$label.option}');
-    data.addColumn('number', '{!$label.sum}');
+    data.addColumn('string', '{!$Label.option}');
+    data.addColumn('number', '{!$Label.sum}');
     data.addRows(custom_survey_data);
     var options = {
         'width':500,
         'height':250,
         'colors':['#FFCEEC'],
         'chartArea':{width:'85%',height:'80%'},
-        'hAxis':{title:'{!$label.sum}',viewWindowMode:'explicit',viewWindow:{min:0,max:'auto'}},
-        'vAxis':{title:'{!$label.option}',textPosition:'in'},
+        'hAxis':{title:'{!$Label.sum}',viewWindowMode:'explicit',viewWindow:{min:0,max:'auto'}},
+        'vAxis':{title:'{!$Label.option}',textPosition:'in'},
         'legend':{position:'none'}
     };
     var chart = new google.visualization.BarChart(document.getElementById('barchart_' + csq_id));
@@ -207,33 +190,83 @@ function drawBarChart(csq_id, custom_survey_data, session_id, custom_survey_opti
         row = selectedData[0].row;
         //item = data.getValue(row,0);
         window.location = "/apex/guest_list?session_id=" + session_id + "&search_by=option_id&option_id=" + custom_survey_option_ids[row];
-	});
-}
-
-function onErrorSfdc(error) {
-    alert("onErrorSfdc: " + JSON.stringify(error));
+    });
 }
 </script>
-<chatter:follow entityId="{!session.id}"></chatter:follow>
-<apex:outputPanel id="rating" styleClass="section" layout="block" rendered="{! Session.enable_rate__c && !ISNULL(Session.Rate_Avg__c) }">
-    <div class="section_header">{!$Label.rating}</div>
-    <div id="rating_left">
-        <p>
-        <span style="font-size:1.5em;">Rate Avg. </span>
-        <span style="font-size:4.0em;">{!Session.Rate_Avg__c}</span>
-        <span style="font-size:1.5em;"> pt</span>
-        </p>
-        <p>
-        <span>{!$Label.survey_collection_rate} {!Session.Survey_Collection_Rate__c}% ( {!ROUND(Session.Survey_Sum__c, 0)}/{!ROUND(Session.Guest_Sum__c,0)} )</span>
-        </p>
+<div style="position:relative; overflow:hidden;">
+    <div style="float:left; width:50%;">
+        <chatter:follow entityId="{!session.id}"></chatter:follow>
     </div>
-    <div id="rating_right">
+    <div style="float:left; width:50%; text-align:right;">
+        <button class="button_reload_report_container">{!$Label.reload}</button>
     </div>
-</apex:outputPanel>
-<div id="custom_survey" class="section">
 </div>
-<div id="comment" class="section">
-    <div class="section_header">{!$Label.comment}</div>
-    <chatter:feed entityId="{!session.id}" showPublisher="false"></chatter:feed>
+<div id="report_container">
+    <apex:outputPanel layout="block" id="rating" styleClass="section" rendered="{!session.Enable_Rate__c}">
+        <div class="section_header">
+            {!$Label.rating}
+        </div>
+        <apex:outputPanel style="position:relative; overflow:hidden;" layout="block" rendered="{! !ISNULL(Session.Rate_Avg__c) && Session.Rate_Avg__c != 0.00}">
+            <div id="rating_left">
+                <p>
+                    <span style="font-size:1.5em;">Rate Avg. </span>
+                    <span style="font-size:4.0em;">{!Session.Rate_Avg__c}</span>
+                    <span style="font-size:1.5em;"> pt</span>
+                </p>
+                <p>
+                    <span>{!$Label.survey_collection_rate} {!Session.Survey_Collection_Rate__c}% ( {!ROUND(Session.Survey_Sum__c, 0)}/{!ROUND(Session.Guest_Sum__c,0)} )</span>
+                </p>
+            </div>
+            <div id="rating_right">
+                <!-- Rating Chart will be inserted here -->
+            </div>
+        </apex:outputPanel>
+        <apex:outputPanel styleClass="no_data_container" layout="block" rendered="{! ISNULL(Session.Rate_Avg__c) || Session.Rate_Avg__c == 0.00}">
+            <span class="no_data">{!$Label.no_data}</span>
+        </apex:outputPanel>
+    </apex:outputPanel>
+    <div id="custom_survey" class="section">
+        <div class="section_header">
+            {!$Label.survey}
+        </div>
+        <apex:outputText rendered="{! session.Custom_Survey_Question__r != null }">
+            <apex:param name="is_csq" value="true" />
+            <apex:repeat value="{!session.Custom_Survey_Question__r}" var="csq">
+                <div class="barchart_container">
+                    <div class="barchart_header">
+                        <apex:outputText value="{!csq.Question__c}" />
+                    </div>
+                    <apex:outputText rendered="{!csq.Survey_Type__c != 'free'}">
+                        <div id="barchart_{!csq.id}" class="barchart_graph">
+                            <!-- Custom Survey Chart will be inserted here -->
+                        </div>
+                    </apex:outputText>
+                    <apex:outputText rendered="{!csq.Enable_Free_Form__c}">
+                        <div class="free_answer_container">
+                            <div class="free_answer_header">
+                                {!$Label.free_answers}
+                            </div>
+                            <div class="free_answer" id="free_answer_for_{!csq.id}">
+                                <!-- Free Answer will be inserted here -->
+                                <c:session_report_free_answer session_id="{!session.id}" csq_id="{!csq.id}" />
+                            </div>
+                        </div>
+                    </apex:outputText>
+                    <apex:outputText rendered="{!csq.Survey_Type__c == 'free'}">
+                        <div class="free_answer_container">
+                            <div class="free_answer" id="free_answer_for_{!csq.id}">
+                                <!-- Free Answer will be inserted here -->
+                                <c:session_report_free_answer session_id="{!session.id}" csq_id="{!csq.id}" />
+                            </div>
+                        </div>
+                    </apex:outputText>
+                </div>
+            </apex:repeat>
+        </apex:outputText>
+    </div>
+    <div id="comment" class="section">
+        <div class="section_header">{!$Label.comment}</div>
+        <chatter:feed entityId="{!session.id}" showPublisher="false"></chatter:feed>
+    </div>
 </div>
 </apex:page>

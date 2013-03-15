@@ -36,6 +36,41 @@
         <value>添付ファイル</value>
     </labels>
     <labels>
+        <fullName>attended_the_event_and_submitted_survey1</fullName>
+        <language>ja</language>
+        <protected>true</protected>
+        <shortDescription>attended_the_event_and_submitted_survey1</shortDescription>
+        <value>さんが</value>
+    </labels>
+    <labels>
+        <fullName>attended_the_event_and_submitted_survey2</fullName>
+        <language>ja</language>
+        <protected>true</protected>
+        <shortDescription>attended_the_event_and_submitted_survey2</shortDescription>
+        <value>に参加し、アンケートに回答しました。</value>
+    </labels>
+    <labels>
+        <fullName>attending_the_event1</fullName>
+        <language>ja</language>
+        <protected>true</protected>
+        <shortDescription>attending_the_event1</shortDescription>
+        <value>さんが</value>
+    </labels>
+    <labels>
+        <fullName>attending_the_event2</fullName>
+        <language>ja</language>
+        <protected>true</protected>
+        <shortDescription>attending_the_event2</shortDescription>
+        <value>に参加します。</value>
+    </labels>
+    <labels>
+        <fullName>best_event</fullName>
+        <language>ja</language>
+        <protected>true</protected>
+        <shortDescription>best_event</shortDescription>
+        <value>Best イベント</value>
+    </labels>
+    <labels>
         <fullName>body_of_deck_delivery_mail</fullName>
         <language>ja</language>
         <protected>true</protected>
@@ -83,6 +118,13 @@
         <protected>true</protected>
         <shortDescription>complete</shortDescription>
         <value>完了</value>
+    </labels>
+    <labels>
+        <fullName>create</fullName>
+        <language>ja</language>
+        <protected>true</protected>
+        <shortDescription>create</shortDescription>
+        <value>作成</value>
     </labels>
     <labels>
         <fullName>create_lead</fullName>
@@ -197,6 +239,20 @@
         <value>イベント</value>
     </labels>
     <labels>
+        <fullName>event_date</fullName>
+        <language>ja</language>
+        <protected>true</protected>
+        <shortDescription>event_date</shortDescription>
+        <value>開催日</value>
+    </labels>
+    <labels>
+        <fullName>event_history</fullName>
+        <language>ja</language>
+        <protected>true</protected>
+        <shortDescription>event_history</shortDescription>
+        <value>イベント履歴</value>
+    </labels>
+    <labels>
         <fullName>failed_to_create_feedItem</fullName>
         <language>ja</language>
         <protected>true</protected>
@@ -209,6 +265,13 @@
         <protected>true</protected>
         <shortDescription>free_answers</shortDescription>
         <value>その他の回答</value>
+    </labels>
+    <labels>
+        <fullName>go_to_contact</fullName>
+        <language>ja</language>
+        <protected>true</protected>
+        <shortDescription>go_to_contact</shortDescription>
+        <value>取引先責任者</value>
     </labels>
     <labels>
         <fullName>guest_id_is_not_set</fullName>
@@ -281,6 +344,13 @@
         <value>いいえ</value>
     </labels>
     <labels>
+        <fullName>no_data</fullName>
+        <language>ja</language>
+        <protected>true</protected>
+        <shortDescription>no_data</shortDescription>
+        <value>NO DATA</value>
+    </labels>
+    <labels>
         <fullName>option</fullName>
         <language>ja</language>
         <protected>false</protected>
@@ -302,11 +372,60 @@
         <value>パスワード</value>
     </labels>
     <labels>
+        <fullName>people</fullName>
+        <language>ja</language>
+        <protected>true</protected>
+        <shortDescription>people</shortDescription>
+        <value>人</value>
+    </labels>
+    <labels>
+        <fullName>performance_summary</fullName>
+        <language>ja</language>
+        <protected>true</protected>
+        <shortDescription>performance_summary</shortDescription>
+        <value>パフォーマンスサマリー</value>
+    </labels>
+    <labels>
         <fullName>phone</fullName>
         <language>ja</language>
         <protected>true</protected>
         <shortDescription>phone</shortDescription>
         <value>電話番号</value>
+    </labels>
+    <labels>
+        <fullName>picklist_anyone</fullName>
+        <language>ja</language>
+        <protected>true</protected>
+        <shortDescription>picklist_anyone</shortDescription>
+        <value>全員</value>
+    </labels>
+    <labels>
+        <fullName>picklist_no_condition</fullName>
+        <language>ja</language>
+        <protected>true</protected>
+        <shortDescription>picklist_no_condition</shortDescription>
+        <value>無条件</value>
+    </labels>
+    <labels>
+        <fullName>picklist_registered_guests_only</fullName>
+        <language>ja</language>
+        <protected>true</protected>
+        <shortDescription>picklist_registered_guests_only</shortDescription>
+        <value>事前登録者のみ</value>
+    </labels>
+    <labels>
+        <fullName>picklist_require_email</fullName>
+        <language>ja</language>
+        <protected>true</protected>
+        <shortDescription>picklist_require_email</shortDescription>
+        <value>Eメールの入力が必要</value>
+    </labels>
+    <labels>
+        <fullName>picklist_require_survey_submission</fullName>
+        <language>ja</language>
+        <protected>true</protected>
+        <shortDescription>picklist_require_survey_submission</shortDescription>
+        <value>アンケートの入力が必要</value>
     </labels>
     <labels>
         <fullName>pls_enter_by_255_letters</fullName>
@@ -379,11 +498,39 @@
         <value>評価</value>
     </labels>
     <labels>
+        <fullName>rate_avg</fullName>
+        <language>ja</language>
+        <protected>true</protected>
+        <shortDescription>rate_avg</shortDescription>
+        <value>評価平均</value>
+    </labels>
+    <labels>
+        <fullName>rate_avg_transition</fullName>
+        <language>ja</language>
+        <protected>true</protected>
+        <shortDescription>rate_avg_transition</shortDescription>
+        <value>評価平均の推移</value>
+    </labels>
+    <labels>
         <fullName>rating</fullName>
         <language>ja</language>
         <protected>true</protected>
         <shortDescription>rating</shortDescription>
         <value>評価</value>
+    </labels>
+    <labels>
+        <fullName>re_initialize</fullName>
+        <language>ja</language>
+        <protected>true</protected>
+        <shortDescription>re_initialize</shortDescription>
+        <value>設定を更新</value>
+    </labels>
+    <labels>
+        <fullName>reload</fullName>
+        <language>ja</language>
+        <protected>true</protected>
+        <shortDescription>reload</shortDescription>
+        <value>再読み込み</value>
     </labels>
     <labels>
         <fullName>report</fullName>
@@ -519,11 +666,25 @@
         <value>アンケート</value>
     </labels>
     <labels>
+        <fullName>survey_answer</fullName>
+        <language>ja</language>
+        <protected>true</protected>
+        <shortDescription>survey_answer</shortDescription>
+        <value>アンケートの回答</value>
+    </labels>
+    <labels>
         <fullName>survey_collection_rate</fullName>
         <language>ja</language>
         <protected>true</protected>
         <shortDescription>survey_collection_rate</shortDescription>
         <value>回答率</value>
+    </labels>
+    <labels>
+        <fullName>survey_has_been_created</fullName>
+        <language>ja</language>
+        <protected>true</protected>
+        <shortDescription>survey_has_been_created</shortDescription>
+        <value>アンケートが作成されました。</value>
     </labels>
     <labels>
         <fullName>survey_has_been_deleted</fullName>
@@ -601,6 +762,20 @@
         <protected>true</protected>
         <shortDescription>title_of_deliverDeck</shortDescription>
         <value>資料配信</value>
+    </labels>
+    <labels>
+        <fullName>total_events</fullName>
+        <language>ja</language>
+        <protected>true</protected>
+        <shortDescription>total_events</shortDescription>
+        <value>イベント数</value>
+    </labels>
+    <labels>
+        <fullName>total_guests</fullName>
+        <language>ja</language>
+        <protected>true</protected>
+        <shortDescription>total_guests</shortDescription>
+        <value>ゲスト数</value>
     </labels>
     <labels>
         <fullName>unknown_company</fullName>

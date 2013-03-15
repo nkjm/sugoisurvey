@@ -10,107 +10,89 @@ public with sharing class jr_session {
     
     @remoteAction 
     public static r finish_init(){
-    	r r = new r();
-    	config__c config = config__c.getOrgDefaults();
+        r r = new r();
+        config__c config = config__c.getOrgDefaults();
 
         // Quit if app has been initialized.
-        if (config.initialized__c == true){
+        if (config.initialized__c == true && config.need_re_initialization__c == false){
             r.status = false;
             r.message = system.label.already_initialized;
             return r;
         }
         
-    	config.initialized__c = true;
-    	upsert config;
-    	
-    	// Start copying comment to feedItem
+        //// Launch scheduler
+        // Start cron job for copy comment to feedItem. This should be merged into universal cron trigger but there is no way to kill existing job programatically.
         Datetime next = Datetime.now().addMinutes(1);
         string sch = string.valueOf(next.second()) + ' ' + string.valueOf(next.minute()) + ' ' + string.valueOf(next.hour()) + ' ' + string.valueOf(next.day()) + ' ' + string.valueOf(next.month()) + ' ?';
+        if (config.initialized__c == false && config.need_re_initialization__c == false){
+            if (!Test.isRunningTest()){
+                system.schedule('Copy comment to feedItem - ' + sch, sch, new schedule_copy_comment_to_feedItem());
+            }
+        }
+        // Start cron job for universal purpose. As of v4 1.13, chatter_notification.notify_guest_registration_for_pending_guest is the only method to invoke.
+        id cron_trigger_id;
         if (!Test.isRunningTest()){
-            system.schedule('Copy comment to feedItem - ' + string.valueOf(next.second()) + ' ' + string.valueOf(next.minute()) + ' ' + string.valueOf(next.hour()) + ' ' + string.valueOf(next.day()) + ' ' + string.valueOf(next.month()) + ' ?', sch, new schedule_copy_comment_to_feedItem());
+            cron_trigger_id = system.schedule('Cron Trigger v1.13 - ' + sch, sch, new cron_trigger());
         }
-        
-    	r.status = true;
-    	return r;
-    }
-    
-    private static testmethod void validate_finish_init(){
-        r r = new r();
 
-        config__c config = config__c.getOrgDefaults();
-        config.initialized__c = false;
+        // update config
+        config.cron_trigger_id__c = cron_trigger_id;
+        config.initialized__c = true;
+        config.need_re_initialization__c = false;
         upsert config;
-        
-        r = finish_init();
-        system.assertEquals(true, r.status);
-        system.assertEquals(true, config__c.getOrgDefaults().initialized__c);
-        
-        r = finish_init();
-        system.assertEquals(false, r.status);
-        system.assertEquals(system.label.already_initialized, r.message);
-    }
-
-    @remoteAction 
-    public static r assign_permission_set(){
-    	r r = new r();
-   		config__c config = config__c.getOrgDefaults();
-   		
-        // Quit if site has not been activated
-		if (config.survey_sites_domain__c == null){
-			r.status = false;
-			r.message = system.label.sites_not_activated;
-			return r;
-		}
-		
-        string sites_user_username = 'sugoisurvey@' + config.survey_sites_domain__c;
-        
-        // retreive id of user for sites
-        string sites_user_id;
-        try {
-        	sites_user_id = [select id from user where username = :sites_user_username].id;
-        } catch(Exception e) {
-        	r.status = false;
-        	r.message = system.label.sites_user_not_found;
-        	return r;
-        }
-        
-        // retrieve id of permission set for sites
-        string sites_permission_set_id;
-        try {
-        	sites_permission_set_id = [select id from permissionSet where name = 'Sugoi_Survey_Sites_for_Any_License'].id;
-        } catch(Exception e){
-        	r.status = false;
-        	r.message = system.label.sites_permission_set_not_found;
-        	return r;
-        }
-        
-        permissionSetAssignment psa = new permissionSetAssignment(assigneeId = sites_user_id, permissionSetId = sites_permission_set_id);
-        insert psa;
         
         r.status = true;
         return r;
     }
     
-    private static testmethod void validate_assign_permission_set(){
-    	/*
-    	r r = new r();
-    	r = assign_permission_set();
-    	system.assertEquals(true, r.status);
-    	
-    	string sites_user_username = 'sugoisurvey@sugoisurvey-developer-edition.na14.force.com';
-    	id sites_user_id = [select id from user where username = :sites_user_username].id;
-    	id sites_permission_set_id = [select id from permissionSet where name = 'Sugoi_Survey_Sites_for_Any_License'].id;
-    	system.assertEquals(1, [select id from permissionSetAssignment where assigneeId = :sites_user_id and permissionSetId = :sites_permission_set_id].size());
-    	*/
+    @remoteAction 
+    public static r assign_permission_set(){
+        r r = new r();
+        config__c config = config__c.getOrgDefaults();
+        
+        // Quit if site has not been activated
+        if (config.survey_sites_domain__c == null){
+            r.status = false;
+            r.message = system.label.sites_not_activated;
+            return r;
+        }
+        
+        // retreive id of user for sites
+        string sites_user_id;
+        try {
+            sites_user_id = [select id from user where username = :config.sites_username__c].id;
+        } catch(Exception e) {
+            r.status = false;
+            r.message = system.label.sites_user_not_found;
+            return r;
+        }
+        
+        // retrieve id of permission set for sites
+        string sites_permission_set_id;
+        try {
+            sites_permission_set_id = [select id from permissionSet where name = 'Sugoi_Survey_Sites_for_Any_License'].id;
+        } catch(Exception e){
+            r.status = false;
+            r.message = system.label.sites_permission_set_not_found;
+            return r;
+        }
+        
+        if ([select id from permissionSetAssignment where assigneeId = :sites_user_id and permissionSetId = :sites_permission_set_id].size() == 0){
+            permissionSetAssignment psa = new permissionSetAssignment(assigneeId = sites_user_id, permissionSetId = sites_permission_set_id);
+            insert psa;
+        }
+        
+        r.status = true;
+        return r;
     }
     
     @remoteAction 
-    public static r start_init(){
+    public static r start_init(string current_url){
         r r = new r();
         config__c config = config__c.getOrgDefaults();
         
         // Quit if app has been initialized.
-        if (config.initialized__c == true){
+        if (config.initialized__c == true && config.need_re_initialization__c == false){
             r.status = false;
             r.message = system.label.already_initialized;
             return r;
@@ -118,25 +100,55 @@ public with sharing class jr_session {
         
         // Quit if sites has not been activated yet.
         list<site> sites = [select status, subdomain from site where urlPathPrefix = 'sugoisurvey'];
-		if (sites.size() == 0 || sites[0].subdomain == null || sites[0].status != 'Active'){
-			r.status = false;
-			r.message = system.label.sites_not_activated;
-			return r;
-		}
-		
-		// Identify the Edition of this Org
-		string edition = [select OrganizationType from organization].OrganizationType;
+        if (sites.size() == 0 || sites[0].subdomain == null || sites[0].status != 'Active'){
+            r.status = false;
+            r.message = system.label.sites_not_activated;
+            return r;
+        }
         
+        // Identify the Edition of this Org
+        string edition = [select OrganizationType from organization].OrganizationType;
+        
+        // Identify whether this org is production or sandbox
+        string hostname = current_url.split('/',0)[2];
+        config.sandbox__c = (Pattern.matches('(.*\\.)?cs[0-9]*(-api)?\\..*force.com',hostname));
+        
+        // Identify if my domain is set
+        config.my_domain_enabled__c = hostname.contains('--');
+        if (config.my_domain_enabled__c == true){
+            config.my_domain__c = hostname.split('--', 0)[0];
+        }
+
         // Set Domain and Survey Site URL
-        if (edition == 'Team Edition' || edition == 'Professional Edition' || edition == 'Enterprise Edition' || edition == 'Unlimited Edition'){
-        	// Production Org
-        	config.survey_sites_domain__c = sites[0].subdomain + '.force.com';
-        	config.survey_sites_url__c = 'https://' + sites[0].subdomain + '.secure.force.com/sugoisurvey/';
+        if (config.sandbox__c == true){
+            // Sandbox Org
+            config.instance__c = hostname.split('\\.', 0)[1];
+            if (config.my_domain_enabled__c == true){
+                // My Domain is set
+                config.sandbox_name__c = hostname.split('\\.', 0)[0].split('--', 0)[1];
+                config.survey_sites_domain__c = sites[0].subdomain + '.' + config.sandbox_name__c + '.' + config.instance__c + '.force.com';
+                config.survey_sites_url__c = 'https://' + config.survey_sites_domain__c + '/sugoisurvey/';
+                config.sites_username__c = 'sugoisurvey@' + sites[0].subdomain + '.force.com.' + config.sandbox_name__c;
+            } else {
+                // My Domain is NOT set
+                /* Following method to identify sandbox_name is un-reliable. Should be replaced by proper api-call once it's released */
+                list<string> divided_username = UserInfo.getUsername().split('\\.',0);
+                config.sandbox_name__c = divided_username[divided_username.size() - 1];
+                config.survey_sites_domain__c = sites[0].subdomain + '.' + config.sandbox_name__c + '.' + config.instance__c + '.force.com';
+                config.survey_sites_url__c = 'https://' + config.survey_sites_domain__c + '/sugoisurvey/';
+                config.sites_username__c = 'sugoisurvey@' + config.survey_sites_domain__c;
+            }
+        } else if(edition == 'Team Edition' || edition == 'Professional Edition' || edition == 'Enterprise Edition' || edition == 'Unlimited Edition'){
+            // Production Org
+            config.survey_sites_domain__c = sites[0].subdomain + '.force.com';
+            config.survey_sites_url__c = 'https://' + sites[0].subdomain + '.secure.force.com/sugoisurvey/';
+            config.sites_username__c = 'sugoisurvey@' + config.survey_sites_domain__c;
         } else {
-        	// Non-Production Org
-        	string sites_instance = system.url.getSalesforceBaseUrl().getHost().replace('sugoisurvey4','').replace('visual.force.com','').replace('salesforce.com','').replace('.','').replace(sites[0].subdomain + '--', '');
-        	config.survey_sites_domain__c = sites[0].subdomain + '.' + sites_instance + '.force.com';
-        	config.survey_sites_url__c = 'https://' + config.survey_sites_domain__c + '/sugoisurvey/';
+            // Non-Production Org
+            config.instance__c = hostname.replace('sugoisurvey4','').replace('visual.force.com','').replace('salesforce.com','').replace('.','').replace(sites[0].subdomain + '--', '');
+            config.survey_sites_domain__c = sites[0].subdomain + '.' + config.instance__c + '.force.com';
+            config.survey_sites_url__c = 'https://' + config.survey_sites_domain__c + '/sugoisurvey/';
+            config.sites_username__c = 'sugoisurvey@' + config.survey_sites_domain__c;
         }
         
         upsert config;
@@ -144,23 +156,7 @@ public with sharing class jr_session {
         r.status = true;
         return r;
     }
-    
-    private static testmethod void validate_start_init(){
-    	r r = new r();
-		
-    	r = start_init();
-    	system.assertEquals(true, r.status);
-    	system.assertEquals('https://sugoisurvey4-developer-edition.na11.force.com/sugoisurvey/', config__c.getOrgDefaults().survey_sites_url__c);
-    	system.assertEquals('sugoisurvey4-developer-edition.na11.force.com', config__c.getOrgDefaults().survey_sites_domain__c);
-    	
-    	config__c config = config__c.getOrgDefaults();
-    	config.initialized__c = true;
-    	upsert config;
-    	r = start_init();
-    	system.assertEquals(false, r.status);
-    	system.assertEquals(system.label.already_initialized, r.message);
-    }
-    
+
     @remoteAction
     public static r close_survey(id session_id){
         r r = new r();
@@ -188,21 +184,6 @@ public with sharing class jr_session {
         return r;
     }
     
-    private static testmethod void validate_close_survey(){
-        r r = new r();
-        session__c session = validate_session.createDummySession('irjffiejdjhjkf', 'Eメールの入力が必要', 'アンケートの入力が必要');
-        system.assertEquals(true, [select open__c from session__c where id = :session.id].open__c);
-        
-        close_survey(session.id);
-        system.assertEquals(false, [select open__c from session__c where id = :session.id].open__c);
-        system.assertEquals(2, [select id from feedItem where parentId = :session.id].size());
-        
-        delete session;
-        r = close_survey(session.id);
-        system.assertEquals(false, r.status);
-        system.assertEquals(system.label.specified_session_does_not_exist, r.message);
-    }
-    
     @remoteAction
     public static r copy_comment_to_feedItem(id session_id){
         r r = new r();
@@ -224,35 +205,19 @@ public with sharing class jr_session {
             }
         }
 
-		if (comments_to_copy != null && comments_to_copy.size() > 0){
-        	update comments_to_copy;
-		}
+        if (comments_to_copy != null && comments_to_copy.size() > 0){
+            update comments_to_copy;
+        }
         
         r.status = true;
         return r;
     }
     
-    private static testmethod void validate_copy_comment_to_feedItem(){
-        // perform only for batch based copy since manual copy validation is implemented in validate_close_survey()
-        r r = new r();
-        session__c s1 = validate_session.createDummySession('irjffiejdjhjkf', 'Eメールの入力が必要', 'アンケートの入力が必要');
-        session__c s2 = validate_session.createDummySession('afjrrhjgjjfjfjjf', 'Eメールの入力が必要', 'アンケートの入力が必要');
-        session__c s3 = validate_session.createDummySession('brjffisdferdjhjkf', 'Eメールの入力が必要', 'アンケートの入力が必要');
-        s3.open__c = false;
-        update s3;
-        
-        r = copy_comment_to_feedItem(null);
-        system.assertEquals(true, r.status);
-        system.assertEquals(2, [select id from feedItem where parentId = :s1.id].size());
-        system.assertEquals(2, [select id from feedItem where parentId = :s2.id].size());
-        system.assertEquals(0, [select id from feedItem where parentId = :s3.id].size());
-    }
-
     public static boolean create_feedItem_from_comment(id parent_id, string body, guest__c guest){
         string url = '/' + guest.id;
         string title = '';
         if (guest == null){
-        	return false;
+            return false;
         }
         if (guest.company__c != null && guest.company__c != ''){
             title += guest.company__c + ' ';
@@ -260,11 +225,20 @@ public with sharing class jr_session {
         if (guest.title__c != null && guest.title__c != ''){
             title += guest.title__c + ' ';
         }
-        if (guest.last_name__c != null && guest.last_name__c != ''){
-            title += guest.last_name__c + ' ';
-        }
-        if (guest.first_name__c != null && guest.first_name__c != ''){
-            title += guest.first_name__c;
+        if ([select languageLocaleKey from user where id = :Userinfo.getUserId()].languageLocaleKey == 'ja'){
+            if (guest.last_name__c != null && guest.last_name__c != ''){
+                title += guest.last_name__c + ' ';
+            }
+            if (guest.first_name__c != null && guest.first_name__c != ''){
+                title += guest.first_name__c;
+            }
+        } else {
+            if (guest.first_name__c != null && guest.first_name__c != ''){
+                title += guest.first_name__c + ' ';
+            }
+            if (guest.last_name__c != null && guest.last_name__c != ''){
+                title += guest.last_name__c;
+            }
         }
         if (title == ''){
             title = system.label.unregistered_guest;
@@ -307,26 +281,27 @@ public with sharing class jr_session {
         
         // check value of rate 
         if (session.enable_rate__c == true){
-		    if (survey.rate__c == null || !(1 <= survey.rate__c) || !(survey.rate__c <= 5)){
-		        r.status = false;
-		        string label_for_rate;
-		        if (session.label_for_rate__c == null){
-		            label_for_rate = system.label.xPointScale;
-		        } else {
-		            label_for_rate = session.label_for_rate__c;
-		        }
-		        r.message = system.label.pls_enter_required_field + ' ' + label_for_rate;
-		        return r;         
-		    }
+            if (survey.rate__c == null || !(1 <= survey.rate__c) || !(survey.rate__c <= 5)){
+                r.status = false;
+                string label_for_rate;
+                if (session.label_for_rate__c == null){
+                    label_for_rate = system.label.xPointScale;
+                } else {
+                    label_for_rate = session.label_for_rate__c;
+                }
+                r.message = system.label.pls_enter_required_field + ' ' + label_for_rate;
+                return r;         
+            }
         } else {
-        	survey.rate__c = null;
+            survey.rate__c = null;
         }
         
         // - check if user is entitled to submit survey
         // - identify guest by email if user is registered guest
         // - insert guest__c if user is unregistered guest and if condition is not registered only
         guest__c guest;
-        if (session.who_can_submit_survey__c == '無条件' || session.who_can_submit_survey__c == 'Anyone'){
+        if (session.who_can_submit_survey__c == '無条件' || 
+            session.who_can_submit_survey__c == 'Anyone'){
             guest = identifyGuest(session.id, guest_email);
             if (guest == null){
                 guest = createAnonymousGuest(session.id, guest_email);
@@ -336,7 +311,8 @@ public with sharing class jr_session {
                 r.message = system.label.invalid_email;
                 return r;
             }
-        } else if (session.who_can_submit_survey__c == 'Eメールの入力が必要' || session.who_can_submit_survey__c == 'Required Email'){
+        } else if (session.who_can_submit_survey__c == 'Eメールの入力が必要' ||
+                   session.who_can_submit_survey__c == 'Require Email'){
             if (guest_email == '' || guest_email == null){
                 r.status = false;
                 r.message = system.label.pls_input_email;
@@ -351,7 +327,8 @@ public with sharing class jr_session {
                 r.message = system.label.invalid_email;
                 return r;  
             }
-        } else if (session.who_can_submit_survey__c == '事前登録者のみ' || session.who_can_submit_survey__c == 'Registered Guests Only') {
+        } else if (session.who_can_submit_survey__c == '事前登録者のみ' || 
+                   session.who_can_submit_survey__c == 'Registered Guests Only') {
             if (guest_email == '' || guest_email == null){
                 r.status = false;
                 r.message = system.label.pls_input_email;
@@ -384,32 +361,8 @@ public with sharing class jr_session {
         // insert comment__c and feedItem
         if (comment.comment__c != null && comment.comment__c != ''){
             // insert comment__c
-            insert(new comment__c(session__c = session.id, guest__c = guest.id, comment__c = enc.SFDC_HTMLENCODE(comment.comment__c)));
-            
-            /*
-            // set parameter for feedItem
-            string url = System.URL.getSalesforceBaseUrl().toExternalForm() + '/' + guest.id;
-            string url_name = '';
-            if (guest.company__c != null && guest.company__c != ''){
-                url_name += guest.company__c + ' ';
-            }
-            if (guest.title__c != null && guest.title__c != ''){
-                url_name += guest.title__c + ' ';
-            }
-            if (guest.name__c != null && guest.name__c != ''){
-                url_name += guest.name__c;
-            }
-            if (url_name == ''){
-                url_name = system.label.unregistered_guest;
-            }
-            
-            // insert feedItem
-            if (!createLinkPost(session.id, comment.comment__c, url, url_name)){
-                r.status = false;
-                r.message = system.label.failed_to_create_linkpost;
-                return r;
-            }
-            */
+            //insert(new comment__c(session__c = session.id, guest__c = guest.id, comment__c = enc.SFDC_HTMLENCODE(comment.comment__c)));
+            insert(new comment__c(session__c = session.id, guest__c = guest.id, comment__c = comment.comment__c));
         }
         
         // prepare custom_survey_answers to insert
@@ -421,7 +374,8 @@ public with sharing class jr_session {
             csa.session__c = session.id;
             csa.guest__c = guest.id;
             if (csa.free_form__c != null && csa.free_form__c != ''){
-                csa.free_form__c = enc.SFDC_HTMLENCODE(csa.free_form__c);
+                //csa.free_form__c = enc.SFDC_HTMLENCODE(csa.free_form__c);
+                csa.free_form__c = csa.free_form__c;
             }
             csas_to_add.add(csa);
         }
@@ -437,7 +391,7 @@ public with sharing class jr_session {
     
     private static guest__c identifyGuest(id session_id, string guest_email){
         guest__c guest;
-        if (guest_email == '' || guest_email == null){
+        if (String.isEmpty(guest_email)){
             return guest;
         }
         try {
@@ -461,167 +415,6 @@ public with sharing class jr_session {
             guest = null;
         }
         return guest;
-    }
-
-/*
-    public static boolean createLinkPost(id parent_id, string body, string url, string title){
-        FeedItem fi = new FeedItem();
-        fi.type = 'LinkPost';
-        fi.parentId = parent_id;
-        fi.body = body;
-        fi.linkUrl = url;
-        fi.title = title;
-        try {
-            insert fi;
-        } catch (Exception e) {
-            return false;
-        }
-        return true;
-    }
-*/
-    
-    private static testMethod void validate_submit_survey(){
-        r r = new r();
-        
-        //create dummy session
-        List<session__c> session_list = new List<session__c>();
-        session_list.add(new Session__c(who_can_submit_survey__c='無条件'));
-        session_list.add(new Session__c(who_can_submit_survey__c='Eメールの入力が必要'));
-        session_list.add(new Session__c(who_can_submit_survey__c='事前登録者のみ'));
-        insert session_list;
-        
-        for (session__c session : session_list){
-            //create test data for guest
-            Guest__c guest1 = new Guest__c(last_name__c = 'Test1 Name', session__c = session.id, email__c = 'test1@hoge.com', company__c = 'Test1 Inc.');
-            insert guest1;
-            
-            //create test data for custom_survey_question
-            Custom_survey_question__c custom_survey_question = new Custom_survey_question__c(session__c = session.id, question__c = 'test question1');
-            insert custom_survey_question;
-            
-            //create test data for custom_survey_option
-            Custom_survey_option__c custom_survey_option1 = new Custom_survey_option__c(session__c = session.id, custom_survey_question__c = custom_survey_question.id, option__c = 'test option1');
-            Custom_survey_option__c custom_survey_option2 = new Custom_survey_option__c(session__c = session.id, custom_survey_question__c = custom_survey_question.id, option__c = 'test option2');
-            insert custom_survey_option1;
-            insert custom_survey_option2;
-            
-            //create answer of guest1 (Registered)
-            list<custom_survey_answer__c> csas_of_guest1 = new list<custom_survey_answer__c>();
-            csas_of_guest1.add(new custom_survey_answer__c(custom_survey_option__c = custom_survey_option1.id));
-            csas_of_guest1.add(new custom_survey_answer__c(custom_survey_option__c = custom_survey_option2.id, free_form__c = 'value for free form'));
-            
-            
-            // null session id
-            r = submit_survey(
-                new survey__c(),
-                new comment__c(comment__c = 'test comment1'),
-                csas_of_guest1, 
-                guest1.email__c
-            );
-            system.assertEquals(false, r.status);
-            system.assertEquals(system.label.session_id_is_not_set, r.message);
-            
-            // null rate
-            r = submit_survey(
-                new survey__c(session__c = session.id),
-                new comment__c(comment__c = 'test comment1'),
-                csas_of_guest1, 
-                guest1.email__c
-            );
-            system.assertEquals(false, r.status);
-            system.assertEquals(system.label.pls_enter_required_field + ' ' + system.label.xPointScale, r.message);
-            
-            // invalid rate
-            r = submit_survey(
-                new survey__c(session__c = session.id, rate__c = 101),
-                new comment__c(comment__c = 'test comment1'),
-                csas_of_guest1, 
-                guest1.email__c
-            );
-            system.assertEquals(false, r.status);
-            system.assertEquals(system.label.pls_enter_required_field + ' ' + system.label.xPointScale, r.message);
-            
-            //correct submit
-            r = submit_survey(
-                new survey__c(session__c = session.id, rate__c = 5),
-                new comment__c(comment__c = 'test comment1'),
-                csas_of_guest1, 
-                guest1.email__c
-            );
-            system.assertEquals(true, r.status);
-            
-            //duplicated submit
-            r = submit_survey(
-                new survey__c(session__c = session.id, rate__c = 5),
-                new comment__c(comment__c = 'test comment1'),
-                csas_of_guest1, 
-                guest1.email__c
-            );
-            system.assertEquals(false, r.status);
-            system.assertEquals(system.label.already_submitted, r.message);
-            
-            //create answer of guest2 (With Email)
-            list<custom_survey_answer__c> csas_of_guest2 = new list<custom_survey_answer__c>();
-            csas_of_guest2.add(new custom_survey_answer__c(custom_survey_option__c = custom_survey_option1.id));
-
-            // invalid email
-            r = submit_survey(
-                new survey__c(session__c = session.id, rate__c = 4),
-                new comment__c(comment__c = 'test comment2'),
-                csas_of_guest2, 
-                'guest2.hoge.com'
-            );
-            system.assertEquals(false, r.status);
-            r = submit_survey(
-                new survey__c(session__c = session.id, rate__c = 4),
-                new comment__c(comment__c = 'test comment2'),
-                csas_of_guest2, 
-                'guest2@hoge.com'
-            );
-            
-            //create answer of guest3 (Anonymous)
-            list<custom_survey_answer__c> csas_of_guest3 = new list<custom_survey_answer__c>();
-            csas_of_guest3.add(new custom_survey_answer__c(custom_survey_option__c = custom_survey_option2.id));
-            
-            r = submit_survey(
-                new survey__c(session__c = session.id, rate__c = 3),
-                new comment__c(comment__c = 'test comment3'),
-                csas_of_guest3, 
-                ''
-            );
-            
-            //check avg.
-            Session__c session_for_validate = [select rate_avg__c from session__c where id = :session.id];
-            if (session.Who_Can_Submit_Survey__c == '無条件'){
-                system.assertEquals(4, session_for_validate.rate_avg__c);
-                Custom_survey_option__c custom_survey_option_for_validate1 = [select sum__c from custom_survey_option__c where id = :custom_survey_option1.id];
-                Custom_survey_option__c custom_survey_option_for_validate2 = [select sum__c from custom_survey_option__c where id = :custom_survey_option2.id];
-                system.assertEquals(2, custom_survey_option_for_validate1.sum__c);
-                system.assertEquals(2, custom_survey_option_for_validate2.sum__c);
-            } else if (session.Who_Can_Submit_Survey__c == 'Eメールの入力が必要'){
-                system.assertEquals(4.5, session_for_validate.rate_avg__c);
-                Custom_survey_option__c custom_survey_option_for_validate1 = [select sum__c from custom_survey_option__c where id = :custom_survey_option1.id];
-                Custom_survey_option__c custom_survey_option_for_validate2 = [select sum__c from custom_survey_option__c where id = :custom_survey_option2.id];
-                system.assertEquals(2, custom_survey_option_for_validate1.sum__c);
-                system.assertEquals(1, custom_survey_option_for_validate2.sum__c);
-            } else if (session.Who_Can_Submit_Survey__c == '事前登録者のみ'){
-                system.assertEquals(5, session_for_validate.rate_avg__c);
-                Custom_survey_option__c custom_survey_option_for_validate1 = [select sum__c from custom_survey_option__c where id = :custom_survey_option1.id];
-                Custom_survey_option__c custom_survey_option_for_validate2 = [select sum__c from custom_survey_option__c where id = :custom_survey_option2.id];
-                system.assertEquals(1, custom_survey_option_for_validate1.sum__c);
-                system.assertEquals(1, custom_survey_option_for_validate2.sum__c);
-            }
-        }
-        
-        // validate enable_rate__c
-        session__c session_rate_disabled = new session__c(name='rirjfnkeik', enable_rate__c=true, who_can_submit_survey__c='無条件');
-        insert session_rate_disabled;
-        r = submit_survey(new survey__c(session__c = session_rate_disabled.id), new comment__c(comment__c = ''), new list<custom_survey_answer__c>(), '');
-        system.assertEquals(false, r.status);
-        session_rate_disabled.enable_rate__c = false;
-        update session_rate_disabled;
-        r = submit_survey(new survey__c(session__c = session_rate_disabled.id), new comment__c(comment__c = ''), new list<custom_survey_answer__c>(), '');
-        system.assertEquals(true, r.status);
     }
     
     @remoteAction
@@ -671,42 +464,6 @@ public with sharing class jr_session {
         }
         
         return session;
-    }
-
-    private static testmethod void validate_get_session(){
-        session__c session;
-        session = validate_session.createDummySession('wpoeiru', 'Eメールの入力が必要', 'アンケートの入力が必要');
-        
-        /*
-        Condition
-        - session_id => null
-        - open__c => true
-        */
-        system.assertEquals(null, get_session(null));
-        
-        /*
-        Condition
-        - session_id => set(exists)
-        - open__c => true
-        */
-        system.assertEquals('wpoeiru', get_session(session.id).name);
-
-        /*
-        Condition
-        - session_id => set(exists)
-        - open__c => false
-        */
-        session.open__c = false;
-        update session;
-        system.assertEquals('wpoeiru', get_session(session.id).name);
-        
-        /*
-        Condition
-        - session_id => set(not exist)
-        - open__c => n/a
-        */
-        delete session;
-        system.assertEquals(null, get_session(session.id));
     }
     
     @remoteAction
@@ -764,79 +521,6 @@ public with sharing class jr_session {
         return r;
     }
     
-    private static testmethod void validate_reorder_question(){
-        r r = new r();
-        
-        session__c s = new session__c(name = 'curnfivdnbnef');
-        insert s;
-        
-        custom_survey_question__c csq = new custom_survey_question__c(session__c = s.id, question__c = '#1');
-        insert csq;
-        
-        list<id> question_ids = new list<id>();
-        question_ids.add(csq.id);
-
-        // session id is null       
-        r = reorder_question(null, question_ids);
-        system.assertEquals(false, r.status);
-        system.assertEquals(system.label.session_id_is_not_set, r.message);
-
-        // requested # of question < 2
-        r = reorder_question(s.id, question_ids);
-        system.assertEquals(false, r.status);
-        system.assertEquals(system.label.there_are_not_enough_number_of_question_to_sort, r.message);
-
-        // re-order and sort_order__c in 2 questions are updated
-        csq = new custom_survey_question__c(session__c = s.id, question__c = '#2');
-        insert csq;
-        question_ids.add(csq.id);
-        r = reorder_question(s.id, question_ids);
-        system.assertEquals(true, r.status);
-        system.assertEquals(1, [select sort_order__c from custom_survey_question__c where session__c = :s.id and question__c = '#1'].sort_order__c);
-        system.assertEquals(2, [select sort_order__c from custom_survey_question__c where session__c = :s.id and question__c = '#2'].sort_order__c);
-
-        // reverse the order
-        list<id> question_ids_reversed = question_ids.clone();
-        question_ids_reversed[0] = question_ids[1];
-        question_ids_reversed[1] = question_ids[0];
-        r = reorder_question(s.id, question_ids_reversed);
-        system.assertEquals(2, [select sort_order__c from custom_survey_question__c where session__c = :s.id and question__c = '#1'].sort_order__c);
-        system.assertEquals(1, [select sort_order__c from custom_survey_question__c where session__c = :s.id and question__c = '#2'].sort_order__c);
-        
-        // # of question in database < 2
-        delete csq;
-        r = reorder_question(s.id, question_ids_reversed);
-        system.assertEquals(false, r.status);
-        system.assertEquals(system.label.there_are_not_enough_number_of_question_to_sort, r.message);
-
-        // # of requested question < database
-        csq = new custom_survey_question__c(session__c = s.id, question__c = '#2');
-        insert csq;
-        csq = new custom_survey_question__c(session__c = s.id, question__c = '#3');
-        insert csq;
-        list<custom_survey_question__c> csqs = [select id from custom_survey_question__c where session__c = :s.id];
-        question_ids = new list<id>();
-        for (custom_survey_question__c csq_qoiweuyr : csqs){
-            question_ids.add(csq_qoiweuyr.id);
-        }
-        csq = new custom_survey_question__c(session__c = s.id, question__c = '#4');
-        insert csq;
-        r = reorder_question(s.id, question_ids);
-        system.assertEquals(false, r.status);
-        system.assertEquals(system.label.requested_number_of_question_is_not_valid, r.message);
-
-        // # of requested question > database
-        csqs = [select id from custom_survey_question__c where session__c = :s.id];
-        question_ids = new list<id>();
-        for (custom_survey_question__c csq_ueryyruu : csqs){
-            question_ids.add(csq_ueryyruu.id);
-        }
-        question_ids[0] = s.id;
-        r = reorder_question(s.id, question_ids);
-        system.assertEquals(false, r.status);
-        system.assertEquals(system.label.specified_question_not_found, r.message);
-    }
-    
     @remoteAction
     public static r clone_session(id session_id){
         r r = new r();
@@ -882,18 +566,6 @@ public with sharing class jr_session {
         r.status = true;
         return r;
     }
-    
-    private static testmethod void validate_clone_session(){
-        r r = new r();
-        r = clone_session(null);
-        system.assertEquals(false, r.status);
-        system.assertEquals(system.label.session_id_is_not_set, r.message);
-        
-        session__c s = validate_session.createDummySession('woeiru34oriudf', 'Eメールの入力が必要', 'アンケートの入力が必要');
-        r = clone_session(s.id);
-        system.assertEquals(true, r.status);
-        system.assertEquals(2, [select id from session__c where name = 'woeiru34oriudf'].size());
-    }
 
     @remoteAction
     public static list<custom_survey_answer__c> get_free_answers(id csq_id){
@@ -930,55 +602,6 @@ public with sharing class jr_session {
         }
         return free_answers;
     }
-    
-    private static testmethod void validate_get_free_answers(){
-        session__c s = new session__c(name = 'test session');
-        insert s;
-        
-        custom_survey_question__c csq = new custom_survey_question__c(session__c = s.id, question__c = 'test question');
-        insert csq;
-        
-        custom_survey_option__c cso1 = new custom_survey_option__c(session__c = s.id, custom_survey_question__c = csq.id, option__c = 'test option1', enable_free_form__c = true);
-        custom_survey_option__c cso2 = new custom_survey_option__c(session__c = s.id, custom_survey_question__c = csq.id, option__c = 'test option2', enable_free_form__c = false);
-        insert cso1;
-        insert cso2;
-        
-        custom_survey_answer__c csa1 = new custom_survey_answer__c(session__c = s.id, custom_survey_option__c = cso1.id, free_form__c = 'test answer1');
-        custom_survey_answer__c csa2 = new custom_survey_answer__c(session__c = s.id, custom_survey_option__c = cso1.id);
-        custom_survey_answer__c csa3 = new custom_survey_answer__c(session__c = s.id, custom_survey_option__c = cso2.id);
-        insert csa1;
-        insert csa2;
-        insert csa3;
-
-        /*
-        Condition
-        - csq_id => null
-        */
-        system.assertEquals(null, get_free_answers(null));
-
-        /*
-        Condition
-        - csq_id => set(exists)
-        */
-        system.assertEquals(1, get_free_answers(csq.id).size());
-        
-        /*
-        Condition
-        - csq_id => set(not exist)
-        */
-        delete csq;
-        system.assertEquals(null, get_free_answers(csq.id));
-        
-        // for non-selectable survey
-        r r = new r();
-        r = create_survey(new custom_survey_question__c(session__c = s.id, question__c = 'jfioirgjbiorfv', survey_type__c = 'free'), new list<custom_survey_option__c>());
-        id cso_id = [select id from custom_survey_option__c where session__c = :s.id and custom_survey_question__c = :r.message].id;
-        insert new custom_survey_answer__c(session__c = s.id, custom_survey_option__c = cso_id, free_form__c = 'lkjhsdfoewiur');
-        insert new custom_survey_answer__c(session__c = s.id, custom_survey_option__c = cso_id, free_form__c = 'iefjvniefjjie');
-        system.assertEquals(2, get_free_answers(r.message).size());
-        system.assertEquals('iefjvniefjjie', get_free_answers(r.message)[0].free_form__c);
-        system.assertEquals('lkjhsdfoewiur', get_free_answers(r.message)[1].free_form__c);  
-    }
 
     @remoteAction
     public static r add_session(string session_name){
@@ -996,16 +619,6 @@ public with sharing class jr_session {
         r.status = true;
         r.message = new_session.id;
         return r;
-    }
-
-    private static testmethod void validate_add_session(){
-        r r = new r();
-        r = add_session('');
-        system.assertEquals(false, r.status);
-        system.assertEquals(system.label.pls_enter_session_name, r.message);
-        
-        r = add_session('session for validate');
-        system.assertEquals(true, r.status);
     }
     
     @remoteAction
@@ -1050,23 +663,6 @@ public with sharing class jr_session {
         return r;
     }
     
-    private static testmethod void validate_delete_session(){
-        r r = new r();
-        r = delete_session(null);
-        system.assertEquals(false, r.status);
-        system.assertEquals(system.label.session_id_is_not_set, r.message);
-        
-        session__c s = validate_session.createDummySession('test session1', 'Eメールの入力が必要', 'アンケートの入力が必要');
-        delete s;
-        r = delete_session(s.id);
-        system.assertEquals(false, r.status);
-        system.assertEquals(system.label.specified_session_does_not_exist, r.message);
-        
-        s = validate_session.createDummySession('test session1', 'Eメールの入力が必要', 'アンケートの入力が必要');
-        r = delete_session(s.id);
-        system.assertEquals(true, r.status);
-    }
-    
     @remoteAction
     public static r delete_survey(id survey_id){
         r r = new r();
@@ -1090,24 +686,6 @@ public with sharing class jr_session {
         r.status = true;
         r.message = survey_id;
         return r;
-    }
-    
-    private static testmethod void validate_delete_survey(){
-        r r = new r();
-        
-        r = delete_survey(null);
-        system.assertEquals(false, r.status);
-        system.assertEquals(system.label.survey_id_is_not_set, r.message);
-        
-        r = delete_survey('000000000000000000');
-        system.assertEquals(false, r.status);
-        system.assertEquals(system.label.specified_survey_does_not_exist, r.message);
-            
-        session__c s = validate_session.createDummySession('test session1', 'Eメールの入力が必要', 'アンケートの入力が必要');
-        custom_survey_question__c csq = [select id from custom_survey_question__c where session__c = :s.id];
-        
-        r = delete_survey(csq.id);
-        system.assertEquals(true, r.status);
     }
 
     @remoteAction
@@ -1150,7 +728,7 @@ public with sharing class jr_session {
         list<custom_survey_option__c> csos_to_add = new list<custom_survey_option__c>();
         
         if (csq.survey_type__c == 'checkbox' || csq.survey_type__c == 'radio') {
-        	// In case of selectable survey
+            // In case of selectable survey
             for (custom_survey_option__c cso : csos){
                 if (cso.option__c != null && cso.option__c != ''){
                     csos_to_add.add(new custom_survey_option__c(
@@ -1162,7 +740,7 @@ public with sharing class jr_session {
             }
             
             if (csq.enable_free_form__c){
-            	// add option for free form
+                // add option for free form
                 csos_to_add.add(new custom_survey_option__c(
                     session__c = csq.session__c,
                     custom_survey_question__c = csq.id,
@@ -1171,7 +749,7 @@ public with sharing class jr_session {
                 ));
             }
         } else {
-        	// In case of non-selectable survey
+            // In case of non-selectable survey
             csos_to_add.add(new custom_survey_option__c(
                 session__c = csq.session__c,
                 custom_survey_question__c = csq.id,
@@ -1187,67 +765,6 @@ public with sharing class jr_session {
         return r;
     }
 
-    private static testmethod void validate_create_survey(){
-        r r = new r();
-        
-        custom_survey_question__c csq = new custom_survey_question__c();
-        list<custom_survey_option__c> csos = new list<custom_survey_option__c>();
-        
-        r = create_survey(csq, csos);
-        system.assertEquals(false, r.status);
-        system.assertEquals(system.label.session_id_is_not_set, r.message);
-        
-        // non-exist sesssion
-        session__c s = validate_session.createDummySession('test session1', 'Eメールの入力が必要', 'アンケートの入力が必要');
-        delete s;
-        csq.session__c = s.id;
-        r = create_survey(csq, csos);
-        system.assertEquals(false, r.status);
-        system.assertEquals(system.label.specified_session_does_not_exist, r.message);
-        
-        // empty question
-        s = validate_session.createDummySession('test session1', 'Eメールの入力が必要', 'アンケートの入力が必要');
-        csq.session__c = s.id;
-        r = create_survey(csq, csos);
-        system.assertEquals(false, r.status);
-        system.assertEquals(system.label.pls_enter_question, r.message);
-        
-        // valid survey in case of selectable survey
-        csq.question__c = 'wqoeiurpqowiuer';
-        csq.enable_free_form__c = true;
-        csq.survey_type__c = 'checkbox';
-        csq.sort_order__c = 1;
-        csos.add(new custom_survey_option__c(option__c = 'option1 for validate'));
-        csos.add(new custom_survey_option__c(option__c = 'option2 for validate'));
-        r = create_survey(csq, csos);
-        system.assertEquals(true, r.status);
-        list<custom_survey_question__c> csqs = [select id from custom_survey_question__c where session__c = :s.id AND question__c = 'wqoeiurpqowiuer'];
-        system.assertEquals(1, csqs.size());
-        system.assertEquals(3, [select id from custom_survey_option__c where custom_survey_question__c = :csqs[0].id].size());
-        
-        // valid survey in case of selectable survey (adding 1 more survey and validate if sort_order is set incrementally)
-        csq = new custom_survey_question__c();
-        csq.session__c = s.id;
-        csq.question__c = 'ifugjjrieijkdkf';
-        csq.enable_free_form__c = true;
-        csq.survey_type__c = 'checkbox';
-        r = create_survey(csq, new list<custom_survey_option__c>());
-        system.assertEquals(true, r.status);
-        system.assertEquals(2, [select sort_order__c from custom_survey_question__c where session__c = :s.id AND question__c = 'ifugjjrieijkdkf'].sort_order__c);
-        
-        // valid survey in free text
-        csq = new custom_survey_question__c();
-        csq.session__c = s.id;
-        csq.question__c = 'poiuerwoieur';
-        csq.survey_type__c = 'free';
-        csos = new list<custom_survey_option__c>();
-        r = create_survey(csq, csos);
-        system.assertEquals(true, r.status);
-        csqs = [select id from custom_survey_question__c where session__c = :s.id AND question__c = 'poiuerwoieur'];
-        system.assertEquals(1, csqs.size());
-        system.assertEquals(1, [select id from custom_survey_option__c where custom_survey_question__c = :csqs[0].id].size());
-    }
-    
     @remoteAction
     public static r edit_survey(custom_survey_question__c csq, list<custom_survey_option__c> csos){
         r r = new r();
@@ -1395,94 +912,6 @@ public with sharing class jr_session {
         return r;
     }
     
-    private static testmethod void validate_edit_survey(){
-        r r = new r();
-
-        r = edit_survey(new custom_survey_question__c(), new list<custom_survey_option__c>());
-        system.assertEquals(false, r.status);
-        system.assertEquals(system.label.session_id_is_not_set, r.message);
-        
-        session__c s = validate_session.createDummySession('test session1', 'Eメールの入力が必要', 'アンケートの入力が必要');
-        
-        r = edit_survey(new custom_survey_question__c(session__c = s.id), new list<custom_survey_option__c>());
-        system.assertEquals(false, r.status);
-        system.assertEquals(system.label.survey_id_is_not_set, r.message);
-        
-        list<custom_survey_question__c> csqs = [select id from custom_survey_question__c where session__c = :s.id];
-        
-        r = edit_survey(new custom_survey_question__c(session__c = s.id, id = csqs[0].id), new list<custom_survey_option__c>());
-        system.assertEquals(false, r.status);
-        system.assertEquals(system.label.pls_enter_question, r.message);
-        
-        delete s;
-        
-        r = edit_survey(new custom_survey_question__c(session__c = s.id, id = csqs[0].id, question__c = 'question for validate'), new list<custom_survey_option__c>());
-        system.assertEquals(false, r.status);
-        system.assertEquals(system.label.specified_session_does_not_exist, r.message);
-        
-        s = validate_session.createDummySession('test session1', 'Eメールの入力が必要', 'アンケートの入力が必要');
-        
-        r = edit_survey(new custom_survey_question__c(session__c = s.id, id = csqs[0].id, question__c = 'question for validate'), new list<custom_survey_option__c>());
-        system.assertEquals(false, r.status);
-        system.assertEquals(system.label.specified_survey_does_not_exist, r.message);
-        
-        s = validate_session.createDummySession('test session1', 'Eメールの入力が必要', 'アンケートの入力が必要');
-        csqs = [select id from custom_survey_question__c where session__c = :s.id];
-        list<custom_survey_option__c> csos = [select id, option__c from custom_survey_option__c where custom_survey_question__c = :csqs[0].id];
-        
-        // validate updating custom_survey_question__c.question__c
-        custom_survey_question__c csq_for_validate_updating_question = new custom_survey_question__c(session__c = s.id, id = csqs[0].id, question__c = 'question for validate');
-        r = edit_survey(csq_for_validate_updating_question, csos);
-        system.assertEquals('question for validate', [select question__c from custom_survey_question__c where id = :csqs[0].id].question__c);
-
-        // validate enabling free form
-        csq_for_validate_updating_question.enable_free_form__c = true;
-        r = edit_survey(csq_for_validate_updating_question, csos);
-        system.assertEquals(true, [select enable_free_form__c from custom_survey_question__c where id = :csqs[0].id].enable_free_form__c);
-        system.assertEquals(1, [select id from custom_survey_option__c where custom_survey_question__c = :csqs[0].id AND enable_free_form__c = true].size());
-        
-        // validate disabling free form
-        csq_for_validate_updating_question.enable_free_form__c = false;
-        r = edit_survey(csq_for_validate_updating_question, csos);
-        system.assertEquals(false, [select enable_free_form__c from custom_survey_question__c where id = :csqs[0].id].enable_free_form__c);
-        system.assertEquals(0, [select id from custom_survey_option__c where custom_survey_question__c = :csqs[0].id AND enable_free_form__c = true].size());
-        
-        // validate adding custom_survey_option
-        integer num_of_csos_before = csos.size();
-        integer num_of_csos_after = num_of_csos_before + 1;
-        csos.add(new custom_survey_option__c(option__c = 'added option for validate'));
-        r = edit_survey(new custom_survey_question__c(session__c = s.id, id = csqs[0].id, question__c = 'question for validate'), csos);
-        system.assertEquals(num_of_csos_after, [select id from custom_survey_option__c where custom_survey_question__c = :csqs[0].id].size());
-        
-        // validate updating custom_survey_option
-        csos[0].option__c = 'editted option of validate';
-        r = edit_survey(new custom_survey_question__c(session__c = s.id, id = csqs[0].id, question__c = 'question for validate'), csos);
-        system.assertEquals('editted option of validate', [select option__c from custom_survey_option__c where id = :csos[0].id].option__c);
-        
-        // validate deleting custom_survey_option__c by passing blank custom_survey_option__c.option__c
-        csos = [select id, option__c from custom_survey_option__c where custom_survey_question__c = :csqs[0].id];
-        num_of_csos_before = csos.size();
-        num_of_csos_after = num_of_csos_before - 1;
-        csos[0].option__c = '';
-        r = edit_survey(new custom_survey_question__c(session__c = s.id, id = csqs[0].id, question__c = 'question for validate'), csos);
-        system.assertEquals(num_of_csos_after, [select id from custom_survey_option__c where custom_survey_question__c = :csqs[0].id].size());
-        
-        // validate deleting custom_survey_option__c by not passing custom_survey_options
-        csos = [select id, option__c from custom_survey_option__c where custom_survey_question__c = :csqs[0].id];
-        num_of_csos_before = csos.size();
-        num_of_csos_after = num_of_csos_before - 1;
-        csos.remove(0);
-        r = edit_survey(new custom_survey_question__c(session__c = s.id, id = csqs[0].id, question__c = 'question for validate'), csos);
-        system.assertEquals(num_of_csos_after, [select id from custom_survey_option__c where custom_survey_question__c = :csqs[0].id].size());
-        
-        // validate non-multi-choice survey
-        custom_survey_question__c csq_free = new custom_survey_question__c(session__c = s.id, question__c = 'opiufoijpoij', enable_free_form__c = false, survey_type__c = 'free');
-        insert csq_free;
-        csq_free.question__c = 'uiouoewrfoi';
-        r = edit_survey(csq_free, new list<custom_survey_option__c>());
-        system.assertEquals('uiouoewrfoi', [select question__c from custom_survey_question__c where session__c = :s.id AND survey_type__c = 'free'].question__c);
-    }
-    
     @remoteAction
     public static r deliver_deck(id session_id){
         r r = new r();
@@ -1514,7 +943,8 @@ public with sharing class jr_session {
         //Generarte email list to be used for Bcc:
         List<List<String>> bcc_addresses_list = new List<List<String>>();
         List<String> bcc_addresses = new List<String>();
-        if (session.who_can_get_handout__c == '全員' || session.who_can_get_handout__c == 'Anyone'){
+        if (session.who_can_get_handout__c == '全員' ||
+            session.who_can_get_handout__c == 'Anyone'){
             for (Guest__c guest : session.guest__r){
                 if (guest.email__c != null && guest.email__c != '' && guest.handout_delivered__c == false){
                     if (bcc_addresses.size() <= 20) {
@@ -1527,7 +957,8 @@ public with sharing class jr_session {
                     }
                 }
             }
-        } else if (session.who_can_get_handout__c == 'アンケートの入力が必要' || session.who_can_get_handout__c == 'Require Survey Submission'){
+        } else if (session.who_can_get_handout__c == 'アンケートの入力が必要' || 
+                   session.who_can_get_handout__c == 'Require Survey Submission'){
             List<id> guest_ids_submitted_survey = new List<id>();
             for (Survey__c survey : session.survey__r){
                 guest_ids_submitted_survey.add(survey.guest__c);
@@ -1633,115 +1064,5 @@ public with sharing class jr_session {
         r.status = true;
         r.message = string.valueOf(sum_of_mail);
         return r;
-    }
-    
-
-    static testmethod void validate_deliver_deck(){
-        r r = new r();
-        
-        session__c session;
-        list<guest__c> guests;
-        list<survey__c> surveys;
-        
-        // Condition
-        // - session_id => null
-        r = deliver_deck(null);
-        system.assertEquals(false, r.status);
-        system.assertEquals(system.label.session_id_is_not_set, r.message);
-        
-        // Condition
-        // - session_id => set(not exist)
-        session = validate_session.createDummySession('test session', 'Eメールの入力が必要', 'アンケートの入力が必要');
-        delete session;
-        r = deliver_deck(session.id);
-        system.assertEquals(false, r.status);
-        system.assertEquals(system.label.specified_session_does_not_exist, r.message);
-        
-        // Condition
-        // - mass_mail_sender__c => 'test@hoge.com'
-        // - who_can_get_handout__c => 'アンケートの入力が必要'
-        // - bcc address size <= 20
-        //
-        session = validate_session.createDummySession('test session', 'Eメールの入力が必要', 'アンケートの入力が必要');
-        session.mass_mail_additional_body__c = 'additional text for validate';
-        session.handout_password__c = 'pwoeiurqwer';
-        update session;
-        r = deliver_deck(session.id);
-        system.assertEquals(true, r.status);
-        system.assertEquals('5', r.message);
-        system.assertEquals(5, [select id from guest__c where session__c = :session.id AND handout_delivered__c = true].size());
-        
-        
-        // Condition
-        // - mass_mail_sender__c => ''
-        // - who_can_get_handout__c => 'アンケートの入力が必要'
-        // - bcc address size <= 20
-        //
-        session.mass_mail_sender__c = '';
-        update session;
-        r = deliver_deck(session.id);
-        system.assertEquals(true, r.status);
-        system.assertEquals('0', r.message);
-        system.assertEquals(5, [select id from guest__c where session__c = :session.id AND handout_delivered__c = true].size());
-        
-        // Condition
-        // - mass_mail_sender__c => ''
-        // - who_can_get_handout__c => 'アンケートの入力が必要'
-        // - bcc address size > 20
-        //
-        guests = new list<guest__c>();
-        for (integer num_of_guests = 11; num_of_guests <= 40; num_of_guests++){
-            string email = 'hoge' + string.valueOf(num_of_guests) + '@hoge.com';
-            string last_name = 'test guest ' + string.valueOf(num_of_guests);
-            guests.add(new guest__c(session__c = session.id, last_name__c = last_name, email__c = email));
-        }
-        insert guests;
-        surveys = new list<survey__c>();
-        for (guest__c guest : guests){
-            surveys.add(new survey__c(session__c = session.id, rate__c = 5, guest__c = guest.id));
-        }
-        insert surveys;
-        r = deliver_deck(session.id);
-        system.assertEquals(true, r.status);
-        system.assertEquals('30', r.message);
-        system.assertEquals(35, [select id from guest__c where session__c = :session.id AND handout_delivered__c = true].size());
-        
-        // Condition
-        // - mass_mail_sender__c => 'test@hoge.com'
-        // - who_can_get_handout__c => '全員'
-        // - bcc address size <= 20
-        //
-        session = validate_session.createDummySession('test session', 'Eメールの入力が必要', '全員');
-        r = deliver_deck(session.id);
-        system.assertEquals(true, r.status);
-        system.assertEquals('6', r.message);
-        system.assertEquals(6, [select id from guest__c where session__c = :session.id AND handout_delivered__c = true].size());
-        
-        // Condition
-        // - mass_mail_sender__c => 'test@hoge.com'
-        // - who_can_get_handout__c => '全員'
-        // - bcc address size > 20
-        //
-        guests = new list<guest__c>();
-        for (integer num_of_guests = 11; num_of_guests <= 40; num_of_guests++){
-            string email = 'hoge' + string.valueOf(num_of_guests) + '@hoge.com';
-            string last_name = 'test guest ' + string.valueOf(num_of_guests);
-            guests.add(new guest__c(session__c = session.id, last_name__c = last_name, email__c = email));
-        }
-        insert guests;
-        r = deliver_deck(session.id);
-        system.assertEquals(true, r.status);
-        system.assertEquals('30', r.message);
-        system.assertEquals(36, [select id from guest__c where session__c = :session.id AND handout_delivered__c = true].size());
-
-        // Condition
-        // - mass_mail_sender__c => 'test@hoge.com'
-        // - who_can_get_handout__c => 'Invalid Setting'
-        // - bcc address size <= 20
-        //
-        session = validate_session.createDummySession('test session', 'Eメールの入力が必要', 'Invalid Setting');
-        r = deliver_deck(session.id);
-        system.assertEquals(false, r.status);
-        system.assertEquals(system.label.session_is_not_configured_correctly, r.message);
     }
 }

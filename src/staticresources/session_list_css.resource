@@ -56,7 +56,8 @@ text-decoration: none;
 }
 
 #existing_session_list .session_row {
-padding: 8px 10px;
+position: relative;
+overflow: hidden;
 border: solid 1px #ffffff;
 border-bottom: solid 1px #F4E2ED;
 font-family: 'Cuprum';
@@ -78,11 +79,38 @@ color: #000000;
 color: #000000;
 }
 
+#existing_session_list .session_row_left {
+position: relative;
+float: left;
+width: 85%;
+padding: 10px 5px;
+-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
+}
+
+#existing_session_list .session_row_right {
+position: relative;
+float: left;
+width: 15%;
+height: 70px;
+-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
+}
+
 #existing_session_list .session_name {
 font-weight: bold;
 }
 
 #existing_session_list .session_presenter {
+}
+
+#existing_session_list .session_rate {
+position: absolute;
+top: 40%;
+font-weight: bold;
+color: #999999;
 }
 
 #site_setting .section_header {
@@ -94,7 +122,7 @@ text-align: left;
 
 #report .section {
 position: relative;
-margin-bottom: 60px;
+margin-bottom: 20px;
 }
 
 #report .section_header {
@@ -106,11 +134,25 @@ font-weight: bold;
 text-align: center;
 }
 
+#report .no_data_container {
+text-align:center;
+background-color: #ffffff;
+padding:20px 0;
+}
+
+#report .no_data {
+font-size:72px;
+display:block;
+color:#cccccc;
+font-weight:bold;
+font-family:Cuprum;
+}
+
 #rating_left {
 position: relative;
 float: left;
-margin-top: 100px;
 width: 50%;
+padding-top: 100px;
 font-family: 'Cuprum';
 text-align: center;
 }

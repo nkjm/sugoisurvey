@@ -78,10 +78,10 @@ j$(document).ready(function(){
                     } else {
                         j$('#page_session_detail_{!s.Id} input,textarea').not('input[type="radio"],input[type="checkbox"],:hidden, :button, :submit, :reset').val('');
                         
-                        j$('#page_session_detail_{!s.Id} input[type="radio"]').removeProp('checked');
+                        j$('#page_session_detail_{!s.Id} input[type="radio"]').not('.dummy').removeProp('checked');
                         j$('#page_session_detail_{!s.Id} input[type="checkbox"]').removeProp('checked');
                         
-                        j$('#page_session_detail_{!s.Id} input[type="checkbox"]').checkboxradio('refresh');
+                        j$('#page_session_detail_{!s.Id} input[type="checkbox"]').not('.dummy').checkboxradio('refresh');
                         j$('#page_session_detail_{!s.Id} input[type="radio"]').checkboxradio('refresh');
                         
                         j$('#page_session_detail_{!s.Id} .hide_on_submit').hide();

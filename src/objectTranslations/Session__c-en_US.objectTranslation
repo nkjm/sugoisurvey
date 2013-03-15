@@ -57,6 +57,16 @@
         <name>Open__c</name>
     </fields>
     <fields>
+        <help>If checked, a notification is posted to Account Record Feed when a guest is registered or submit a survey.</help>
+        <label>Post guest&apos;s activity to Account Feed</label>
+        <name>Post_To_Account_Record_Feed__c</name>
+    </fields>
+    <fields>
+        <help>If checked, a notification is posted to Contact Record Feed when a guest is registered or submit a survey.</help>
+        <label>Post guest&apos;s activity to Contact Feed</label>
+        <name>Post_To_Contact_Record_Feed__c</name>
+    </fields>
+    <fields>
         <label>Presenter</label>
         <name>Presenter__c</name>
         <relationshipLabel>Event</relationshipLabel>
@@ -115,6 +125,10 @@
     </fields>
     <layouts>
         <layout>イベントレイアウト</layout>
+        <sections>
+            <label>Chatter Setting</label>
+            <section>Chatter設定</section>
+        </sections>
         <sections>
             <label>Survey Site</label>
             <section>アンケートサイト</section>

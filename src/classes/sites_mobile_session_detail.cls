@@ -11,7 +11,7 @@ public with sharing class sites_mobile_session_detail {
     
     private static testmethod void validate_getSession_detail(){
     	sites_mobile_session_detail smsd = new sites_mobile_session_detail();
-    	session__c session = validate_session.createDummySession('irjffiejdjhjkf', 'Eメールの入力が必要', 'アンケートの入力が必要');
+    	session__c session = validate_session.createDummySession('irjffiejdjhjkf', system.label.picklist_require_email, system.label.picklist_require_survey_submission);
     	smsd.session_id = session.id;
     	system.assertEquals('http://hoge.com', smsd.getSession_detail().handout_url__c);
     }
