@@ -1,4 +1,4 @@
-<apex:page standardController="Presenter__c" extensions="presenter" standardStylesheets="false" docType="html-5.0">
+<apex:page readOnly="true" standardController="Presenter__c" extensions="presenter" standardStylesheets="false" docType="html-5.0">
 <apex:styleSheet value="https://fonts.googleapis.com/css?family=Cuprum&subset=latin" />
 <apex:stylesheet value="{!$Resource.presenter_performance_css}"/>
 <apex:includeScript value="{!URLFOR($Resource.jqueryui_1_9_2_custom_zip, 'jquery-ui-1.9.2.custom/js/jquery-1.8.3.js')}" />
@@ -18,7 +18,12 @@ j$("document").ready(function(){
         
         // For Event History
         j$.each({!sessions_json}, function(i, session){
-            var rate_data = get_rate_data(session.sugoisurvey4__Survey__r.records);
+        	var rate_data = [];
+        	rate_data.push(['5pt', session.sugoisurvey4__Rate_5__c]);
+        	rate_data.push(['4pt', session.sugoisurvey4__Rate_4__c]);
+        	rate_data.push(['3pt', session.sugoisurvey4__Rate_3__c]);
+        	rate_data.push(['2pt', session.sugoisurvey4__Rate_2__c]);
+        	rate_data.push(['1pt', session.sugoisurvey4__Rate_1__c]);
             draw_pie_chart(rate_data, session.Id);
         });
     }
@@ -45,32 +50,6 @@ function draw_area_chart(sessions){
 
     var chart = new google.visualization.AreaChart(document.getElementById('rate_chart_container'));
     chart.draw(data, options);
-}
-
-function get_rate_data(survey_list){
-    //console.log(survey_list);
-    
-    var rate_data = [];
-    var sum = [];
-    //initialize rate_data
-    for (var i = 5; i > 0; i--){
-        key = i + 'pt';
-        sum[key] = 0;
-    }
-    //set data for 5pt - 1pt
-    if (typeof(survey_list) == 'object'){
-        j$.each(survey_list, function(i, survey) {
-            if (survey.sugoisurvey4__Rate__c){
-                key = survey.sugoisurvey4__Rate__c + 'pt';
-                sum[key]++;
-            }
-        });
-    }
-    for (var i = 5; i > 0; i--){
-        key = i + 'pt';
-        rate_data.push([key, sum[key]]);
-    }
-    return(rate_data);
 }
 
 function draw_pie_chart(rate_data, session_id){

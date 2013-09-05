@@ -17,6 +17,14 @@
         <name>already_submitted</name>
     </customLabels>
     <customLabels>
+        <label>Required</label>
+        <name>answer_required</name>
+    </customLabels>
+    <customLabels>
+        <label>Application has been updated</label>
+        <name>app_updated</name>
+    </customLabels>
+    <customLabels>
         <label>Are you sure?</label>
         <name>are_you_sure</name>
     </customLabels>
@@ -51,6 +59,14 @@
     <customLabels>
         <label>Cancel</label>
         <name>cancel</name>
+    </customLabels>
+    <customLabels>
+        <label>Reset Delivery Status</label>
+        <name>clear_delivered_flag</name>
+    </customLabels>
+    <customLabels>
+        <label>Going to reset delivery status.</label>
+        <name>clearing_delivered_flag</name>
     </customLabels>
     <customLabels>
         <label>Going to clone this event.</label>
@@ -177,6 +193,14 @@
         <name>has_been_delivered</name>
     </customLabels>
     <customLabels>
+        <label>has checked in for</label>
+        <name>has_checked_in_1</name>
+    </customLabels>
+    <customLabels>
+        <label>.</label>
+        <name>has_checked_in_2</name>
+    </customLabels>
+    <customLabels>
         <label>High</label>
         <name>high</name>
     </customLabels>
@@ -189,7 +213,7 @@
         <name>low</name>
     </customLabels>
     <customLabels>
-        <label>Mail Preview</label>
+        <label>Preview</label>
         <name>mail_preview</name>
     </customLabels>
     <customLabels>
@@ -211,6 +235,10 @@
     <customLabels>
         <label>Other</label>
         <name>other</name>
+    </customLabels>
+    <customLabels>
+        <label>Other Survey</label>
+        <name>other_survey</name>
     </customLabels>
     <customLabels>
         <label>Password</label>
@@ -437,7 +465,7 @@
         <name>there_are_not_enough_number_of_question_to_sort</name>
     </customLabels>
     <customLabels>
-        <label>Deliver Handout</label>
+        <label>Mail Distribution</label>
         <name>title_of_deliverDeck</name>
     </customLabels>
     <customLabels>

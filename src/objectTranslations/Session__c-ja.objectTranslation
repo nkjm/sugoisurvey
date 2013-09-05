@@ -5,6 +5,14 @@
         <value>イベント</value>
     </caseValues>
     <fields>
+        <label><!-- 歩留まり --></label>
+        <name>Attending_Guest_Percentage__c</name>
+    </fields>
+    <fields>
+        <label><!-- ゲスト数（出席） --></label>
+        <name>Attending_Guest_Sum__c</name>
+    </fields>
+    <fields>
         <label><!-- Chatter用Eメールアドレス --></label>
         <name>Chatter_Email__c</name>
     </fields>
@@ -19,6 +27,10 @@
     <fields>
         <label><!-- 5段階評価を実施 --></label>
         <name>Enable_Rate__c</name>
+    </fields>
+    <fields>
+        <label><!-- イベントID --></label>
+        <name>Event_Id__c</name>
     </fields>
     <fields>
         <label><!-- ゲスト数 --></label>
@@ -41,12 +53,16 @@
         <name>Label_For_Rate__c</name>
     </fields>
     <fields>
-        <label><!-- 資料配信メール本文(HTML) --></label>
+        <label><!-- メール本文(HTML) --></label>
         <name>Mass_Mail_Additional_Body__c</name>
     </fields>
     <fields>
-        <label><!-- 資料配信メール送信元アドレス --></label>
+        <label><!-- メール送信元アドレス --></label>
         <name>Mass_Mail_Sender__c</name>
+    </fields>
+    <fields>
+        <label><!-- メール題名 --></label>
+        <name>Mass_Mail_Title__c</name>
     </fields>
     <fields>
         <label><!-- オープン --></label>
@@ -65,7 +81,27 @@
     <fields>
         <label><!-- プレゼンター --></label>
         <name>Presenter__c</name>
-        <relationshipLabel><!-- Surveys --></relationshipLabel>
+        <relationshipLabel><!-- イベント --></relationshipLabel>
+    </fields>
+    <fields>
+        <label><!-- Rate 1 --></label>
+        <name>Rate_1__c</name>
+    </fields>
+    <fields>
+        <label><!-- Rate 2 --></label>
+        <name>Rate_2__c</name>
+    </fields>
+    <fields>
+        <label><!-- Rate 3 --></label>
+        <name>Rate_3__c</name>
+    </fields>
+    <fields>
+        <label><!-- Rate 4 --></label>
+        <name>Rate_4__c</name>
+    </fields>
+    <fields>
+        <label><!-- Rate 5 --></label>
+        <name>Rate_5__c</name>
     </fields>
     <fields>
         <label><!-- 評価平均 --></label>
@@ -92,7 +128,7 @@
         <name>Survey_Sum__c</name>
     </fields>
     <fields>
-        <label><!-- 資料を配信される人 --></label>
+        <label><!-- メールを配信される人 --></label>
         <name>Who_Can_Get_Handout__c</name>
         <picklistValues>
             <masterLabel>アンケートの入力が必要</masterLabel>
@@ -101,6 +137,10 @@
         <picklistValues>
             <masterLabel>全員</masterLabel>
             <translation><!-- 全員 --></translation>
+        </picklistValues>
+        <picklistValues>
+            <masterLabel>出席者</masterLabel>
+            <translation><!-- 出席者 --></translation>
         </picklistValues>
     </fields>
     <fields>
@@ -134,8 +174,8 @@
             <section>カスタムリンク</section>
         </sections>
         <sections>
-            <label><!-- 資料設定 --></label>
-            <section>資料設定</section>
+            <label><!-- メール配信設定 --></label>
+            <section>メール配信設定</section>
         </sections>
     </layouts>
     <webLinks>

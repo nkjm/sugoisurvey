@@ -25,11 +25,11 @@
         <name>instance__c</name>
     </fields>
     <fields>
-        <label><!-- My Domain --></label>
+        <label>My Domain</label>
         <name>my_domain__c</name>
     </fields>
     <fields>
-        <label><!-- My Domainが有効 --></label>
+        <label>My Domain is active</label>
         <name>my_domain_enabled__c</name>
     </fields>
     <fields>
@@ -43,6 +43,10 @@
     <fields>
         <label>Sandbox Name</label>
         <name>sandbox_name__c</name>
+    </fields>
+    <fields>
+        <label>Show Survey List in Survey Site</label>
+        <name>show_survey_list__c</name>
     </fields>
     <fields>
         <label>Sites Username</label>

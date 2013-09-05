@@ -7,7 +7,9 @@ public class validate_session {
             who_can_submit_survey__c = who_can_submit_survey,
             who_can_get_handout__c = who_can_get_handout,
             mass_mail_sender__c = 'test@hoge.com',
-            handout_url__c = 'http://hoge.com'
+            handout_url__c = 'http://hoge.com',
+            Post_To_Account_Record_Feed__c = false,
+            Post_To_Contact_Record_Feed__c = false
         );
         insert session;
         
@@ -18,11 +20,11 @@ public class validate_session {
         insert attachment2;
         
         //create dummy guest
-        guest__c guest1 = new guest__c(session__c=session.id, last_name__c='test guest1', first_name__c='uruffjjfr', title__c='rufhbrfjjf', company__c='jfjieerjfkf', email__c='hoge1@hoge.com');
-        guest__c guest2 = new guest__c(session__c=session.id, last_name__c='test guest2', email__c='hoge2@hoge.com');
-        guest__c guest3 = new guest__c(session__c=session.id, last_name__c='test guest3', email__c='hoge3@hoge.com');
-        guest__c guest4 = new guest__c(session__c=session.id, last_name__c='test guest4', email__c='hoge4@hoge.com');
-        guest__c guest5 = new guest__c(session__c=session.id, last_name__c='test guest5', email__c='hoge5@hoge.com');
+        guest__c guest1 = new guest__c(status__c = 'submitted', session__c=session.id, last_name__c='test guest1', email__c='hoge1@hoge.com', first_name__c='uruffjjfr', title__c='rufhbrfjjf', company__c='jfjieerjfkf');
+        guest__c guest2 = new guest__c(status__c = 'submitted', session__c=session.id, last_name__c='test guest2', email__c='hoge2@hoge.com');
+        guest__c guest3 = new guest__c(status__c = 'submitted', session__c=session.id, last_name__c='test guest3', email__c='hoge3@hoge.com');
+        guest__c guest4 = new guest__c(status__c = 'submitted', session__c=session.id, last_name__c='test guest4', email__c='hoge4@hoge.com');
+        guest__c guest5 = new guest__c(status__c = 'submitted', session__c=session.id, last_name__c='test guest5', email__c='hoge5@hoge.com');
         guest__c guest6 = new guest__c(session__c=session.id, last_name__c='test guest6', email__c='hoge6@hoge.com');
         insert guest1;
         insert guest2;
@@ -76,6 +78,42 @@ public class validate_session {
         insert csa3;
         
         return session;
+    }
+    
+    public static Session__c createDummySessionIncludeRequiredQuestion() {
+        Session__c session = new Session__c(
+            name = '9ejlflkldsflkjdf'
+        );
+        insert session;
+        
+        //create dummy question
+        custom_survey_question__c csq1 = new custom_survey_question__c(session__c=session.id, question__c='q1_h9hefljlkjf', survey_type__c = 'checkbox', required__c=false);
+        custom_survey_question__c csq2 = new custom_survey_question__c(session__c=session.id, question__c='q2_oiuj0wfjoie', survey_type__c = 'radio', required__c=true);
+        custom_survey_question__c csq3 = new custom_survey_question__c(session__c=session.id, question__c='q3_dfjf0wfsdfj', survey_type__c = 'free', required__c=false);
+        insert csq1;
+        insert csq2;
+        insert csq3;
+        
+        //create dummy option
+        custom_survey_option__c cso1 = new custom_survey_option__c(session__c=session.id, custom_survey_question__c=csq1.id, option__c='o1_ldjfojwef');
+        custom_survey_option__c cso2 = new custom_survey_option__c(session__c=session.id, custom_survey_question__c=csq1.id, option__c='o2_ljsdkflkj');
+        insert cso1;
+        insert cso2;
+        custom_survey_option__c cso3 = new custom_survey_option__c(session__c=session.id, custom_survey_question__c=csq2.id, option__c='o1_3rfjpofb');
+        custom_survey_option__c cso4 = new custom_survey_option__c(session__c=session.id, custom_survey_question__c=csq2.id, option__c='o2_djfhonfk');
+        insert cso3;
+        insert cso4;
+        custom_survey_option__c cso5 = new custom_survey_option__c(session__c=session.id, custom_survey_question__c=csq3.id, option__c='o1_0ifoflkdf', dummy__c = true, enable_free_form__c = true);
+        insert cso5;
+
+        return [
+        	select 
+        		id, name,
+        		(select id, name, question__c from custom_survey_question__r),
+        		(select id, name, option__c from custom_survey_option__r)
+    		from session__c
+    		where id = :session.id
+		];
     }
     
     static testmethod void validate_getSession(){

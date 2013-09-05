@@ -42,11 +42,29 @@
     <enableHistory>false</enableHistory>
     <enableReports>true</enableReports>
     <fields>
+        <fullName>Attend__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>deprecated_出席</label>
+        <trackFeedHistory>false</trackFeedHistory>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Checkin__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <formula>IF( TEXT(Status__c) = &apos;attended&apos; || TEXT(Status__c) = &apos;submitted&apos;,true,false)</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>出席</label>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
         <fullName>Company__c</fullName>
         <deprecated>false</deprecated>
         <externalId>false</externalId>
         <label>会社</label>
-        <length>30</length>
+        <length>255</length>
         <required>false</required>
         <trackFeedHistory>false</trackFeedHistory>
         <type>Text</type>
@@ -91,7 +109,7 @@
         <defaultValue>false</defaultValue>
         <deprecated>false</deprecated>
         <externalId>false</externalId>
-        <label>資料配信済み</label>
+        <label>メール配信済み</label>
         <trackFeedHistory>false</trackFeedHistory>
         <type>Checkbox</type>
     </fields>
@@ -110,6 +128,7 @@
         <fullName>Multiple_Contacts__c</fullName>
         <defaultValue>false</defaultValue>
         <deprecated>false</deprecated>
+        <description>Deprecated since v4 1.31 (23.5.2013)</description>
         <externalId>false</externalId>
         <label>複数の取引先責任者に該当</label>
         <trackFeedHistory>false</trackFeedHistory>
@@ -162,11 +181,34 @@ Last_Name__c + &apos; &apos; +  First_Name__c
         <writeRequiresMasterRead>false</writeRequiresMasterRead>
     </fields>
     <fields>
+        <fullName>Status__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>状況</label>
+        <picklist>
+            <picklistValues>
+                <fullName>registered</fullName>
+                <default>true</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>attended</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>submitted</fullName>
+                <default>false</default>
+            </picklistValues>
+            <sorted>false</sorted>
+        </picklist>
+        <trackFeedHistory>false</trackFeedHistory>
+        <type>Picklist</type>
+    </fields>
+    <fields>
         <fullName>Title__c</fullName>
         <deprecated>false</deprecated>
         <externalId>false</externalId>
         <label>役職</label>
-        <length>30</length>
+        <length>255</length>
         <required>false</required>
         <trackFeedHistory>false</trackFeedHistory>
         <type>Text</type>

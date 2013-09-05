@@ -17,6 +17,10 @@
         <name>Question__c</name>
     </fields>
     <fields>
+        <label>Required</label>
+        <name>Required__c</name>
+    </fields>
+    <fields>
         <label>Session</label>
         <name>Session__c</name>
         <relationshipLabel>Custom Survey Question</relationshipLabel>

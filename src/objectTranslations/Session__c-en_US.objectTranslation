@@ -9,6 +9,14 @@
         <value>Surveys</value>
     </caseValues>
     <fields>
+        <label><!-- 歩留まり --></label>
+        <name>Attending_Guest_Percentage__c</name>
+    </fields>
+    <fields>
+        <label>Number of guest (Attended)</label>
+        <name>Attending_Guest_Sum__c</name>
+    </fields>
+    <fields>
         <label>Email for Chatter Reply</label>
         <name>Chatter_Email__c</name>
     </fields>
@@ -23,6 +31,10 @@
     <fields>
         <label>Enable Rating</label>
         <name>Enable_Rate__c</name>
+    </fields>
+    <fields>
+        <label>Event ID</label>
+        <name>Event_Id__c</name>
     </fields>
     <fields>
         <label>Number of guest</label>
@@ -45,12 +57,16 @@
         <name>Label_For_Rate__c</name>
     </fields>
     <fields>
-        <label>Body for Handout mail</label>
+        <label>Body for Handout Delivery Mail</label>
         <name>Mass_Mail_Additional_Body__c</name>
     </fields>
     <fields>
-        <label>Sender Email for Handout mail</label>
+        <label>Sender Email for Handout Mail</label>
         <name>Mass_Mail_Sender__c</name>
+    </fields>
+    <fields>
+        <label>Title for Handout Delivery Mail</label>
+        <name>Mass_Mail_Title__c</name>
     </fields>
     <fields>
         <label>Open</label>
@@ -70,6 +86,26 @@
         <label>Presenter</label>
         <name>Presenter__c</name>
         <relationshipLabel>Event</relationshipLabel>
+    </fields>
+    <fields>
+        <label><!-- Rate 1 --></label>
+        <name>Rate_1__c</name>
+    </fields>
+    <fields>
+        <label><!-- Rate 2 --></label>
+        <name>Rate_2__c</name>
+    </fields>
+    <fields>
+        <label><!-- Rate 3 --></label>
+        <name>Rate_3__c</name>
+    </fields>
+    <fields>
+        <label><!-- Rate 4 --></label>
+        <name>Rate_4__c</name>
+    </fields>
+    <fields>
+        <label><!-- Rate 5 --></label>
+        <name>Rate_5__c</name>
     </fields>
     <fields>
         <label>Avg of Rate</label>
@@ -106,6 +142,10 @@
             <masterLabel>全員</masterLabel>
             <translation>Anyone</translation>
         </picklistValues>
+        <picklistValues>
+            <masterLabel>出席者</masterLabel>
+            <translation>Attendees</translation>
+        </picklistValues>
     </fields>
     <fields>
         <label>Who can submit survey</label>
@@ -139,7 +179,7 @@
         </sections>
         <sections>
             <label>Handout Distribution Setting</label>
-            <section>資料設定</section>
+            <section>メール配信設定</section>
         </sections>
     </layouts>
     <nameFieldLabel>Event Name</nameFieldLabel>
@@ -157,7 +197,7 @@
         <name>delete_session</name>
     </webLinks>
     <webLinks>
-        <label>Deliver Handout</label>
+        <label>Mail</label>
         <name>deliver_handout</name>
     </webLinks>
 </CustomObjectTranslation>

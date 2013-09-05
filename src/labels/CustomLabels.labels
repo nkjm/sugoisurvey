@@ -22,6 +22,20 @@
         <value>アンケートは提出済みです。</value>
     </labels>
     <labels>
+        <fullName>answer_required</fullName>
+        <language>ja</language>
+        <protected>false</protected>
+        <shortDescription>answer_required</shortDescription>
+        <value>必須</value>
+    </labels>
+    <labels>
+        <fullName>app_updated</fullName>
+        <language>ja</language>
+        <protected>false</protected>
+        <shortDescription>app_updated</shortDescription>
+        <value>アプリケーションがアップデートされました</value>
+    </labels>
+    <labels>
         <fullName>are_you_sure</fullName>
         <language>ja</language>
         <protected>true</protected>
@@ -83,6 +97,20 @@
         <protected>true</protected>
         <shortDescription>cancel</shortDescription>
         <value>キャンセル</value>
+    </labels>
+    <labels>
+        <fullName>clear_delivered_flag</fullName>
+        <language>ja</language>
+        <protected>false</protected>
+        <shortDescription>clear_delivered_flag</shortDescription>
+        <value>配信履歴をリセット</value>
+    </labels>
+    <labels>
+        <fullName>clearing_delivered_flag</fullName>
+        <language>ja</language>
+        <protected>false</protected>
+        <shortDescription>clearing_delivered_flag</shortDescription>
+        <value>配信履歴をリセットします。</value>
     </labels>
     <labels>
         <fullName>cloning_event</fullName>
@@ -302,6 +330,20 @@
         <value>通のメールが配信されました。</value>
     </labels>
     <labels>
+        <fullName>has_checked_in_1</fullName>
+        <language>ja</language>
+        <protected>false</protected>
+        <shortDescription>has_checked_in_1</shortDescription>
+        <value>さんが</value>
+    </labels>
+    <labels>
+        <fullName>has_checked_in_2</fullName>
+        <language>ja</language>
+        <protected>false</protected>
+        <shortDescription>has_checked_in_2</shortDescription>
+        <value>にチェックインしました。</value>
+    </labels>
+    <labels>
         <fullName>high</fullName>
         <language>ja</language>
         <protected>true</protected>
@@ -325,9 +367,9 @@
     <labels>
         <fullName>mail_preview</fullName>
         <language>ja</language>
-        <protected>true</protected>
+        <protected>false</protected>
         <shortDescription>mail_preview</shortDescription>
-        <value>メールプレビュー</value>
+        <value>プレビュー</value>
     </labels>
     <labels>
         <fullName>new_survey_name</fullName>
@@ -363,6 +405,13 @@
         <protected>true</protected>
         <shortDescription>other</shortDescription>
         <value>その他</value>
+    </labels>
+    <labels>
+        <fullName>other_survey</fullName>
+        <language>ja</language>
+        <protected>false</protected>
+        <shortDescription>other_survey</shortDescription>
+        <value>他のアンケート</value>
     </labels>
     <labels>
         <fullName>password</fullName>
@@ -761,7 +810,7 @@
         <language>ja</language>
         <protected>true</protected>
         <shortDescription>title_of_deliverDeck</shortDescription>
-        <value>資料配信</value>
+        <value>メール配信</value>
     </labels>
     <labels>
         <fullName>total_events</fullName>

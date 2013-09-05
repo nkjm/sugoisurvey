@@ -9,6 +9,14 @@
         <value>Guests</value>
     </caseValues>
     <fields>
+        <label>Attend</label>
+        <name>Attend__c</name>
+    </fields>
+    <fields>
+        <label>Attending</label>
+        <name>Checkin__c</name>
+    </fields>
+    <fields>
         <label>Company</label>
         <name>Company__c</name>
     </fields>
@@ -26,7 +34,7 @@
         <name>First_Name__c</name>
     </fields>
     <fields>
-        <label>Handout delivered</label>
+        <label>Handout Delivered</label>
         <name>Handout_Delivered__c</name>
     </fields>
     <fields>
@@ -53,6 +61,22 @@
         <label>Session</label>
         <name>Session__c</name>
         <relationshipLabel>Guest</relationshipLabel>
+    </fields>
+    <fields>
+        <label>Status</label>
+        <name>Status__c</name>
+        <picklistValues>
+            <masterLabel>attended</masterLabel>
+            <translation><!-- attended --></translation>
+        </picklistValues>
+        <picklistValues>
+            <masterLabel>registered</masterLabel>
+            <translation><!-- registered --></translation>
+        </picklistValues>
+        <picklistValues>
+            <masterLabel>submitted</masterLabel>
+            <translation><!-- submitted --></translation>
+        </picklistValues>
     </fields>
     <fields>
         <label>Title</label>

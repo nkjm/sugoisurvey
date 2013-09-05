@@ -95,6 +95,12 @@ function redirectToEditPage(guest_id){
         </div>
     </div>  
 </div>
+<apex:outputPanel layout="block" style="width:95%; margin: 0 auto; text-align:right;" rendered="{!guest.Checkin__c}">
+	<img style="height:20px;" src="{!$resource.check_png}"></img>
+</apex:outputPanel>
+<div id="qr_code_container" class="container" style="text-align: center;">
+	<img src="https://chart.googleapis.com/chart?cht=qr&chs=100x100&chl={!HTMLENCODE(guest.id)}"></img>
+</div>
 <div id="survey_data_container" class="container">
     <div id="rate_block" class="block">
         <div class="block_header">{!$Label.rate}</div>

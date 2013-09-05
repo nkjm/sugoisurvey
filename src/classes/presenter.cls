@@ -78,8 +78,12 @@ public with sharing class presenter {
                     name, 
                     date__c, 
                     rate_avg__c,
-                    guest_sum__c,
-                    (select id, name, rate__c from survey__r)
+                    rate_5__c,
+                    rate_4__c,
+                    rate_3__c,
+                    rate_2__c,
+                    rate_1__c,
+                    guest_sum__c
                 from session__c 
                 where 
                     presenter__c = :this.presenter.id and

@@ -2,56 +2,51 @@ trigger link_to_contact on Guest__c (before insert) {
     list<contact> contacts;
     list<chatter_notification.args_for_guest_registration> args_for_guest_registration_list = new list<chatter_notification.args_for_guest_registration>();
     list<session__c> sessions = [select id, name, post_to_account_record_feed__c, post_to_contact_record_feed__c from session__c];
- 
-    // Retrieve contact records.   
-    if (Trigger.new.size() > 1){
-        // This is a bulk trigger.
-        // Retrieve all contact records in buld so that we can avoid executing SOQL query inside loop
-        contacts = [
-            select 
-                id, 
-                name,
-                lastname,
-                firstname,
-                email,
-                phone,
-                title,
-                accountId, 
-                account.Name,
-                createdDate
-            from contact
-            order by createdDate
-        ];
-    } else if (String.isEmpty(Trigger.new[0].email__c)){
-        // This is not a bulk trigger.
-        // email__c is not set in guest record and there is no possibility that we can link to the contact so exiting.
-        return;
-    } else {
-        // This is not a bulk trigger.
-        // Retrieve one contact record corresponding to the guest record.
-        // If there is no corresponding record, we exit.
-        try {
-            contacts = [
-                select 
-                    id, 
-                    name,
-                    lastname,
-                    firstname,
-                    email,
-                    phone,
-                    title,
-                    accountId, 
-                    account.Name,
-                    createdDate
-                from contact
-                where email = :Trigger.new[0].email__c
-                order by createdDate
-            ];
-        } catch (Exception e){
-            return;
-        }
-    }
 
+	// Create list of new guest's mail which will be used for query to retrieve corresponding contacts
+	list<string> guest_mails = new list<string>();
+	for (guest__c g : Trigger.new){
+		if (!String.isEmpty(g.email__c)){
+			guest_mails.add(g.email__c);
+		}
+	}
+	
+	if (guest_mails.size() == 0){
+		// email__c is not set in guest record and there is no possibility that we can link to the contact so exiting.
+		return;
+	}
+	
+	// Retrieve contact records corresponding to new guests.
+	contacts = [
+        select 
+            id, 
+            name,
+            lastname,
+            firstname,
+            email,
+            phone,
+            title,
+            accountId, 
+            account.Name,
+            createdDate,
+            (select id from guest__r)
+        from contact
+        where email in :guest_mails
+        order by createdDate
+	];
+	// Create map of contact using email as key so that we can search by email
+	map<string, contact> contacts_map = new map<string, contact>();
+	for (contact c : contacts){
+		if (contacts_map.containsKey(c.email)){
+			// Contact has already been added but if this one is choosed by user manually more than once, we follow user's decision.
+			if (c.guest__r.size() > 0){
+				contacts_map.put(c.email, c);
+			}
+		} else {
+			contacts_map.put(c.email, c);
+		}
+	}
+    
     config__c config = config__c.getOrgDefaults();
     
     // Set flag meaning if current user is from Sites.
@@ -62,40 +57,30 @@ trigger link_to_contact on Guest__c (before insert) {
     }
     
     for (guest__c g : Trigger.new){
-    
+    	contact c;
         // prepare contacts to be linked
-        boolean found = false;
-        list<contact> contacts_candidate = new list<contact>();
-        for (contact c : contacts){
-            if (!String.isEmpty(g.email__c) && g.email__c == c.email){
-                contacts_candidate.add(c);
-            }
-        }
-        if (contacts_candidate.size() == 0){
-            continue;
-        } else if (contacts_candidate.size() > 1){
-            g.multiple_contacts__c = true;
+        if (contacts_map.containsKey(g.email__c)){
+        	c = contacts_map.get(g.email__c);
+        } else {
+        	continue;
         }
 
-        // link guest record and contact record. And autofill blank field of guest__c from contact. 
-        // In case that multiple candidates exist, oldedst candidate is picked up and is used.
-        contact c = contacts_candidate[0];
         // link
         g.contact__c = c.id;
         // autofill
-        if ((String.isEmpty(g.last_name__c) || g.last_name__c == system.label.unregistered_guest) && !String.isEmpty(c.lastname)){
+        if (!String.isEmpty(c.lastname)){
             g.last_name__c = c.lastname;
         }
-        if (String.isEmpty(g.first_name__c) && !String.isEmpty(c.firstname)){
+        if (!String.isEmpty(c.firstname)){
             g.first_name__c = c.firstname;
         }
-        if (String.isEmpty(g.title__c) && !String.isEmpty(c.title)){
+        if (!String.isEmpty(c.title)){
             g.title__c = c.title;
         }
-        if (String.isEmpty(g.company__c) && c.accountId != null){
+        if (c.accountId != null){
             g.company__c = c.account.name;
         }
-        if (String.isEmpty(g.phone__c) && !String.isEmpty(c.phone)){
+        if (!String.isEmpty(c.phone)){
             g.phone__c = c.phone;
         }
 
@@ -123,7 +108,7 @@ trigger link_to_contact on Guest__c (before insert) {
     }
     
     // Create feedItem notifying the contact who has been registered to the event.
-    // In case that multiple candidates exist, feedItem is posted to oldest Account/Contact record
+    // In case that multiple candidates exist, feedItem is posted to Account/Contact record which has been linked to guest more than once
     if (is_sites_user == false){
         chatter_notification.notify_registration_to_record_feed(args_for_guest_registration_list, false);
     }

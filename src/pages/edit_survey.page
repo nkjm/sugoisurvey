@@ -1,4 +1,4 @@
-<apex:page standardController="Session__c" extensions="session_v2,jr_session" standardStyleSheets="false" sidebar="false" showheader="false" doctype="html-5.0">
+<apex:page readOnly="true" standardController="Session__c" extensions="session_v2,jr_session" standardStyleSheets="false" sidebar="false" showheader="false" doctype="html-5.0">
 
 <script>
 j$ = jQuery.noConflict();
@@ -124,9 +124,9 @@ function map_all_event(selector){
     
     j$(selector).on('change', '.enable_free_form_existing', function(){
     	if (j$(this).prop('checked')){
-    		j$(this).parent().parent().find('.custom_survey_options_other_container').show();
+    		j$(this).parent().parent().parent().find('.custom_survey_options_other_container').show();
    		} else {
-   			j$(this).parent().parent().find('.custom_survey_options_other_container').hide();
+   			j$(this).parent().parent().parent().find('.custom_survey_options_other_container').hide();
   		}
    	});
     
@@ -149,6 +149,7 @@ function map_all_event(selector){
             'session__c':'{!session__c.id}',
             'question__c':j$(this).parent().parent().find("input[name='question']").val(),
             'survey_type__c':j$(this).parent().parent().find("input[name='survey_type']").val(),
+            'required__c':j$(this).parent().parent().find("input[name='required']").prop("checked"),
             'enable_free_form__c':j$(this).parent().parent().find("input[name='enable_free_form']").prop("checked")
         };
 
@@ -213,6 +214,7 @@ function map_all_event(selector){
             'id':j$(this).parent().parent().find("input[name='question']").attr("id"),
             'question__c':j$(this).parent().parent().find("input[name='question']").val(),
             'survey_type__c':j$(this).parent().parent().find("input[name='survey_type']").val(),
+            'required__c':j$(this).parent().parent().find("input[name='required']").prop("checked"),
             'enable_free_form__c':j$(this).parent().parent().find("input[name='enable_free_form']").prop("checked")
         };
         var custom_survey_options = [];
@@ -334,15 +336,15 @@ function generate_html_options(type, num_of_existing_option, num_of_creating_opt
         option_num = i + 1;
         html_options += '<div class="custom_survey_option">';
         if (type == "checkbox"){
-        	html_options += '<img height="20px" class="checkbox_img" src="{!$resource.checkbox_png}" style="position:absolute;top:5px;"></img>';
-        	html_options += '<img height="20px" class="radio_img" src="{!$resource.radio_png}" style="position:absolute;top:5px;display:none;"></img>';
+        	html_options += '<img class="checkbox_img" src="{!$resource.checkbox_png}" style="position:absolute;top:5px; height:20px;"></img>';
+        	html_options += '<img class="radio_img" src="{!$resource.radio_png}" style="position:absolute;top:5px;display:none; height:20px;"></img>';
        	} else if (type == "radio"){
-       		html_options += '<img height="20px" class="checkbox_img" src="{!$resource.checkbox_png}" style="position:absolute;top:5px;display:none;"></img>';
-       		html_options += '<img height="20px" class="radio_img" src="{!$resource.radio_png}" style="position:absolute;top:5px;"></img>';
+       		html_options += '<img class="checkbox_img" src="{!$resource.checkbox_png}" style="position:absolute;top:5px;display:none; height:20px;"></img>';
+       		html_options += '<img class="radio_img" src="{!$resource.radio_png}" style="position:absolute;top:5px; height:20px;"></img>';
        	}
         html_options += '<div style="margin-left:30px;"><input type="text" name="option[]" placeholder="{!$label.customSurveyOption}' + option_num + '"></input></div>';
         if (option_num > 2){
-            html_options += '<img class="button_img delete_option_button" style="position:absolute; top:3px; right:-30px;" height="30px" src="{!URLFOR($resource.delete_png)}" />';
+            html_options += '<img class="button_img delete_option_button" style="position:absolute; top:8px; right:-32px; height:23px;" src="{!URLFOR($resource.delete_png)}" />';
         }
         html_options += '</div>';
     }
@@ -371,17 +373,25 @@ function generate_html_options(type, num_of_existing_option, num_of_creating_opt
             <input type="text" name="question" placeholder="{!$label.customSurveyQuestion}"></input>
         </div>
         <div class="section">
+        	<span>
+                <label for="required">
+                	<input type="checkbox" name="required" id="required"></input>
+                	{!$label.answer_required}
+                </label>
+            </span>
             <span id="option_in_selectable_survey">
-                <input type="checkbox" name="enable_free_form" id="enable_free_form_new"></input>
-                <label for="enable_free_form_new">{!$label.enable_free_form}</label>
+                <label for="enable_free_form_new">
+                	<input type="checkbox" name="enable_free_form" id="enable_free_form_new"></input>
+                	{!$label.enable_free_form}
+                </label>
             </span>
         </div>
         <div class="section">
             <div class="custom_survey_options_container">
             </div>
             <div class="custom_survey_options_other_container" style="position:relative; display:none;">
-                <img height="20px" class="checkbox_img" src="{!$resource.checkbox_png}" style="position:absolute;top:5px"></img>
-        		<img height="20px" class="radio_img" src="{!$resource.radio_png}" style="position:absolute;top:5px;display:none;"></img>
+                <img class="checkbox_img" src="{!$resource.checkbox_png}" style="position:absolute;top:5px; height:20px;"></img>
+        		<img class="radio_img" src="{!$resource.radio_png}" style="position:absolute;top:5px;display:none; height:20px;"></img>
             	<div class="custom_survey_option_other dummy_form">
 					{!$label.other}
                 </div>
@@ -390,8 +400,8 @@ function generate_html_options(type, num_of_existing_option, num_of_creating_opt
                 </div>
             </div>
             <div class="custom_survey_option" style="text-align:right;">
-                <button type="submit" class="white_button add_option_button" style="position:relative; padding-left:40px; text-align:right;">
-                    <img style="position:absolute; top: 5px; left: 5px;" height="30px" src="{!URLFOR($resource.add_png)}"/>
+                <button type="submit" class="white_button add_option_button" style="position:relative; padding-left:33px; text-align:right;">
+                    <img style="position:absolute; top: 8px; left: 8px; height:20px;" src="{!URLFOR($resource.add_png)}"/>
                     {!$label.add_option}
                 </button>
             </div>
@@ -413,22 +423,27 @@ function generate_html_options(type, num_of_existing_option, num_of_creating_opt
             <!-- Static List -->
             <div id="existing_survey_container_{!csq.id}">
                 <div id="list_survey_container_{!csq.id}" class="survey_container">
-                    <img class="button_img delete_survey_button" style="position:absolute; top:7px; right:7px;" height="30px" src="{!URLFOR($resource.delete_png)}" survey_id="{!csq.id}" />
+                    <img class="button_img delete_survey_button" style="position:absolute; top:7px; right:7px; height:25px;" src="{!URLFOR($resource.delete_png)}" survey_id="{!csq.id}" />
                     <div class="inner">
                         <div class="section" style="font-weight:bold; font-size:13pt;">
+                        	<apex:outputText rendered="{!csq.Required__c}">
+                        		<div style="margin-bottom: 10px;">
+                        			<span style="padding:2px 4px; background-color:#ff0000; color:#ffffff; font-size:9pt; font-weight:normal;">{!$Label.answer_required}</span>
+                        		</div>
+                        	</apex:outputText>
                             <apex:outputText value="{!csq.Question__c}" />
                         </div>  
                         <div class="section">
                             <apex:repeat value="{!Session.custom_survey_option__r}" var="cso" rendered="{! (csq.survey_type__c != 'free')}">
                                 <apex:outputpanel layout="block" styleClass="custom_survey_option" style="padding: 5px 0px; border-bottom: solid 1px #F4E2ED; font-size: 12pt;" rendered="{!(cso.Custom_Survey_Question__c == csq.id) && !(cso.Enable_Free_Form__c)}">
-                                    <img height="20px" src="{! IF(csq.survey_type__c == 'checkbox',$resource.checkbox_png,$resource.radio_png) }" style="position:absolute;top:5px;"></img>
+                                    <img src="{! IF(csq.survey_type__c == 'checkbox',$resource.checkbox_png,$resource.radio_png) }" style="position:absolute;top:5px;height:20px;"></img>
                                     <div style="margin-left: 30px;">
                                         <apex:outputText value="{!cso.Option__c}" />
                                     </div>
                                 </apex:outputpanel>
                             </apex:repeat>
                             <apex:outputpanel layout="block" styleClass="custom_survey_option" style="padding: 5px 0px;font-size: 12pt;" rendered="{! (csq.survey_type__c != 'free') && (csq.Enable_Free_Form__c)}">
-                                <img height="20px" src="{! IF(csq.survey_type__c == 'checkbox',$resource.checkbox_png,$resource.radio_png) }" style="position:absolute;top:5px;"></img>
+                                <img src="{! IF(csq.survey_type__c == 'checkbox',$resource.checkbox_png,$resource.radio_png) }" style="position:absolute;top:5px; height:20px;"></img>
                                 <div style="margin-left: 30px;">
                                     {!$Label.other}
                                 </div>
@@ -459,13 +474,24 @@ function generate_html_options(type, num_of_existing_option, num_of_creating_opt
                         </apex:outputPanel>
                         <apex:outputtext rendered="{! (csq.survey_type__c != 'free')}">
                             <div class="section">
-                                <apex:outputText rendered="{!csq.Enable_Free_Form__c}">
-                                    <input type="checkbox" name="enable_free_form" id="enable_free_form_{!csq.Id}" class="enable_free_form_existing" checked="true"></input>
-                                </apex:outputText>
-                                <apex:outputText rendered="{! !csq.Enable_Free_Form__c}">
-                                    <input type="checkbox" name="enable_free_form" id="enable_free_form_{!csq.Id}" class="enable_free_form_existing"></input>
-                                </apex:outputText>
-                                <label for="enable_free_form_{!csq.Id}">{!$Label.enable_free_form}</label>
+                            	<label for="required_{!csq.Id}">
+	                                <apex:outputText rendered="{!csq.Required__c}">
+	                                    <input type="checkbox" name="required" id="required_{!csq.Id}" class="required_existing" checked="true"></input>
+	                                </apex:outputText>
+	                                <apex:outputText rendered="{! !csq.Required__c}">
+	                                    <input type="checkbox" name="required" id="required_{!csq.Id}" class="required_existing"></input>
+	                                </apex:outputText>
+                                	{!$Label.answer_required}
+                                </label>
+                            	<label for="enable_free_form_{!csq.Id}">
+	                                <apex:outputText rendered="{!csq.Enable_Free_Form__c}">
+	                                    <input type="checkbox" name="enable_free_form" id="enable_free_form_{!csq.Id}" class="enable_free_form_existing" checked="true"></input>
+	                                </apex:outputText>
+	                                <apex:outputText rendered="{! !csq.Enable_Free_Form__c}">
+	                                    <input type="checkbox" name="enable_free_form" id="enable_free_form_{!csq.Id}" class="enable_free_form_existing"></input>
+	                                </apex:outputText>
+                                	{!$Label.enable_free_form}
+                                </label>
                             </div>
                             <div class="section">
                                 <div class="custom_survey_options_container">
@@ -473,21 +499,21 @@ function generate_html_options(type, num_of_existing_option, num_of_creating_opt
                                         <apex:outputText rendered="{!(cso.Custom_Survey_Question__c == csq.id) && !(cso.Enable_Free_Form__c)}">
                                             <div class="custom_survey_option">
                                             	<apex:outputText rendered="{! (csq.survey_type__c == 'checkbox') }">
-                                            		<img height="20px" src="{!$resource.checkbox_png}" style="position:absolute;top:5px;" />
+                                            		<img src="{!$resource.checkbox_png}" style="position:absolute;top:5px; height:20px;" />
                                            		</apex:outputText>
                                            		<apex:outputText rendered="{! (csq.survey_type__c == 'radio') }">
-                                           			<img height="20px" src="{!$resource.radio_png}" style="position:absolute;top:5px;" />
+                                           			<img src="{!$resource.radio_png}" style="position:absolute;top:5px; height:20px;" />
                                            		</apex:outputText>
                                            		<apex:outputPanel layout="block" style="margin-left:30px;">
                                                 	<input type="text" option_id="{!cso.Id}" name="option[]" value="{!cso.Option__c}"></input>
                                                 </apex:outputPanel>
-                                                <img class="button_img delete_option_button" style="position:absolute; top:3px; right:-30px;" height="30px" src="{!URLFOR($resource.delete_png)}" />
+                                                <img class="button_img delete_option_button" style="position:absolute; top:8px; right:-32px; height:23px;" src="{!URLFOR($resource.delete_png)}" />
                                             </div>
                                         </apex:outputText>
                                     </apex:repeat>
                                 </div>
 					            <div class="custom_survey_options_other_container" style="position:relative; {! IF(csq.enable_free_form__c,'','display:none;') }">
-					                <img height="20px" class="checkbox_img" src="{! IF(csq.survey_type__c == 'checkbox',$resource.checkbox_png,$resource.radio_png) }" style="position:absolute;top:5px"></img>
+					                <img class="checkbox_img" src="{! IF(csq.survey_type__c == 'checkbox',$resource.checkbox_png,$resource.radio_png) }" style="position:absolute;top:5px; height:20px;"></img>
 					            	<div class="custom_survey_option_other dummy_form">
 										{!$label.other}
 					                </div>
@@ -496,8 +522,8 @@ function generate_html_options(type, num_of_existing_option, num_of_creating_opt
 					                </div>
 					            </div>
                                 <div class="custom_survey_option" style="text-align:right;">
-                                    <button type="submit" class="white_button add_option_button" style="position:relative; padding-left:40px; text-align:right;">
-                                        <img style="position:absolute; top: 5px; left: 5px;" height="30px" src="{!URLFOR($resource.add_png)}"/>
+                                    <button type="submit" class="white_button add_option_button" style="position:relative; padding-left:33px; text-align:right;">
+                                        <img style="position:absolute; top: 8px; left: 8px; height:20px;" src="{!URLFOR($resource.add_png)}"/>
                                         {!$label.add_option}
                                     </button>
                                 </div>

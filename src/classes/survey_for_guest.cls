@@ -26,6 +26,8 @@ public with sharing class survey_for_guest {
                 phone__c, 
                 profile_photo__c, 
                 session__c, 
+                status__c,
+                checkin__c,
                 session__r.name, 
                 session__r.date__c,
                 contact__c

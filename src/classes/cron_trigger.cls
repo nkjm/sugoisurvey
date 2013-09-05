@@ -4,6 +4,8 @@ global class cron_trigger implements Schedulable{
     global void execute(SchedulableContext SC) {
         // notify guest registration
         chatter_notification.notify_registration_to_record_feed_for_pending_guest();
+        // copy comments to chatter feed 
+        jr_session.copy_comment_to_feedItem(null);
 
         // schedule next copy
         Datetime next = Datetime.now().addMinutes(this.interval);

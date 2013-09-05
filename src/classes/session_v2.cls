@@ -1,11 +1,17 @@
 public with sharing class session_v2 {
 
     private session__c session;
+    public boolean email_required {get;set;}
  
     public session_v2(ApexPages.StandardController controller) {
         session__c session = (session__c)controller.getRecord();
         if (session.id != null) {
             this.session = jr_session.get_session(session.id);
+            if (this.session.who_can_submit_survey__c != '無条件' && this.session.who_can_submit_survey__c != 'Anyone'){
+            	this.email_required = true;
+            } else {
+            	this.email_required = false;
+            }
         }
     }
 
@@ -45,29 +51,29 @@ public with sharing class session_v2 {
         system.assertEquals(true, getConfig().initialized__c);
     }
     
-
-    
     public list<guest__c> getDeliveryDestinations(){
         list<guest__c> deliveryDestinations = new list<guest__c>();
         if (this.session.who_can_get_handout__c == '全員' ||
             this.session.who_can_get_handout__c == 'Anyone'){
-            for (Guest__c guest : this.session.guest__r){
-                if (guest.email__c != '' && guest.email__c != null){
-                    deliveryDestinations.add(guest);
-                }
-            }
+            deliveryDestinations = [
+            	select name__c, email__c, title__c, company__c, handout_delivered__c, checkin__c, status__c 
+            	from guest__c 
+            	where session__c = :this.session.id and email__c <> null and email__c <> ''
+        	];
+        } else if (this.session.who_can_get_handout__c == '出席者' ||
+                   this.session.who_can_get_handout__c == 'Attendees'){
+            deliveryDestinations = [
+            	select name__c, email__c, title__c, company__c, handout_delivered__c, checkin__c, status__c 
+            	from guest__c 
+            	where session__c = :this.session.id and checkin__c = true and email__c <> null and email__c <> ''
+        	];
         } else if (this.session.who_can_get_handout__c == 'アンケートの入力が必要' ||
                    this.session.who_can_get_handout__c == 'Require Survey Submission'){
-            List<id> guest_ids_submitted_survey = new List<id>();
-            for (Survey__c survey : this.session.survey__r){
-                guest_ids_submitted_survey.add(survey.guest__c);
-            }
-            if (guest_ids_submitted_survey.size() >= 1){
-                try {
-                    deliveryDestinations = [select name__c, email__c, company__c, title__c, handout_delivered__c from guest__c where id in :guest_ids_submitted_survey and email__c != '' order by handout_delivered__c, company__c];
-                } catch (Exception e){
-                }
-            }
+            deliveryDestinations = [
+            	select name__c, email__c, title__c, company__c, handout_delivered__c, checkin__c, status__c 
+            	from guest__c 
+            	where session__c = :this.session.id and status__c = 'submitted' and email__c <> null and email__c <> ''
+        	];
         }
         return deliveryDestinations;
     }

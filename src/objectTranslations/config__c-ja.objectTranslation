@@ -41,6 +41,10 @@
         <name>sandbox_name__c</name>
     </fields>
     <fields>
+        <label><!-- アンケートサイトにアンケートリストを表示 --></label>
+        <name>show_survey_list__c</name>
+    </fields>
+    <fields>
         <label><!-- サイト ユーザー名 --></label>
         <name>sites_username__c</name>
     </fields>

@@ -2,7 +2,7 @@
 position: relative;
 clear: both;
 width: 95%;
-margin: 0 auto 40px auto;
+margin: 0 auto 10px auto;
 overflow: hidden;
 font-family: 'Cuprum';
 font-size: 1.0em;

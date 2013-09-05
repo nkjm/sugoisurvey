@@ -6,7 +6,7 @@
         <img src="https://chart.googleapis.com/chart?cht=qr&chs=200x200&chl={!HTMLENCODE(config.survey_sites_url__c + '?id=' + session.id + '#page_session_detail_' + session.id)}" />
     </div>
     <div style="margin-top:20px; font-family:'Cuprum'; font-size: 12pt;">
-        <a href="{!HTMLENCODE(config.survey_sites_url__c + '?id=' + session.id + '#page_session_detail_' + session.id)}" target="_blank">{!HTMLENCODE(config.survey_sites_url__c + '?id=' + session.id + '#page_session_detail_' + session.id)}</a>
+    	<a href="{!HTMLENCODE(config.survey_sites_url__c + '?id=' + session.id + '#page_session_detail_' + session.id)}" target="_blank">{!HTMLENCODE(config.survey_sites_url__c + '?id=' + session.id + '#page_session_detail_' + session.id)}</a><br />
     </div>
 </apex:outputPanel>
 </apex:page>

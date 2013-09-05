@@ -1,4 +1,4 @@
-<apex:page standardController="Session__c" extensions="session_v2,jr_session" sidebar="false" showHeader="false" standardStylesheets="false" doctype="html-5.0" cache="false">
+<apex:page readOnly="true" standardController="Session__c" extensions="session_v2,jr_session" sidebar="false" showHeader="false" standardStylesheets="false" doctype="html-5.0" cache="false">
 <apex:styleSheet value="{!URLFOR($Resource.jquery_mobile_1_2_0, 'jquery.mobile-1.2.0/jquery.mobile-1.2.0.min.css')}" />
 <apex:includeScript value="{!URLFOR($Resource.jqueryui_1_9_2_custom_zip, 'jquery-ui-1.9.2.custom/js/jquery-1.8.3.js')}" />
 <apex:includeScript value="{!URLFOR($Resource.jquery_mobile_1_2_0, 'jquery.mobile-1.2.0/jquery.mobile-1.2.0.min.js')}" />

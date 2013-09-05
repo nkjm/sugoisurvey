@@ -58,6 +58,14 @@
         <unique>false</unique>
     </fields>
     <fields>
+        <fullName>Required__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>回答必須</label>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
         <fullName>Session__c</fullName>
         <deprecated>false</deprecated>
         <externalId>false</externalId>

@@ -107,4 +107,60 @@ public with sharing class chatter_notification {
         }
         return true;
     }
+    
+    public static boolean notify_checkin_to_record_feed(guest__c guest){
+    	feedItem fi;
+    	
+    	if (guest == null || guest.session__c == null || guest.name__c == null){
+    		return false;
+    	}
+    	
+    	// retrieve session record
+    	session__c session = [select id, name, Post_To_Account_Record_Feed__c, Post_To_Contact_Record_Feed__c from session__c where id = :guest.session__c];
+    	
+    	// post to Session Feed
+    	fi = new feedItem();
+    	fi.type = 'LinkPost';
+    	fi.parentId = guest.session__c;
+    	fi.body = guest.name__c + ' ' + system.label.has_checked_in_1 + ' ' + session.name + system.label.has_checked_in_2;
+    	fi.LinkUrl = '/' + guest.id;
+    	fi.title = guest.name__c;
+    	insert fi;
+    	
+    	if (guest.contact__c == null){
+    		return true;
+    	}
+    	
+    	// retrieve contact record
+    	contact c;
+    	try {
+    		c = [select id, name, accountId from contact where id = :guest.contact__c];
+    	} catch (Exception e){
+    		return false;
+    	}
+    	
+    	// post to Account Feed
+    	fi = new feedItem();
+    	if (session.Post_To_Account_Record_Feed__c && c.accountId != null){
+	    	fi.type = 'LinkPost';
+	    	fi.parentId = c.accountId;
+	    	fi.body = guest.name__c + ' ' + system.label.has_checked_in_1 + ' ' + session.name + system.label.has_checked_in_2;
+	    	fi.LinkUrl = '/' + guest.session__c;
+	    	fi.title = session.name;
+	    	insert fi;
+    	}
+    	
+    	// post to Contact Feed
+    	fi = new feedItem();
+    	if (session.Post_To_Account_Record_Feed__c){
+	    	fi.type = 'LinkPost';
+	    	fi.parentId = guest.contact__c;
+	    	fi.body = guest.name__c + ' ' + system.label.has_checked_in_1 + ' ' + session.name + system.label.has_checked_in_2;
+	    	fi.LinkUrl = '/' + guest.session__c;
+	    	fi.title = session.name;
+	    	insert fi;
+    	}
+    	
+    	return true;
+    }
 }

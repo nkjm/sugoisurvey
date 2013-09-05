@@ -231,8 +231,6 @@ box-shadow: 0 0 12px rgba(50,50,50,0.6);
 }
 
 #edit_survey .survey_form {
-background: -moz-linear-gradient(center bottom, #eee 2%,#fff 100%);
-background: -webkit-gradient(linear, left bottom, left top, color-stop(0.02, #eee),color-stop(1, #fff));
 box-shadow: 0 0 7px rgba(50,50,50,0.3);
 -moz-box-shadow: 0 0 7px rgba(50,50,50,0.3);
 -webkit-box-shadow: 0 0 7px rgba(50,50,50,0.3);

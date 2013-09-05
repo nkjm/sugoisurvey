@@ -42,6 +42,35 @@
     <enableHistory>true</enableHistory>
     <enableReports>true</enableReports>
     <fields>
+        <fullName>Attending_Guest_Percentage__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <formula>IF(Guest_Sum__c == 0,0,
+  IF(Attending_Guest_Sum__c == 0,0, Attending_Guest_Sum__c / Guest_Sum__c))</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>歩留まり</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackHistory>false</trackHistory>
+        <type>Percent</type>
+    </fields>
+    <fields>
+        <fullName>Attending_Guest_Sum__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>ゲスト数（出席）</label>
+        <summaryFilterItems>
+            <field>Guest__c.Status__c</field>
+            <operation>equals</operation>
+            <value>attended, submitted</value>
+        </summaryFilterItems>
+        <summaryForeignKey>Guest__c.Session__c</summaryForeignKey>
+        <summaryOperation>count</summaryOperation>
+        <trackHistory>false</trackHistory>
+        <type>Summary</type>
+    </fields>
+    <fields>
         <fullName>Chatter_Email__c</fullName>
         <deprecated>false</deprecated>
         <externalId>false</externalId>
@@ -82,6 +111,17 @@
         <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
         <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Event_Id__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <formula>Id</formula>
+        <label>イベントID</label>
+        <required>false</required>
+        <trackHistory>false</trackHistory>
+        <type>Text</type>
+        <unique>false</unique>
     </fields>
     <fields>
         <fullName>Guest_Sum__c</fullName>
@@ -142,10 +182,9 @@
     </fields>
     <fields>
         <fullName>Mass_Mail_Additional_Body__c</fullName>
-        <defaultValue>$Label.body_of_deck_delivery_mail</defaultValue>
         <deprecated>false</deprecated>
         <externalId>false</externalId>
-        <label>資料配信メール本文(HTML)</label>
+        <label>メール本文(HTML)</label>
         <length>32768</length>
         <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
@@ -156,11 +195,23 @@
         <fullName>Mass_Mail_Sender__c</fullName>
         <deprecated>false</deprecated>
         <externalId>false</externalId>
-        <label>資料配信メール送信元アドレス</label>
+        <label>メール送信元アドレス</label>
         <required>false</required>
         <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
         <type>Email</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Mass_Mail_Title__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>メール題名</label>
+        <length>255</length>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <type>Text</type>
         <unique>false</unique>
     </fields>
     <fields>
@@ -207,6 +258,81 @@
         <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
         <type>Lookup</type>
+    </fields>
+    <fields>
+        <fullName>Rate_1__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Rate 1</label>
+        <summaryFilterItems>
+            <field>Survey__c.Rate__c</field>
+            <operation>equals</operation>
+            <value>1</value>
+        </summaryFilterItems>
+        <summaryForeignKey>Survey__c.Session__c</summaryForeignKey>
+        <summaryOperation>count</summaryOperation>
+        <trackHistory>false</trackHistory>
+        <type>Summary</type>
+    </fields>
+    <fields>
+        <fullName>Rate_2__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Rate 2</label>
+        <summaryFilterItems>
+            <field>Survey__c.Rate__c</field>
+            <operation>equals</operation>
+            <value>2</value>
+        </summaryFilterItems>
+        <summaryForeignKey>Survey__c.Session__c</summaryForeignKey>
+        <summaryOperation>count</summaryOperation>
+        <trackHistory>false</trackHistory>
+        <type>Summary</type>
+    </fields>
+    <fields>
+        <fullName>Rate_3__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Rate 3</label>
+        <summaryFilterItems>
+            <field>Survey__c.Rate__c</field>
+            <operation>equals</operation>
+            <value>3</value>
+        </summaryFilterItems>
+        <summaryForeignKey>Survey__c.Session__c</summaryForeignKey>
+        <summaryOperation>count</summaryOperation>
+        <trackHistory>false</trackHistory>
+        <type>Summary</type>
+    </fields>
+    <fields>
+        <fullName>Rate_4__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Rate 4</label>
+        <summaryFilterItems>
+            <field>Survey__c.Rate__c</field>
+            <operation>equals</operation>
+            <value>4</value>
+        </summaryFilterItems>
+        <summaryForeignKey>Survey__c.Session__c</summaryForeignKey>
+        <summaryOperation>count</summaryOperation>
+        <trackHistory>false</trackHistory>
+        <type>Summary</type>
+    </fields>
+    <fields>
+        <fullName>Rate_5__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Rate 5</label>
+        <summaryFilterItems>
+            <field>Survey__c.Rate__c</field>
+            <operation>equals</operation>
+            <value>5</value>
+        </summaryFilterItems>
+        <summaryForeignKey>Survey__c.Session__c</summaryForeignKey>
+        <summaryOperation>count</summaryOperation>
+        <trackHistory>false</trackHistory>
+        <type>Summary</type>
     </fields>
     <fields>
         <fullName>Rate_Avg__c</fullName>
@@ -285,10 +411,14 @@
         <fullName>Who_Can_Get_Handout__c</fullName>
         <deprecated>false</deprecated>
         <externalId>false</externalId>
-        <label>資料を配信される人</label>
+        <label>メールを配信される人</label>
         <picklist>
             <picklistValues>
                 <fullName>全員</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>出席者</fullName>
                 <default>false</default>
             </picklistValues>
             <picklistValues>
@@ -427,7 +557,7 @@ sugoisurvey4.jr_session.delete_session(&apos;{!Session__c.Id}&apos;,
         <displayType>button</displayType>
         <height>600</height>
         <linkType>page</linkType>
-        <masterLabel>資料配信</masterLabel>
+        <masterLabel>メール配信</masterLabel>
         <openType>noSidebar</openType>
         <page>deliver_handout</page>
         <protected>false</protected>

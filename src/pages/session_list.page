@@ -1,4 +1,4 @@
-<apex:page standardController="Session__c" extensions="session_v2,jr_session" sidebar="false" showheader="true" standardStylesheets="false" doctype="html-5.0">
+<apex:page readOnly="true" standardController="Session__c" extensions="session_v2,jr_session" sidebar="false" showheader="true" standardStylesheets="false" doctype="html-5.0">
 <apex:styleSheet value="https://fonts.googleapis.com/css?family=Cuprum&subset=latin" />
 <apex:styleSheet value="{!URLFOR($Resource.jqueryui_1_9_2_custom_zip, 'jquery-ui-1.9.2.custom/css/smoothness/jquery-ui-1.9.2.custom.min.css')}" />
 <apex:styleSheet value="{!URLFOR($Resource.reusable_class_css)}" />
@@ -76,7 +76,7 @@ function add_session(){
         </div>
         <div class="column_content">
             <div style="text-align:center;">
-                <img id="plus_session" class="button_img" height="30px" src="{!$resource.add_png}"></img>               
+            	<img id="plus_session" class="button_img" style="height:25px;" src="{!$resource.add_png}"></img>         
             </div>
             <div id="form_new_session" style="display:none; position:relative; margin: 10px 0px; height: 50px;">
                 <input type="text" placeholder="{!$label.new_survey_name}" style="width:78%;"></input>

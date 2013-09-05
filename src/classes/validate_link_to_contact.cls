@@ -72,6 +72,18 @@ public class validate_link_to_contact {
         create_account_and_contacts();
         guest__c g;
         list<feedItem> feedItems;
+
+		//// Test Case #0
+		// guest without email
+        g = new guest__c();
+        g.last_name__c = 'fufndnnejrj';
+        g.session__c = sessions[0].id;
+        insert g;
+        // assert
+        g = [select id, last_name__c, first_name__c, title__c, company__c, phone__c, session__c, to_be_posted_to_record_feed__c, contact__c from guest__c where id = :g.id];
+        system.assertEquals('fufndnnejrj', g.last_name__c);
+        system.assertEquals(false, g.to_be_posted_to_record_feed__c);
+        system.assertEquals(null, g.contact__c);
         
         //// Test Case #1
         // create guest
@@ -80,13 +92,12 @@ public class validate_link_to_contact {
         g.session__c = sessions[0].id;
         insert g;
         // assert
-        g = [select id, session__c, session__r.name, contact__c, contact__r.name, contact__r.accountId, last_name__c, first_name__c, title__c, company__c, phone__c, multiple_contacts__c, to_be_posted_to_record_feed__c from guest__c where id = :g.id];
+        g = [select id, session__c, session__r.name, contact__c, contact__r.name, contact__r.accountId, last_name__c, first_name__c, title__c, company__c, phone__c, to_be_posted_to_record_feed__c from guest__c where id = :g.id];
         system.assertEquals('aoeifioj', g.last_name__c);
         system.assertEquals('aoeifioj', g.first_name__c);
         system.assertEquals('aoeifioj', g.title__c);
         system.assertEquals('adsoiuf', g.company__c);
         system.assertEquals('090-0000-0000', g.phone__c);
-        system.assertEquals(false, g.multiple_contacts__c);
         system.assertEquals(false, g.to_be_posted_to_record_feed__c);
         feeditems = [select linkUrl, title, body from feedItem where parentId = :g.contact__c];
         system.assertEquals(1, feedItems.size());
@@ -106,11 +117,22 @@ public class validate_link_to_contact {
         g.session__c = sessions[0].id;
         insert g;
         // assert
-        g = [select id, last_name__c, first_name__c, title__c, company__c, phone__c, session__c, multiple_contacts__c, to_be_posted_to_record_feed__c from guest__c where id = :g.id];
+        g = [select id, last_name__c, first_name__c, title__c, company__c, phone__c, session__c, to_be_posted_to_record_feed__c, contact__c from guest__c where id = :g.id];
         system.assertEquals('boeifioj', g.last_name__c);
         system.assertEquals('adsoiuf', g.company__c);
-        system.assertEquals(true, g.multiple_contacts__c);
         system.assertEquals(false, g.to_be_posted_to_record_feed__c);
+        
+        //// Test Case #2.1 - User manually link the guest to contact:'coeifioj'.
+        g.contact__c = [select id from contact where lastname = 'coeifioj'].id;
+        update g;
+        g = new guest__c();
+        g.email__c = 'boeifioj@hoge.com';
+        g.session__c = sessions[0].id;
+        insert g;
+        // assert
+        g = [select id, last_name__c, first_name__c, title__c, company__c, phone__c, session__c, to_be_posted_to_record_feed__c, contact__c from guest__c where id = :g.id];
+        system.assertEquals('coeifioj', g.last_name__c);
+        
         
         //// Test Case #3
         // create guest
@@ -119,10 +141,9 @@ public class validate_link_to_contact {
         g.session__c = sessions[0].id;
         insert g;
         // assert
-        g = [select id, last_name__c, first_name__c, title__c, company__c, phone__c, session__c, multiple_contacts__c, to_be_posted_to_record_feed__c from guest__c where id = :g.id];
+        g = [select id, last_name__c, first_name__c, title__c, company__c, phone__c, session__c, to_be_posted_to_record_feed__c from guest__c where id = :g.id];
         system.assertEquals('doeifioj', g.last_name__c);
         system.assertEquals(null, g.company__c);
-        system.assertEquals(false, g.multiple_contacts__c);
         system.assertEquals(false, g.to_be_posted_to_record_feed__c);
         
         //// Test Case #4
@@ -133,10 +154,9 @@ public class validate_link_to_contact {
         g.session__c = sessions[0].id;
         insert g;
         // assert
-        g = [select id, last_name__c, first_name__c, title__c, company__c, phone__c, session__c, multiple_contacts__c, to_be_posted_to_record_feed__c from guest__c where id = :g.id];
+        g = [select id, last_name__c, first_name__c, title__c, company__c, phone__c, session__c, to_be_posted_to_record_feed__c from guest__c where id = :g.id];
         system.assertEquals(system.label.unregistered_guest, g.last_name__c);
         system.assertEquals(null, g.company__c);
-        system.assertEquals(false, g.multiple_contacts__c);
         system.assertEquals(false, g.to_be_posted_to_record_feed__c);
         
         //// Test Case #5 - Invoke Bulk Trigger
@@ -155,9 +175,9 @@ public class validate_link_to_contact {
         guests.add(g.clone());
         insert guests;
         // assert
-        g = [select id, last_name__c, first_name__c, title__c, company__c, phone__c, session__c, multiple_contacts__c, to_be_posted_to_record_feed__c from guest__c where id = :guests[0].id];
+        g = [select id, last_name__c, first_name__c, title__c, company__c, phone__c, session__c, to_be_posted_to_record_feed__c from guest__c where id = :guests[0].id];
         system.assertEquals('aoeifioj', g.last_name__c);
-        g = [select id, last_name__c, first_name__c, title__c, company__c, phone__c, session__c, multiple_contacts__c, to_be_posted_to_record_feed__c from guest__c where id = :guests[1].id];
+        g = [select id, last_name__c, first_name__c, title__c, company__c, phone__c, session__c, to_be_posted_to_record_feed__c from guest__c where id = :guests[1].id];
         system.assertEquals('boeifioj', g.last_name__c);
         
         //// Test Case #6 - Disable post to account feed, Enable post to contact feed
@@ -169,7 +189,7 @@ public class validate_link_to_contact {
         g.session__c = sessions[1].id;
         insert g;
         // assert
-        g = [select id, session__c, session__r.name, contact__c, contact__r.name, contact__r.accountId, last_name__c, first_name__c, title__c, company__c, phone__c, multiple_contacts__c, to_be_posted_to_record_feed__c from guest__c where id = :g.id];
+        g = [select id, session__c, session__r.name, contact__c, contact__r.name, contact__r.accountId, last_name__c, first_name__c, title__c, company__c, phone__c, to_be_posted_to_record_feed__c from guest__c where id = :g.id];
         feeditems = [select linkUrl, title, body from feedItem where parentId = :g.contact__r.accountId];
         system.assertEquals(0, feedItems.size());
         feeditems = [select linkUrl, title, body from feedItem where parentId = :g.contact__c];
@@ -184,7 +204,7 @@ public class validate_link_to_contact {
         g.session__c = sessions[2].id;
         insert g;
         // assert
-        g = [select id, session__c, session__r.name, contact__c, contact__r.name, contact__r.accountId, last_name__c, first_name__c, title__c, company__c, phone__c, multiple_contacts__c, to_be_posted_to_record_feed__c from guest__c where id = :g.id];
+        g = [select id, session__c, session__r.name, contact__c, contact__r.name, contact__r.accountId, last_name__c, first_name__c, title__c, company__c, phone__c, to_be_posted_to_record_feed__c from guest__c where id = :g.id];
         feeditems = [select linkUrl, title, body from feedItem where parentId = :g.contact__r.accountId];
         system.assertEquals(1, feedItems.size());
         feeditems = [select linkUrl, title, body from feedItem where parentId = :g.contact__c];
@@ -199,7 +219,7 @@ public class validate_link_to_contact {
         g.session__c = sessions[3].id;
         insert g;
         // assert
-        g = [select id, session__c, session__r.name, contact__c, contact__r.name, contact__r.accountId, last_name__c, first_name__c, title__c, company__c, phone__c, multiple_contacts__c, to_be_posted_to_record_feed__c from guest__c where id = :g.id];
+        g = [select id, session__c, session__r.name, contact__c, contact__r.name, contact__r.accountId, last_name__c, first_name__c, title__c, company__c, phone__c, to_be_posted_to_record_feed__c from guest__c where id = :g.id];
         feeditems = [select linkUrl, title, body from feedItem where parentId = :g.contact__r.accountId];
         system.assertEquals(0, feedItems.size());
         feeditems = [select linkUrl, title, body from feedItem where parentId = :g.contact__c];
@@ -216,13 +236,12 @@ public class validate_link_to_contact {
             g.session__c = sessions[0].id;
             insert g;
             // assert
-            g = [select id, session__c, session__r.name, contact__c, contact__r.name, contact__r.accountId, last_name__c, first_name__c, title__c, company__c, phone__c, multiple_contacts__c, to_be_posted_to_record_feed__c from guest__c where id = :g.id];
+            g = [select id, session__c, session__r.name, contact__c, contact__r.name, contact__r.accountId, last_name__c, first_name__c, title__c, company__c, phone__c, to_be_posted_to_record_feed__c from guest__c where id = :g.id];
             system.assertEquals('aoeifioj', g.last_name__c);
             system.assertEquals('aoeifioj', g.first_name__c);
             system.assertEquals('aoeifioj', g.title__c);
             system.assertEquals('adsoiuf', g.company__c);
             system.assertEquals('090-0000-0000', g.phone__c);
-            system.assertEquals(false, g.multiple_contacts__c);
             system.assertEquals(true, g.to_be_posted_to_record_feed__c);
         }
     }
@@ -249,7 +268,7 @@ public class validate_link_to_contact {
             insert g;
         }
         chatter_notification.notify_registration_to_record_feed_for_pending_guest();
-        list<guest__c> guests = [select id, session__c, session__r.name, contact__c, contact__r.name, contact__r.accountId, last_name__c, first_name__c, title__c, company__c, phone__c, multiple_contacts__c, to_be_posted_to_record_feed__c from guest__c where session__c = :sessions[0].id];
+        list<guest__c> guests = [select id, session__c, session__r.name, contact__c, contact__r.name, contact__r.accountId, last_name__c, first_name__c, title__c, company__c, phone__c, to_be_posted_to_record_feed__c from guest__c where session__c = :sessions[0].id];
         system.assertEquals(2, guests.size());
         system.assertEquals(false, guests[0].to_be_posted_to_record_feed__c);
         

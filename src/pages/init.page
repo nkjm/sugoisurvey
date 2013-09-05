@@ -11,22 +11,22 @@ j$ = jQuery.noConflict();
 
 function init(){
     j$.confirm.status({
-        'title' : '{!$label.processing}...',
-        'message' : '{!$label.pls_wait_for_a_while}'
+        'title' : '{!$Label.processing}...',
+        'message' : '{!$Label.pls_wait_for_a_while}'
     });
     start_init();
 }
 
 function start_init(){
-    sugoisurvey4.jr_session.start_init("{!JSENCODE($currentPage.Url)}",
+    sugoisurvey4.jr_session.start_init("{!JSENCODE($CurrentPage.Url)}",
         function(result, event){
             if (event.status){
                 if (result.status == false){
                     j$.confirm.alert({
-                        'title':'{!$label.error}',
+                        'title':'{!$Label.error}',
                         'message':result.message,
                         'color':'#ff0000',
-                        'button_label':'{!$label.close}'
+                        'button_label':'{!$Label.close}'
                     });
                     return;
                 } else {
@@ -34,10 +34,10 @@ function start_init(){
                 }
             } else {
                 j$.confirm.alert({
-                    'title':'{!$label.error}',
+                    'title':'{!$Label.error}',
                     'message':event.message,
                     'color':'#ff0000',
-                    'button_label':'{!$label.close}'
+                    'button_label':'{!$Label.close}'
                 });
                 return;
             }
@@ -51,10 +51,10 @@ function assign_permission_set(){
             if (event.status){
                 if (result.status == false){
                     j$.confirm.alert({
-                        'title':'{!$label.error}',
+                        'title':'{!$Label.error}',
                         'message':result.message,
                         'color':'#ff0000',
-                        'button_label':'{!$label.close}'
+                        'button_label':'{!$Label.close}'
                     });
                     return;
                 } else {
@@ -62,10 +62,10 @@ function assign_permission_set(){
                 }
             } else {
                 j$.confirm.alert({
-                    'title':'{!$label.error}',
+                    'title':'{!$Label.error}',
                     'message':event.message,
                     'color':'#ff0000',
-                    'button_label':'{!$label.close}'
+                    'button_label':'{!$Label.close}'
                 });
                 return;
             }
@@ -79,10 +79,10 @@ function finish_init(){
             if (event.status){
                 if (result.status == false){
                     j$.confirm.alert({
-                        'title':'{!$label.error}',
+                        'title':'{!$Label.error}',
                         'message':result.message,
                         'color':'#ff0000',
-                        'button_label':'{!$label.close}'
+                        'button_label':'{!$Label.close}'
                     });
                     return;
                 } else {
@@ -90,10 +90,10 @@ function finish_init(){
                 }
             } else {
                 j$.confirm.alert({
-                    'title':'{!$label.error}',
+                    'title':'{!$Label.error}',
                     'message':event.message,
                     'color':'#ff0000',
-                    'button_label':'{!$label.close}'
+                    'button_label':'{!$Label.close}'
                 });
                 return;
             }
@@ -104,7 +104,9 @@ function finish_init(){
 </script>
 
 <div id="top">
-    <span class="gradient_tagline">{!$label.sugoisurvey}</span>
+    <span class="gradient_tagline">
+        <apex:outputText value="{! IF(config.need_re_initialization__c,$label.app_updated,$label.sugoisurvey)}" />
+    </span>
 </div>
 <div id="middle">
     <input type="button" onclick="init()" class="green_button" value="{!IF(config.need_re_initialization__c,$label.re_initialize,$label.start)}" style="width:100%;"/>

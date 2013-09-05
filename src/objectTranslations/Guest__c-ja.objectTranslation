@@ -5,6 +5,14 @@
         <value>ゲスト</value>
     </caseValues>
     <fields>
+        <label><!-- deprecated_出席 --></label>
+        <name>Attend__c</name>
+    </fields>
+    <fields>
+        <label><!-- 出席 --></label>
+        <name>Checkin__c</name>
+    </fields>
+    <fields>
         <label><!-- 会社 --></label>
         <name>Company__c</name>
     </fields>
@@ -22,7 +30,7 @@
         <name>First_Name__c</name>
     </fields>
     <fields>
-        <label><!-- 資料配信済み --></label>
+        <label><!-- メール配信済み --></label>
         <name>Handout_Delivered__c</name>
     </fields>
     <fields>
@@ -49,6 +57,22 @@
         <label><!-- イベント --></label>
         <name>Session__c</name>
         <relationshipLabel><!-- ゲスト --></relationshipLabel>
+    </fields>
+    <fields>
+        <label><!-- 状況 --></label>
+        <name>Status__c</name>
+        <picklistValues>
+            <masterLabel>attended</masterLabel>
+            <translation><!-- attended --></translation>
+        </picklistValues>
+        <picklistValues>
+            <masterLabel>registered</masterLabel>
+            <translation><!-- registered --></translation>
+        </picklistValues>
+        <picklistValues>
+            <masterLabel>submitted</masterLabel>
+            <translation><!-- submitted --></translation>
+        </picklistValues>
     </fields>
     <fields>
         <label><!-- 役職 --></label>

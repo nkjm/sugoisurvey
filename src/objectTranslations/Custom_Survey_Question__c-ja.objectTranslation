@@ -13,6 +13,10 @@
         <name>Question__c</name>
     </fields>
     <fields>
+        <label><!-- 回答必須 --></label>
+        <name>Required__c</name>
+    </fields>
+    <fields>
         <label><!-- セッション --></label>
         <name>Session__c</name>
         <relationshipLabel><!-- カスタムアンケート 質問 --></relationshipLabel>

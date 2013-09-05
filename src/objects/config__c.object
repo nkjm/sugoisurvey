@@ -87,6 +87,14 @@
         <unique>false</unique>
     </fields>
     <fields>
+        <fullName>show_survey_list__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>アンケートサイトにアンケートリストを表示</label>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
         <fullName>sites_username__c</fullName>
         <deprecated>false</deprecated>
         <externalId>false</externalId>

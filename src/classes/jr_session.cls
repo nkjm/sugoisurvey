@@ -9,84 +9,6 @@ public with sharing class jr_session {
     }
     
     @remoteAction 
-    public static r finish_init(){
-        r r = new r();
-        config__c config = config__c.getOrgDefaults();
-
-        // Quit if app has been initialized.
-        if (config.initialized__c == true && config.need_re_initialization__c == false){
-            r.status = false;
-            r.message = system.label.already_initialized;
-            return r;
-        }
-        
-        //// Launch scheduler
-        // Start cron job for copy comment to feedItem. This should be merged into universal cron trigger but there is no way to kill existing job programatically.
-        Datetime next = Datetime.now().addMinutes(1);
-        string sch = string.valueOf(next.second()) + ' ' + string.valueOf(next.minute()) + ' ' + string.valueOf(next.hour()) + ' ' + string.valueOf(next.day()) + ' ' + string.valueOf(next.month()) + ' ?';
-        if (config.initialized__c == false && config.need_re_initialization__c == false){
-            if (!Test.isRunningTest()){
-                system.schedule('Copy comment to feedItem - ' + sch, sch, new schedule_copy_comment_to_feedItem());
-            }
-        }
-        // Start cron job for universal purpose. As of v4 1.13, chatter_notification.notify_guest_registration_for_pending_guest is the only method to invoke.
-        id cron_trigger_id;
-        if (!Test.isRunningTest()){
-            cron_trigger_id = system.schedule('Cron Trigger v1.13 - ' + sch, sch, new cron_trigger());
-        }
-
-        // update config
-        config.cron_trigger_id__c = cron_trigger_id;
-        config.initialized__c = true;
-        config.need_re_initialization__c = false;
-        upsert config;
-        
-        r.status = true;
-        return r;
-    }
-    
-    @remoteAction 
-    public static r assign_permission_set(){
-        r r = new r();
-        config__c config = config__c.getOrgDefaults();
-        
-        // Quit if site has not been activated
-        if (config.survey_sites_domain__c == null){
-            r.status = false;
-            r.message = system.label.sites_not_activated;
-            return r;
-        }
-        
-        // retreive id of user for sites
-        string sites_user_id;
-        try {
-            sites_user_id = [select id from user where username = :config.sites_username__c].id;
-        } catch(Exception e) {
-            r.status = false;
-            r.message = system.label.sites_user_not_found;
-            return r;
-        }
-        
-        // retrieve id of permission set for sites
-        string sites_permission_set_id;
-        try {
-            sites_permission_set_id = [select id from permissionSet where name = 'Sugoi_Survey_Sites_for_Any_License'].id;
-        } catch(Exception e){
-            r.status = false;
-            r.message = system.label.sites_permission_set_not_found;
-            return r;
-        }
-        
-        if ([select id from permissionSetAssignment where assigneeId = :sites_user_id and permissionSetId = :sites_permission_set_id].size() == 0){
-            permissionSetAssignment psa = new permissionSetAssignment(assigneeId = sites_user_id, permissionSetId = sites_permission_set_id);
-            insert psa;
-        }
-        
-        r.status = true;
-        return r;
-    }
-    
-    @remoteAction 
     public static r start_init(string current_url){
         r r = new r();
         config__c config = config__c.getOrgDefaults();
@@ -153,6 +75,91 @@ public with sharing class jr_session {
         
         upsert config;
 
+        r.status = true;
+        return r;
+    }
+    
+    
+    @remoteAction 
+    public static r assign_permission_set(){
+        r r = new r();
+        config__c config = config__c.getOrgDefaults();
+        
+        // Quit if site has not been activated
+        if (config.survey_sites_domain__c == null){
+            r.status = false;
+            r.message = system.label.sites_not_activated;
+            return r;
+        }
+        
+        // retreive id of user for sites
+        string sites_user_id;
+        try {
+            sites_user_id = [select id from user where username = :config.sites_username__c].id;
+        } catch(Exception e) {
+            r.status = false;
+            r.message = system.label.sites_user_not_found;
+            return r;
+        }
+        
+        // retrieve id of permission set for sites
+        string sites_permission_set_id;
+        try {
+            sites_permission_set_id = [select id from permissionSet where name = 'Sugoi_Survey_Sites_for_Any_License'].id;
+        } catch(Exception e){
+            r.status = false;
+            r.message = system.label.sites_permission_set_not_found;
+            return r;
+        }
+        
+        if ([select id from permissionSetAssignment where assigneeId = :sites_user_id and permissionSetId = :sites_permission_set_id].size() == 0){
+            permissionSetAssignment psa = new permissionSetAssignment(assigneeId = sites_user_id, permissionSetId = sites_permission_set_id);
+            insert psa;
+        }
+        
+        r.status = true;
+        return r;
+    }
+    
+    
+    @remoteAction 
+    public static r finish_init(){
+        r r = new r();
+        config__c config = config__c.getOrgDefaults();
+
+        // Quit if app has been initialized.
+        if (config.initialized__c == true && config.need_re_initialization__c == false){
+            r.status = false;
+            r.message = system.label.already_initialized;
+            return r;
+        }
+        
+        //// Launch scheduler
+        // Start cron job for copy comment to feedItem. This should be merged into universal cron trigger but there is no way to kill existing job programatically.
+        /*
+        Datetime next = Datetime.now().addMinutes(1);
+        string sch = string.valueOf(next.second()) + ' ' + string.valueOf(next.minute()) + ' ' + string.valueOf(next.hour()) + ' ' + string.valueOf(next.day()) + ' ' + string.valueOf(next.month()) + ' ?';
+        if (config.initialized__c == false && config.need_re_initialization__c == false){
+            if (!Test.isRunningTest()){
+                system.schedule('Copy comment to feedItem - ' + sch, sch, new schedule_copy_comment_to_feedItem());
+            }
+        }
+        */
+        
+        // Start cron job for universal purpose. As of v4 1.13, chatter_notification.notify_guest_registration_for_pending_guest is the only method to invoke.
+        Datetime next = Datetime.now().addMinutes(1);
+        string sch = string.valueOf(next.second()) + ' ' + string.valueOf(next.minute()) + ' ' + string.valueOf(next.hour()) + ' ' + string.valueOf(next.day()) + ' ' + string.valueOf(next.month()) + ' ?';
+        id cron_trigger_id;
+        if (!Test.isRunningTest()){
+            cron_trigger_id = system.schedule('Cron Trigger v1.13 - ' + sch, sch, new cron_trigger());
+        }
+
+        // update config
+        config.cron_trigger_id__c = cron_trigger_id;
+        config.initialized__c = true;
+        config.need_re_initialization__c = false;
+        upsert config;
+        
         r.status = true;
         return r;
     }
@@ -261,7 +268,6 @@ public with sharing class jr_session {
     @remoteAction
     public static r submit_survey(survey__c survey, comment__c comment, list<custom_survey_answer__c> csas, string guest_email){
         r r = new r();
-        SFDCEncoder enc = new SFDCEncoder();
         savepoint sp = Database.setSavepoint();
         
         if (survey.session__c == null){
@@ -272,7 +278,12 @@ public with sharing class jr_session {
         
         session__c session;
         try {
-            session = [select enable_rate__c, label_for_rate__c, who_can_submit_survey__c from session__c where id = :survey.session__c];
+            session = [
+            	select 
+            		enable_rate__c, label_for_rate__c, who_can_submit_survey__c,
+            		(select id, required__c from custom_survey_question__r)
+            	from session__c where id = :survey.session__c
+        	];
         } catch (Exception e){
             r.status = false;
             r.message = system.label.specified_session_does_not_exist;
@@ -294,6 +305,25 @@ public with sharing class jr_session {
             }
         } else {
             survey.rate__c = null;
+        }
+        
+        // check if the guest fills required questions
+        for (custom_survey_question__c csq : [select id, question__c, (select id from custom_survey_option__r) from custom_survey_question__c where session__c = :session.id and required__c = true order by sort_order__c]){
+        	set<string> opt_ids = new set<string>();
+        	for (custom_survey_option__c opt : csq.custom_survey_option__r){
+        		opt_ids.add(string.valueOf(opt.id));
+        	}
+    		boolean required_answer_found = false;
+    		for (custom_survey_answer__c csa : csas){
+    			if (opt_ids.contains(csa.custom_survey_option__c)){
+    				required_answer_found = true;
+    			}
+    		}
+    		if (!required_answer_found){
+    			r.status = false;
+    			r.message = system.label.pls_enter_required_field + ' ' + csq.question__c;
+    			return r;
+    		}
         }
         
         // - check if user is entitled to submit survey
@@ -361,7 +391,6 @@ public with sharing class jr_session {
         // insert comment__c and feedItem
         if (comment.comment__c != null && comment.comment__c != ''){
             // insert comment__c
-            //insert(new comment__c(session__c = session.id, guest__c = guest.id, comment__c = enc.SFDC_HTMLENCODE(comment.comment__c)));
             insert(new comment__c(session__c = session.id, guest__c = guest.id, comment__c = comment.comment__c));
         }
         
@@ -374,7 +403,6 @@ public with sharing class jr_session {
             csa.session__c = session.id;
             csa.guest__c = guest.id;
             if (csa.free_form__c != null && csa.free_form__c != ''){
-                //csa.free_form__c = enc.SFDC_HTMLENCODE(csa.free_form__c);
                 csa.free_form__c = csa.free_form__c;
             }
             csas_to_add.add(csa);
@@ -384,6 +412,10 @@ public with sharing class jr_session {
         if (csas_to_add.size() > 0){
             insert csas_to_add;
         }
+        
+        // update guest status to "submitted"
+        guest.status__c = 'submitted';
+        update guest;
 
         r.status = true;
         return r;
@@ -395,7 +427,7 @@ public with sharing class jr_session {
             return guest;
         }
         try {
-            guest = [select id, name__c, last_name__c, first_name__c, title__c, company__c from guest__c where session__c = :session_id AND email__c = :guest_email];
+            guest = [select id, name__c, last_name__c, first_name__c, title__c, company__c, status__c from guest__c where session__c = :session_id AND email__c = :guest_email];
         } catch (Exception e){
             return guest;
         }
@@ -439,9 +471,15 @@ public with sharing class jr_session {
                     survey_collection_rate__c,
                     survey_sum__c,
                     guest_sum__c,
-                    who_can_get_handout__c,
-                    who_can_submit_survey__c,
+                    rate_5__c,
+                    rate_4__c,
+                    rate_3__c,
+                    rate_2__c,
+                    rate_1__c,
+                    toLabel(who_can_get_handout__c),
+                    toLabel(who_can_submit_survey__c),
                     mass_mail_sender__c,
+                    mass_mail_title__c,
                     mass_mail_additional_body__c,
                     handout_url__c,
                     handout_password__c,
@@ -449,14 +487,14 @@ public with sharing class jr_session {
                     presenter__r.name,
                     presenter__r.title__c,
                     presenter__r.company__c,
-                    (select id, name__c, email__c, title__c, company__c, handout_delivered__c from guest__r order by handout_delivered__c, company__c),
-                    (select id, name, guest__c, rate__c from survey__r order by name),
-                    (select id, name, comment__c from comment__r order by name desc),
-                    (select id, name, question__c, survey_type__c, sort_order__c, enable_free_form__c, session__c from custom_survey_question__r order by sort_order__c, name),
-                    (select id, name, option__c, enable_free_form__c, dummy__c, sum__c, session__c, custom_survey_question__c from custom_survey_option__r order by name),
-                    (select id, free_form__c from custom_survey_answer__r order by name desc),
-                    (select id from lead__r),
-                    (select id, name from attachments)
+                    (select id, name, question__c, survey_type__c, sort_order__c, required__c, enable_free_form__c, session__c from custom_survey_question__r order by sort_order__c, name),
+                    (select id, name, option__c, enable_free_form__c, dummy__c, sum__c, session__c, custom_survey_question__c from custom_survey_option__r order by name)
+                    //(select id, name__c, email__c, title__c, company__c, handout_delivered__c from guest__r order by handout_delivered__c, company__c),
+                    //(select id, name, guest__c, rate__c from survey__r order by name),
+                    //(select id, free_form__c from custom_survey_answer__r order by name desc),
+                    //(select id, name, comment__c from comment__r order by name desc),
+                    //(select id from lead__r),
+                    //(select id, name from attachments)
                 from Session__c where id = :session_id
             ];
         } catch (Exception e){
@@ -532,10 +570,31 @@ public with sharing class jr_session {
         }
         
         // clone session record
-        session__c old_session = get_session(session_id);
+        session__c old_session = [
+            select
+                id, 
+                name,
+                open__c, 
+                enable_rate__c,
+                label_for_rate__c,
+                survey_collection_rate__c,
+                who_can_get_handout__c,
+                who_can_submit_survey__c,
+                mass_mail_sender__c,
+                mass_mail_title__c,
+                mass_mail_additional_body__c,
+                handout_url__c,
+                handout_password__c,
+                Post_To_Account_Record_Feed__c,
+                Post_To_Contact_Record_Feed__c,
+                owner.email,
+                presenter__c,
+                (select id, name, question__c, survey_type__c, sort_order__c, required__c, enable_free_form__c, session__c from custom_survey_question__r),
+                (select id, name, option__c, enable_free_form__c, dummy__c, session__c, custom_survey_question__c from custom_survey_option__r),
+                (select id, name from attachments)
+            from Session__c where id = :session_id
+        ];
         session__c new_session = old_session.clone(false, true, false, false);
-        new_session.date__c = null;
-        new_session.hash_tag__c = null;
         insert new_session;
         
         // retrieve question records and clone
@@ -802,7 +861,7 @@ public with sharing class jr_session {
         // Check if custom_survey_question__c exists.
         custom_survey_question__c existing_csq;
         try {
-            existing_csq = [select id, question__c, survey_type__c, enable_free_form__c, session__c from custom_survey_question__c where id = :csq.id AND session__c = :csq.session__c];
+            existing_csq = [select id, question__c, survey_type__c, required__c, enable_free_form__c, session__c from custom_survey_question__c where id = :csq.id AND session__c = :csq.session__c];
         } catch (Exception e){
             r.status = false;
             r.message = system.label.specified_survey_does_not_exist;
@@ -818,10 +877,14 @@ public with sharing class jr_session {
         }
         
         // Update custom_survey_question if question__c is updated.
-        if (existing_csq.question__c != csq.question__c || existing_csq.survey_type__c != csq.survey_type__c || existing_csq.enable_free_form__c != csq.enable_free_form__c){
+        if (existing_csq.question__c != csq.question__c || 
+        	existing_csq.survey_type__c != csq.survey_type__c || 
+        	existing_csq.enable_free_form__c != csq.enable_free_form__c ||
+        	existing_csq.required__c != csq.required__c){
             existing_csq.question__c = csq.question__c;
             existing_csq.survey_type__c = csq.survey_type__c;
             existing_csq.enable_free_form__c = csq.enable_free_form__c;
+            existing_csq.required__c = csq.required__c;
             update existing_csq;
         }
         
@@ -912,9 +975,34 @@ public with sharing class jr_session {
         return r;
     }
     
+    @remoteAction 
+    public static r clear_delivered_flag(id session_id){
+    	r r = new r();
+		list<guest__c> guests = new list<guest__c>();
+		
+        if (session_id == null){
+            r.status = false;
+            r.message = system.label.session_id_is_not_set;
+            return r;
+        }
+        
+        guests = [select id, handout_delivered__c from guest__c where session__c = :session_id];
+		for (guest__c g : guests){
+			g.handout_delivered__c = false;
+		}
+		
+        if (guests.size() > 0){
+        	update guests;
+        }
+        
+        r.status = true;
+        return r;
+    }
+    
     @remoteAction
     public static r deliver_deck(id session_id){
         r r = new r();
+        session__c session;
         
         if (session_id == null){
             r.status = false;
@@ -922,8 +1010,22 @@ public with sharing class jr_session {
             return r;
         }
         
-        session__c session = get_session(session_id);
-        if (session == null){
+        try {
+            session = [
+                select
+                    id, 
+                    name,
+                    who_can_get_handout__c,
+                    mass_mail_sender__c,
+                    mass_mail_title__c,
+                    mass_mail_additional_body__c,
+                    handout_url__c,
+                    handout_password__c,
+                    owner.email,
+                    (select id, name from attachments)
+                from Session__c where id = :session_id
+            ];
+        } catch (Exception e){
             r.status = false;
             r.message = system.label.specified_session_does_not_exist;
             return r;
@@ -943,51 +1045,28 @@ public with sharing class jr_session {
         //Generarte email list to be used for Bcc:
         List<List<String>> bcc_addresses_list = new List<List<String>>();
         List<String> bcc_addresses = new List<String>();
-        if (session.who_can_get_handout__c == '全員' ||
-            session.who_can_get_handout__c == 'Anyone'){
-            for (Guest__c guest : session.guest__r){
-                if (guest.email__c != null && guest.email__c != '' && guest.handout_delivered__c == false){
-                    if (bcc_addresses.size() <= 20) {
-                        bcc_addresses.add(guest.email__c);
-                        guest.handout_delivered__c = true;
-                    } else {
-                        bcc_addresses_list.add(bcc_addresses.clone());
-                        bcc_addresses.clear();
-                        bcc_addresses.add(guest.email__c);
-                    }
-                }
-            }
-        } else if (session.who_can_get_handout__c == 'アンケートの入力が必要' || 
-                   session.who_can_get_handout__c == 'Require Survey Submission'){
-            List<id> guest_ids_submitted_survey = new List<id>();
-            for (Survey__c survey : session.survey__r){
-                guest_ids_submitted_survey.add(survey.guest__c);
-            }
-            if (guest_ids_submitted_survey.size() >= 1){
-                List<Guest__c> guests_submitted_survey = [select email__c, handout_delivered__c from guest__c where id in :guest_ids_submitted_survey and email__c != ''];
-                for (Guest__c guest : guests_submitted_survey){
-                    if (guest.email__c != null && guest.email__c != '' && guest.handout_delivered__c == false){
-                        if (bcc_addresses.size() <= 20) {
-                            bcc_addresses.add(guest.email__c);
-                            guest.handout_delivered__c = true;
-                        } else {
-                            bcc_addresses_list.add(bcc_addresses.clone());
-                            bcc_addresses.clear();
-                            bcc_addresses.add(guest.email__c);
-                        }
-                    }
-                }
-            }
-        } else {
-            r.status = false;
-            r.message = system.label.session_is_not_configured_correctly;
-            return r;
+        List<guest__c> all_addresses = new list<guest__c>();
+        for (guest__c guest : i_session.getDeliveryDestinations()){
+        	if (guest.handout_delivered__c == true){
+				continue;
+			}
+			all_addresses.add(guest);
         }
-        if (bcc_addresses.size() > 0) {
+		for (guest__c guest : all_addresses){
+			if (bcc_addresses.size() <= 20) {
+                bcc_addresses.add(guest.email__c);
+                guest.handout_delivered__c = true;
+            } else {
+                bcc_addresses_list.add(bcc_addresses.clone());
+                bcc_addresses.clear();
+                bcc_addresses.add(guest.email__c);
+            }
+		}
+		if (bcc_addresses.size() > 0) {
             bcc_addresses_list.add(bcc_addresses.clone());
             bcc_addresses.clear();
         }
-        
+ 
         //Retrieve Attachment:
         List<Messaging.emailFileAttachment> efas = new List<Messaging.emailFileAttachment>();
         for (attachment a : session.attachments){
@@ -1018,8 +1097,12 @@ public with sharing class jr_session {
             mail.setReplyTo(sender_address);
                 
             //Set Subject:
-            mail.setSubject(system.label.subject_of_deck_delivery_mail + ' : ' + session.name);
-                
+            if (session.mass_mail_title__c == null){
+            	mail.setSubject('');
+            } else {
+            	mail.setSubject(session.mass_mail_title__c);
+            }
+            
             //Set Message Body:
             mail.setHtmlBody(i_session.getMailBody());
                 
@@ -1049,20 +1132,12 @@ public with sharing class jr_session {
         
         // mark guest as delivered
         // count total number of mail
-        integer sum_of_mail = 0;
-        for (guest__c guest : session.guest__r){
-            for (list<string> bcc_addresses_sent : bcc_addresses_list){
-                for (string bcc_address_sent : bcc_addresses_sent){
-                    if (bcc_address_sent == guest.email__c){
-                        guest.handout_delivered__c = true;
-                        sum_of_mail++;
-                    }
-                }
-            }
+        for (guest__c guest : all_addresses){
+        	guest.handout_delivered__c = true;
         }
-        update session.guest__r;
+        update all_addresses;
         r.status = true;
-        r.message = string.valueOf(sum_of_mail);
+        r.message = string.valueOf(all_addresses.size());
         return r;
     }
 }

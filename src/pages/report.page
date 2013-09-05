@@ -1,4 +1,4 @@
-<apex:page standardController="Session__c" extensions="session_v2,jr_session" standardStyleSheets="false" sidebar="false" showheader="false" doctype="html-5.0">
+<apex:page readOnly="true" standardController="Session__c" extensions="session_v2,jr_session" standardStyleSheets="false" sidebar="false" showheader="false" doctype="html-5.0">
 
 <script type="text/javascript">
 google.load('visualization', '1.0', {'packages':['corechart']});
@@ -9,7 +9,7 @@ j$("document").ready(function(){
     report__map_all_event(document);
     get_session("{!session.id}", function(session){
         if (session.sugoisurvey4__Enable_Rate__c == true && session.sugoisurvey4__Rate_Avg__c != null && session.sugoisurvey4__Rate_Avg__c != 0.00){
-            report__generate_report_rating(session.Id, session.sugoisurvey4__Survey__r);
+            report__generate_report_rating(session.Id, session.sugoisurvey4__Rate_1__c, session.sugoisurvey4__Rate_2__c, session.sugoisurvey4__Rate_3__c, session.sugoisurvey4__Rate_4__c, session.sugoisurvey4__Rate_5__c);
         }
         if (session.sugoisurvey4__Custom_Survey_Question__r != null && session.sugoisurvey4__Custom_Survey_Option__r != null){
             j$.each(session.sugoisurvey4__Custom_Survey_Question__r, function(i, csq){
@@ -61,7 +61,7 @@ function report__reload_report_container(){
     j$("#report_container").load("{!JSENCODE($CurrentPage.url)} #report_container", function(){
         get_session("{!session.id}", function(session){
             if (session.sugoisurvey4__Enable_Rate__c == true && session.sugoisurvey4__Rate_Avg__c != null && session.sugoisurvey4__Rate_Avg__c != 0.00){
-                report__generate_report_rating(session.Id, session.sugoisurvey4__Survey__r);
+                report__generate_report_rating(session.Id, session.sugoisurvey4__Rate_1__c, session.sugoisurvey4__Rate_2__c, session.sugoisurvey4__Rate_3__c, session.sugoisurvey4__Rate_4__c, session.sugoisurvey4__Rate_5__c);
             }
             if (session.sugoisurvey4__Custom_Survey_Question__r != null && session.sugoisurvey4__Custom_Survey_Option__r != null){
                 j$.each(session.sugoisurvey4__Custom_Survey_Question__r, function(i, csq){
@@ -75,8 +75,13 @@ function report__reload_report_container(){
     });
 }
 
-function report__generate_report_rating(session_id, surveys){
-    var rate_data = report__get_rate_data(surveys);
+function report__generate_report_rating(session_id, rate_1, rate_2, rate_3, rate_4, rate_5){
+    var rate_data = [];
+    rate_data.push(['5pt', rate_5]);
+    rate_data.push(['4pt', rate_4]);
+    rate_data.push(['3pt', rate_3]);
+    rate_data.push(['2pt', rate_2]);
+    rate_data.push(['1pt', rate_1]);
     report__draw_pie_chart(rate_data, session_id);
 }
 
@@ -84,30 +89,6 @@ function report__generate_report_survey(session_id, csq_id, csos){
     var custom_survey_data = report__get_custom_survey_data(csq_id, csos);
     var custom_survey_option_ids = report__get_custom_survey_option_ids(csq_id, csos);
     report__draw_bar_chart(csq_id, custom_survey_data, session_id, custom_survey_option_ids);
-}
-
-function report__get_rate_data(survey_list){
-    var rate_data = [];
-    var sum = [];
-    //initialize rate_data
-    for (var i = 5; i > 0; i--){
-        key = i + 'pt';
-        sum[key] = 0;
-    }
-    //set data for 5pt - 1pt
-    if (typeof(survey_list) == 'object'){
-        j$.each(survey_list, function(i, survey) {
-            if (survey.sugoisurvey4__Rate__c){
-                key = survey.sugoisurvey4__Rate__c + 'pt';
-                sum[key]++;
-            }
-        });
-    }
-    for (var i = 5; i > 0; i--){
-        key = i + 'pt';
-        rate_data.push([key, sum[key]]);
-    }
-    return(rate_data);
 }
 
 function report__draw_pie_chart(rate_data, session_id){
