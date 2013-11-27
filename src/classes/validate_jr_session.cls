@@ -183,9 +183,9 @@ public class validate_jr_session {
     private static testMethod void validate_submit_survey(){
         jr_session.r r = new jr_session.r();
 
-		/***
-		Test if "Required" works.
-		***/
+        /***
+        Test if "Required" works.
+        ***/
         session__c s = validate_session.createDummySessionIncludeRequiredQuestion();
         
         // submit without required answer
@@ -201,9 +201,9 @@ public class validate_jr_session {
         // submit with required answer
         list<custom_survey_answer__c> csas = new list<custom_survey_answer__c>();
         for (custom_survey_option__c cso : s.custom_survey_option__r){
-        	if (cso.option__c == 'o1_3rfjpofb'){
-        		csas.add(new custom_survey_answer__c(custom_survey_option__c = cso.id));
-        	}
+            if (cso.option__c == 'o1_3rfjpofb'){
+                csas.add(new custom_survey_answer__c(custom_survey_option__c = cso.id));
+            }
         }
         r = jr_session.submit_survey(
             new survey__c(session__c = s.id, rate__c = 5),
@@ -356,6 +356,60 @@ public class validate_jr_session {
         update session_rate_disabled;
         r = jr_session.submit_survey(new survey__c(session__c = session_rate_disabled.id), new comment__c(comment__c = ''), new list<custom_survey_answer__c>(), '');
         system.assertEquals(true, r.status);
+    }
+    
+    private static testmethod void validate_submit_survey_with_send_mail_on_submittion(){
+        jr_session.r r = new jr_session.r();
+        
+        session__c session;
+        
+        session = validate_session.createDummySession('eiufhiewfe', system.label.picklist_no_condition, system.label.picklist_require_survey_submission);
+        session.send_mail_on_submittion__c = true;
+        update session;
+
+        r = jr_session.submit_survey(
+            new survey__c(session__c = session.id, rate__c = 5),
+            new comment__c(comment__c = ''),
+            new list<custom_survey_answer__c>(), 
+            '0ejfijoef@hoge.com'
+        );
+        system.assertEquals(true, r.status);
+        system.assertEquals(1, [select id from guest__c where session__c = :session.id and handout_delivered__c = true].size());
+        
+        r = jr_session.submit_survey(
+            new survey__c(session__c = session.id, rate__c = 5),
+            new comment__c(comment__c = ''),
+            new list<custom_survey_answer__c>(), 
+            ''
+        );
+        system.assertEquals(true, r.status);
+        system.assertEquals(1, [select id from guest__c where session__c = :session.id and handout_delivered__c = true].size());
+        
+        guest__c g = new guest__c(last_name__c = 'jefoiefjlsfj', email__c = 'iwjefiof@hoge.com', session__c = session.id);
+        insert g;
+        
+        r = jr_session.submit_survey(
+            new survey__c(session__c = session.id, rate__c = 5),
+            new comment__c(comment__c = ''),
+            new list<custom_survey_answer__c>(), 
+            'iwjefiof@hoge.com'
+        );
+        system.assertEquals(true, r.status);
+        system.assertEquals(2, [select id from guest__c where session__c = :session.id and handout_delivered__c = true].size());
+        system.assertEquals(g.id, [select id from guest__c where session__c = :session.id and email__c = 'iwjefiof@hoge.com'].id);
+        
+        contact c = new contact(lastname = 'uhuejhkrwjeff', email = '98ef9wief@hoge.com');
+        insert c;
+        
+        r = jr_session.submit_survey(
+            new survey__c(session__c = session.id, rate__c = 5),
+            new comment__c(comment__c = ''),
+            new list<custom_survey_answer__c>(), 
+            '98ef9wief@hoge.com'
+        );
+        system.assertEquals(true, r.status);
+        system.assertEquals(3, [select id from guest__c where session__c = :session.id and handout_delivered__c = true].size());
+        system.assertEquals(c.id, [select contact__c from guest__c where session__c = :session.id and email__c = '98ef9wief@hoge.com'].contact__c);
     }
     
     private static testmethod void validate_get_session(){
@@ -720,27 +774,107 @@ public class validate_jr_session {
         csq_free.question__c = 'uiouoewrfoi';
         r = jr_session.edit_survey(csq_free, new list<custom_survey_option__c>());
         system.assertEquals('uiouoewrfoi', [select question__c from custom_survey_question__c where session__c = :s.id AND survey_type__c = 'free'].question__c);
+        
+        // validate changing survey type from non-free to free
+        custom_survey_question__c csq_tofree = new custom_survey_question__c(session__c = s.id, question__c = 'iehjndfbjjg', enable_free_form__c = true, survey_type__c = 'checkbox');
+        list<custom_survey_option__c> csos_tofree = new list<custom_survey_option__c>();
+        csos_tofree.add(new custom_survey_option__c(session__c = s.id, option__c = 'lkjsdlfjldfsdf'));
+        csos_tofree.add(new custom_survey_option__c(session__c = s.id, option__c = system.label.other));
+        r = jr_session.create_survey(csq_tofree, csos_tofree);
+        system.assertEquals(true, r.status);
+        
+        id csq_tofree_id = r.message;
+        csq_tofree.survey_type__c = 'free';
+        r = jr_session.edit_survey(csq_tofree, new list<custom_survey_option__c>());
+        system.assertEquals(true, r.status);
+        system.assertEquals('free', [select survey_type__c from custom_survey_question__c where id = :csq_tofree_id].survey_type__c);
+        system.assertEquals(false, [select enable_free_form__c from custom_survey_question__c where id = :csq_tofree_id].enable_free_form__c);
+        system.assertEquals(1, [select option__c from custom_survey_option__c where custom_survey_question__c = :csq_tofree_id].size());
+        system.assertEquals(true, [select dummy__c from custom_survey_option__c where custom_survey_question__c = :csq_tofree_id].dummy__c);
+        system.assertEquals(system.label.dummy, [select option__c from custom_survey_option__c where custom_survey_question__c = :csq_tofree_id][0].option__c);
+        
+        // validate changing survey type from free to non-free
+        csq_tofree.survey_type__c = 'checkbox';
+        csq_tofree.enable_free_form__c = false;
+        csos_tofree = new list<custom_survey_option__c>();
+        r = jr_session.edit_survey(csq_tofree, new list<custom_survey_option__c>());
+        system.assertEquals(true, r.status);
+        system.assertEquals('checkbox', [select survey_type__c from custom_survey_question__c where id = :csq_tofree_id].survey_type__c);
+        system.assertEquals(0, [select option__c from custom_survey_option__c where custom_survey_question__c = :csq_tofree_id].size());
     }
     
     static testmethod void validate_clear_delivered_flag(){
-    	jr_session.r r = new jr_session.r();
-    	session__c session = validate_session.createDummySession('edfhoanfsdjnfkasdfn', system.label.picklist_require_email, system.label.picklist_require_survey_submission);
-    	list<guest__c> guests = [select id, handout_delivered__c from guest__c where session__c = :session.id];
-    	for (guest__c g : guests){
-        	g.handout_delivered__c = true;
+        jr_session.r r = new jr_session.r();
+        session__c session = validate_session.createDummySession('edfhoanfsdjnfkasdfn', system.label.picklist_require_email, system.label.picklist_require_survey_submission);
+        list<guest__c> guests = [select id, handout_delivered__c from guest__c where session__c = :session.id];
+        for (guest__c g : guests){
+            g.handout_delivered__c = true;
         }
         update guests;
         
-    	r = jr_session.clear_delivered_flag(null);
-    	system.assertEquals(false, r.status);
+        r = jr_session.clear_delivered_flag(null);
+        system.assertEquals(false, r.status);
         system.assertEquals(system.label.session_id_is_not_set, r.message);
         
         r = jr_session.clear_delivered_flag(session.id);
         system.assertEquals(true, r.status);
         
         for (guest__c g : [select id, handout_delivered__c from guest__c where session__c = :session.id]){
-        	system.assertEquals(false, g.handout_delivered__c);
+            system.assertEquals(false, g.handout_delivered__c);
         }
+    }
+    
+    static testmethod void validate_deliver_guest_pass(){
+        jr_session.r r = new jr_session.r();
+        
+        /*
+        session_id : null
+        */
+        r = jr_session.deliver_guest_pass(null);
+        system.assertEquals(false, r.status);
+        system.assertEquals(system.label.session_id_is_not_set, r.message);
+        
+        
+        /*
+        session_id : set but does not exist
+        */
+        session__c s = new session__c(name = 'jskdofasdkfk');
+        insert s;
+        delete s;
+        r = jr_session.deliver_guest_pass(s.id);
+        system.assertEquals(false, r.status);
+        system.assertEquals(system.label.specified_session_does_not_exist, r.message);
+        
+        
+        /*
+        # of guests : 0
+        */
+        s = new session__c(name = 'jskdofasdkfk');
+        insert s;
+        r = jr_session.deliver_guest_pass(s.id);
+        system.assertEquals(true, r.status);
+        system.assertEquals('0', r.message);
+        
+        
+        /*
+        # of guests : 3 (2 have email but 1 does not)
+        */
+        list<guest__c> guests = new list<guest__c>();
+        guests.add(new guest__c(last_name__c = '18eflkjaosdf', session__c = s.id, email__c = '09jrvrljfd@hoge.com'));
+        guests.add(new guest__c(last_name__c = '2d9faojeofjw', session__c = s.id, email__c = 'ojaofjeofa@hoge.com'));
+        guests.add(new guest__c(last_name__c = '38efljadffdf', session__c = s.id));
+        insert guests;
+        r = jr_session.deliver_guest_pass(s.id);
+        system.assertEquals(true, r.status);
+        system.assertEquals('2', r.message);
+        
+        
+        /*
+        # of guests : 3 (all delivered)
+        */
+        r = jr_session.deliver_guest_pass(s.id);
+        system.assertEquals(true, r.status);
+        system.assertEquals('0', r.message);
     }
     
     static testmethod void validate_deliver_deck(){
@@ -752,7 +886,7 @@ public class validate_jr_session {
         
         // Condition
         // - session_id => null
-        r = jr_session.deliver_deck(null);
+        r = jr_session.deliver_deck(null, null);
         system.assertEquals(false, r.status);
         system.assertEquals(system.label.session_id_is_not_set, r.message);
         
@@ -760,7 +894,7 @@ public class validate_jr_session {
         // - session_id => set(not exist)
         session = validate_session.createDummySession('test session', system.label.picklist_require_email, system.label.picklist_require_survey_submission);
         delete session;
-        r = jr_session.deliver_deck(session.id);
+        r = jr_session.deliver_deck(session.id, null);
         system.assertEquals(false, r.status);
         system.assertEquals(system.label.specified_session_does_not_exist, r.message);
         
@@ -773,7 +907,7 @@ public class validate_jr_session {
         session.mass_mail_additional_body__c = 'additional text for validate';
         session.handout_password__c = 'pwoeiurqwer';
         update session;
-        r = jr_session.deliver_deck(session.id);
+        r = jr_session.deliver_deck(session.id, null);
         system.assertEquals(true, r.status);
         system.assertEquals('5', r.message);
         system.assertEquals(5, [select id from guest__c where session__c = :session.id AND handout_delivered__c = true].size());
@@ -786,7 +920,7 @@ public class validate_jr_session {
         //
         session.mass_mail_sender__c = '';
         update session;
-        r = jr_session.deliver_deck(session.id);
+        r = jr_session.deliver_deck(session.id, null);
         system.assertEquals(true, r.status);
         system.assertEquals('0', r.message);
         system.assertEquals(5, [select id from guest__c where session__c = :session.id AND handout_delivered__c = true].size());
@@ -804,7 +938,7 @@ public class validate_jr_session {
         }
         insert guests;
 
-        r = jr_session.deliver_deck(session.id);
+        r = jr_session.deliver_deck(session.id, null);
         system.assertEquals(true, r.status);
         system.assertEquals('30', r.message);
         system.assertEquals(35, [select id from guest__c where session__c = :session.id AND handout_delivered__c = true].size());
@@ -816,7 +950,7 @@ public class validate_jr_session {
         // - bcc address size <= 20
         //
         session = validate_session.createDummySession('test session', system.label.picklist_require_email, system.label.picklist_anyone);
-        r = jr_session.deliver_deck(session.id);
+        r = jr_session.deliver_deck(session.id, null);
         system.assertEquals(true, r.status);
         system.assertEquals('6', r.message);
         system.assertEquals(6, [select id from guest__c where session__c = :session.id AND handout_delivered__c = true].size());
@@ -834,10 +968,9 @@ public class validate_jr_session {
         }
         insert guests;
 
-        r = jr_session.deliver_deck(session.id);
+        r = jr_session.deliver_deck(session.id, null);
         system.assertEquals(true, r.status);
         system.assertEquals('30', r.message);
         system.assertEquals(36, [select id from guest__c where session__c = :session.id AND handout_delivered__c = true].size());
-
     }
 }

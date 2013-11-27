@@ -26,7 +26,7 @@
         <language>ja</language>
         <protected>false</protected>
         <shortDescription>answer_required</shortDescription>
-        <value>必須</value>
+        <value>回答必須</value>
     </labels>
     <labels>
         <fullName>app_updated</fullName>
@@ -78,6 +78,13 @@
         <value>に参加します。</value>
     </labels>
     <labels>
+        <fullName>basic_config</fullName>
+        <language>ja</language>
+        <protected>false</protected>
+        <shortDescription>basic_config</shortDescription>
+        <value>基本情報</value>
+    </labels>
+    <labels>
         <fullName>best_event</fullName>
         <language>ja</language>
         <protected>true</protected>
@@ -97,6 +104,13 @@
         <protected>true</protected>
         <shortDescription>cancel</shortDescription>
         <value>キャンセル</value>
+    </labels>
+    <labels>
+        <fullName>chatter_config</fullName>
+        <language>ja</language>
+        <protected>false</protected>
+        <shortDescription>chatter_config</shortDescription>
+        <value>Chatter設定</value>
     </labels>
     <labels>
         <fullName>clear_delivered_flag</fullName>
@@ -176,11 +190,25 @@
         <value>質問</value>
     </labels>
     <labels>
+        <fullName>delete</fullName>
+        <language>ja</language>
+        <protected>true</protected>
+        <shortDescription>delete</shortDescription>
+        <value>削除</value>
+    </labels>
+    <labels>
         <fullName>deleting_event</fullName>
         <language>ja</language>
         <protected>true</protected>
         <shortDescription>deleting_event</shortDescription>
         <value>このイベントを削除します。</value>
+    </labels>
+    <labels>
+        <fullName>deleting_question</fullName>
+        <language>ja</language>
+        <protected>false</protected>
+        <shortDescription>deleting_question</shortDescription>
+        <value>質問を削除します。</value>
     </labels>
     <labels>
         <fullName>deleting_survey</fullName>
@@ -202,6 +230,13 @@
         <protected>true</protected>
         <shortDescription>delivered_guest_will_not_be_delivered_again</shortDescription>
         <value>配信済みのゲストには送信されません</value>
+    </labels>
+    <labels>
+        <fullName>delivering_guest_pass</fullName>
+        <language>ja</language>
+        <protected>false</protected>
+        <shortDescription>delivering_guest_pass</shortDescription>
+        <value>受講票を配信します。</value>
     </labels>
     <labels>
         <fullName>delivery_complete</fullName>
@@ -316,6 +351,13 @@
         <value>ゲストリスト</value>
     </labels>
     <labels>
+        <fullName>guest_pass_mail_subject</fullName>
+        <language>ja</language>
+        <protected>false</protected>
+        <shortDescription>guest_pass_mail_subject</shortDescription>
+        <value>受講票のご送付</value>
+    </labels>
+    <labels>
         <fullName>handout_download_url</fullName>
         <language>ja</language>
         <protected>true</protected>
@@ -363,6 +405,20 @@
         <protected>true</protected>
         <shortDescription>low</shortDescription>
         <value>低</value>
+    </labels>
+    <labels>
+        <fullName>mail_config</fullName>
+        <language>ja</language>
+        <protected>false</protected>
+        <shortDescription>mail_config</shortDescription>
+        <value>メール設定</value>
+    </labels>
+    <labels>
+        <fullName>mail_limit_exceeds</fullName>
+        <language>ja</language>
+        <protected>false</protected>
+        <shortDescription>mail_limit_exceeds</shortDescription>
+        <value>メール配信数の上限を超過しています。</value>
     </labels>
     <labels>
         <fullName>mail_preview</fullName>
@@ -540,6 +596,20 @@
         <value>プロパティ</value>
     </labels>
     <labels>
+        <fullName>q_a</fullName>
+        <language>ja</language>
+        <protected>false</protected>
+        <shortDescription>q&amp;a</shortDescription>
+        <value>質問と回答</value>
+    </labels>
+    <labels>
+        <fullName>question_is_missing</fullName>
+        <language>ja</language>
+        <protected>false</protected>
+        <shortDescription>question_is_missing</shortDescription>
+        <value>質問を入力してください。</value>
+    </labels>
+    <labels>
         <fullName>rate</fullName>
         <language>ja</language>
         <protected>true</protected>
@@ -689,7 +759,7 @@
     <labels>
         <fullName>submit</fullName>
         <language>ja</language>
-        <protected>true</protected>
+        <protected>false</protected>
         <shortDescription>submit</shortDescription>
         <value>提出</value>
     </labels>
@@ -778,6 +848,13 @@
         <value>アンケートリスト</value>
     </labels>
     <labels>
+        <fullName>survey_name_is_missing</fullName>
+        <language>ja</language>
+        <protected>false</protected>
+        <shortDescription>survey_name_is_missing</shortDescription>
+        <value>アンケート名を入力してください。</value>
+    </labels>
+    <labels>
         <fullName>survey_type_checkbox</fullName>
         <language>ja</language>
         <protected>true</protected>
@@ -797,6 +874,13 @@
         <protected>true</protected>
         <shortDescription>survey_type_radio</shortDescription>
         <value>単一選択</value>
+    </labels>
+    <labels>
+        <fullName>survey_url</fullName>
+        <language>ja</language>
+        <protected>true</protected>
+        <shortDescription>survey_url</shortDescription>
+        <value>アンケートURL</value>
     </labels>
     <labels>
         <fullName>there_are_not_enough_number_of_question_to_sort</fullName>
@@ -848,6 +932,20 @@
         <value>255文字以内</value>
     </labels>
     <labels>
+        <fullName>update</fullName>
+        <language>ja</language>
+        <protected>false</protected>
+        <shortDescription>update</shortDescription>
+        <value>更新</value>
+    </labels>
+    <labels>
+        <fullName>update_has_been_saved</fullName>
+        <language>ja</language>
+        <protected>false</protected>
+        <shortDescription>update_has_been_saved</shortDescription>
+        <value>更新が保存されました。</value>
+    </labels>
+    <labels>
         <fullName>xPointScale</fullName>
         <language>ja</language>
         <protected>true</protected>
@@ -860,5 +958,19 @@
         <protected>true</protected>
         <shortDescription>yes</shortDescription>
         <value>はい</value>
+    </labels>
+    <labels>
+        <fullName>your_company</fullName>
+        <language>ja</language>
+        <protected>false</protected>
+        <shortDescription>your_company</shortDescription>
+        <value>会社名</value>
+    </labels>
+    <labels>
+        <fullName>your_name</fullName>
+        <language>ja</language>
+        <protected>false</protected>
+        <shortDescription>your_name</shortDescription>
+        <value>お名前</value>
     </labels>
 </CustomLabels>

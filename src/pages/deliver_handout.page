@@ -72,7 +72,7 @@ function invoke_deliver_deck(session_id){
         'title' : '{!$Label.processing}',
         'message' : '{!$Label.pls_wait_for_a_while}'
     });
-    sugoisurvey4.jr_session.deliver_deck(session_id,
+    sugoisurvey4.jr_session.deliver_deck(session_id, null,
         function(result, event){
             if (event.status){
                 if (result.status == false){

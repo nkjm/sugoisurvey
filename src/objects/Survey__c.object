@@ -5,6 +5,10 @@
         <type>Default</type>
     </actionOverrides>
     <actionOverrides>
+        <actionName>CancelEdit</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
         <actionName>Clone</actionName>
         <type>Default</type>
     </actionOverrides>
@@ -17,11 +21,19 @@
         <type>Default</type>
     </actionOverrides>
     <actionOverrides>
+        <actionName>Follow</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
         <actionName>List</actionName>
         <type>Default</type>
     </actionOverrides>
     <actionOverrides>
         <actionName>New</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>SaveEdit</actionName>
         <type>Default</type>
     </actionOverrides>
     <actionOverrides>
@@ -32,6 +44,7 @@
         <actionName>View</actionName>
         <type>Default</type>
     </actionOverrides>
+    <compactLayoutAssignment>SYSTEM</compactLayoutAssignment>
     <deploymentStatus>Deployed</deploymentStatus>
     <deprecated>false</deprecated>
     <enableActivities>false</enableActivities>
@@ -46,9 +59,9 @@
         <externalId>false</externalId>
         <label>ゲスト</label>
         <referenceTo>Guest__c</referenceTo>
-        <relationshipLabel>アンケート</relationshipLabel>
         <relationshipName>Survey</relationshipName>
         <required>false</required>
+        <trackTrending>false</trackTrending>
         <type>Lookup</type>
     </fields>
     <fields>
@@ -59,6 +72,7 @@
         <precision>2</precision>
         <required>false</required>
         <scale>0</scale>
+        <trackTrending>false</trackTrending>
         <type>Number</type>
         <unique>false</unique>
     </fields>
@@ -68,14 +82,14 @@
         <externalId>false</externalId>
         <label>セッション</label>
         <referenceTo>Session__c</referenceTo>
-        <relationshipLabel>アンケート</relationshipLabel>
         <relationshipName>Survey</relationshipName>
         <relationshipOrder>0</relationshipOrder>
         <reparentableMasterDetail>false</reparentableMasterDetail>
+        <trackTrending>false</trackTrending>
         <type>MasterDetail</type>
         <writeRequiresMasterRead>false</writeRequiresMasterRead>
     </fields>
-    <label>アンケート</label>
+    <label>アンケート回答</label>
     <listViews>
         <fullName>All</fullName>
         <filterScope>Everything</filterScope>
@@ -83,7 +97,7 @@
     </listViews>
     <nameField>
         <displayFormat>SVY-{00000000}</displayFormat>
-        <label>アンケート番号</label>
+        <label>アンケート回答番号</label>
         <type>AutoNumber</type>
     </nameField>
     <searchLayouts/>

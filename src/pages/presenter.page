@@ -18,12 +18,12 @@ j$("document").ready(function(){
         
         // For Event History
         j$.each({!sessions_json}, function(i, session){
-        	var rate_data = [];
-        	rate_data.push(['5pt', session.sugoisurvey4__Rate_5__c]);
-        	rate_data.push(['4pt', session.sugoisurvey4__Rate_4__c]);
-        	rate_data.push(['3pt', session.sugoisurvey4__Rate_3__c]);
-        	rate_data.push(['2pt', session.sugoisurvey4__Rate_2__c]);
-        	rate_data.push(['1pt', session.sugoisurvey4__Rate_1__c]);
+            var rate_data = [];
+            rate_data.push(['5pt', session.sugoisurvey4__Rate_5__c]);
+            rate_data.push(['4pt', session.sugoisurvey4__Rate_4__c]);
+            rate_data.push(['3pt', session.sugoisurvey4__Rate_3__c]);
+            rate_data.push(['2pt', session.sugoisurvey4__Rate_2__c]);
+            rate_data.push(['1pt', session.sugoisurvey4__Rate_1__c]);
             draw_pie_chart(rate_data, session.Id);
         });
     }

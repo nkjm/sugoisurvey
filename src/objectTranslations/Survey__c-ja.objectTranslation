@@ -2,12 +2,12 @@
 <CustomObjectTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
     <caseValues>
         <plural>false</plural>
-        <value>アンケート</value>
+        <value>アンケート回答</value>
     </caseValues>
     <fields>
         <label><!-- ゲスト --></label>
         <name>Guest__c</name>
-        <relationshipLabel><!-- アンケート --></relationshipLabel>
+        <relationshipLabel><!-- アンケート回答 --></relationshipLabel>
     </fields>
     <fields>
         <label><!-- 評価 --></label>
@@ -16,6 +16,6 @@
     <fields>
         <label><!-- セッション --></label>
         <name>Session__c</name>
-        <relationshipLabel><!-- アンケート --></relationshipLabel>
+        <relationshipLabel><!-- アンケート回答 --></relationshipLabel>
     </fields>
 </CustomObjectTranslation>

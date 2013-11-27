@@ -280,7 +280,7 @@ public with sharing class jr_session {
         try {
             session = [
             	select 
-            		enable_rate__c, label_for_rate__c, who_can_submit_survey__c,
+            		enable_rate__c, label_for_rate__c, who_can_submit_survey__c, send_mail_on_submittion__c,
             		(select id, required__c from custom_survey_question__r)
             	from session__c where id = :survey.session__c
         	];
@@ -416,6 +416,13 @@ public with sharing class jr_session {
         // update guest status to "submitted"
         guest.status__c = 'submitted';
         update guest;
+        
+        // send mail if Send_Mail_On_Submittion__c == true and guest__c.email__c is set.
+        if (session.send_mail_on_submittion__c == true && !String.isEmpty(guest.email__c)){
+        	list<guest__c> guests = new list<guest__c>();
+        	guests.add(guest);
+        	deliver_deck(session.id, guests);
+        }
 
         r.status = true;
         return r;
@@ -427,7 +434,7 @@ public with sharing class jr_session {
             return guest;
         }
         try {
-            guest = [select id, name__c, last_name__c, first_name__c, title__c, company__c, status__c from guest__c where session__c = :session_id AND email__c = :guest_email];
+            guest = [select id, name__c, session__c, last_name__c, first_name__c, email__c, title__c, company__c, status__c, handout_delivered__c from guest__c where session__c = :session_id AND email__c = :guest_email];
         } catch (Exception e){
             return guest;
         }
@@ -443,6 +450,8 @@ public with sharing class jr_session {
         guest.company__c = '';
         try {
             insert guest;
+            // reload guest since guest might be updated by link_to_contact trigger
+            guest = [select id, name, session__c, last_name__c, first_name__c, email__c, title__c, company__c, status__c, handout_delivered__c from guest__c where id = :guest.id];
         } catch(Exception e){
             guest = null;
         }
@@ -876,6 +885,14 @@ public with sharing class jr_session {
             action_for_enable_free_form = 'disable';
         }
         
+        // Check if survey_type changes between free and others
+        string action_for_survey_type = 'stay';
+        if (existing_csq.survey_type__c == 'free' && csq.survey_type__c != 'free'){
+            action_for_survey_type = 'fromfree';
+        } else if (existing_csq.survey_type__c != 'free' && csq.survey_type__c == 'free'){
+            action_for_survey_type = 'tofree';
+        }
+        
         // Update custom_survey_question if question__c is updated.
         if (existing_csq.question__c != csq.question__c || 
         	existing_csq.survey_type__c != csq.survey_type__c || 
@@ -883,20 +900,26 @@ public with sharing class jr_session {
         	existing_csq.required__c != csq.required__c){
             existing_csq.question__c = csq.question__c;
             existing_csq.survey_type__c = csq.survey_type__c;
-            existing_csq.enable_free_form__c = csq.enable_free_form__c;
+            if (action_for_survey_type == 'tofree'){
+            	existing_csq.enable_free_form__c = false;
+            } else {
+            	existing_csq.enable_free_form__c = csq.enable_free_form__c;
+            }
             existing_csq.required__c = csq.required__c;
             update existing_csq;
         }
         
         // return if survey is non-selectable since there should be no option
+        /*
         if (existing_csq.survey_type__c == 'free'){
             r.status = true;
             r.message = existing_csq.id;
             return r;
         }
+        */
         
         // Retrieve existing list of custom_survey_option__c
-        list<custom_survey_option__c> existing_csos = [select id, option__c, session__c, custom_survey_question__c, enable_free_form__c from custom_survey_option__c where custom_survey_question__c = :existing_csq.id];
+        list<custom_survey_option__c> existing_csos = [select id, option__c, session__c, custom_survey_question__c, enable_free_form__c, dummy__c from custom_survey_option__c where custom_survey_question__c = :existing_csq.id];
         
         // Prepare options to be added.
         list<custom_survey_option__c> csos_to_add = new list<custom_survey_option__c>();
@@ -915,6 +938,17 @@ public with sharing class jr_session {
                 custom_survey_question__c = existing_csq.id,
                 option__c = system.label.other,
                 enable_free_form__c = true
+            ));
+        }
+        
+        // add dummy option
+        if (action_for_survey_type == 'tofree'){
+        	csos_to_add.add(new custom_survey_option__c(
+                session__c = existing_csq.session__c,
+                custom_survey_question__c = existing_csq.id,
+                option__c = system.label.dummy,
+                enable_free_form__c = false,
+                dummy__c = true
             ));
         }
         
@@ -953,7 +987,7 @@ public with sharing class jr_session {
                     }
                 }
             }
-            if (found == false && cso_tmp.enable_free_form__c == false){
+            if (found == false && cso_tmp.enable_free_form__c == false && cso_tmp.dummy__c == false){
                 csos_to_delete.add(cso_tmp);
             }
             found = false;
@@ -962,13 +996,27 @@ public with sharing class jr_session {
         // delete options
         delete csos_to_delete;
 
-        // add option for enable free form
+        // delete option for enable free form
         if (action_for_enable_free_form == 'disable'){
             try {
                 delete [select id from custom_survey_option__c where session__c = :existing_csq.session__c AND custom_survey_question__c = :existing_csq.id AND enable_free_form__c = true];
             } catch (Exception e){
             }
-        }   
+        }
+        
+        // delete option
+        if (action_for_survey_type == 'tofree'){
+        	try {
+                delete [select id from custom_survey_option__c where session__c = :existing_csq.session__c AND custom_survey_question__c = :existing_csq.id AND dummy__c != true];
+            } catch (Exception e){
+            }
+        }
+        if (action_for_survey_type == 'fromfree'){
+        	try {
+                delete [select id from custom_survey_option__c where session__c = :existing_csq.session__c AND custom_survey_question__c = :existing_csq.id AND dummy__c = true];
+            } catch (Exception e){
+            }
+        }
         
         r.status = true;
         r.message = existing_csq.id;
@@ -1000,7 +1048,105 @@ public with sharing class jr_session {
     }
     
     @remoteAction
-    public static r deliver_deck(id session_id){
+    public static r deliver_guest_pass(id session_id){
+    	r r = new r();
+        session__c session;
+        
+        if (session_id == null){
+            r.status = false;
+            r.message = system.label.session_id_is_not_set;
+            return r;
+        }
+        
+        try {
+            session = [
+                select
+                    id, 
+                    name,
+					date__c,
+					mass_mail_sender__c,
+                    owner.email,
+                    (select id, name__c, company__c, title__c, email__c, guest_pass_delivered__c from guest__r where guest_pass_delivered__c = false and email__c <> null and email__c <> '')
+                from Session__c where id = :session_id
+            ];
+        } catch (Exception e){
+            r.status = false;
+            r.message = system.label.specified_session_does_not_exist;
+            return r;
+        }
+        
+        // set sender & reply-to address
+        string sender_address = string.isEmpty(session.mass_mail_sender__c) ? session.owner.email : session.mass_mail_sender__c;
+        
+        // reserve single email resource
+        try {
+        	Messaging.reserveSingleEmailCapacity(session.guest__r.size());
+        } catch (System.Limitexception e){
+        	system.debug(e);
+        	r.status = false;
+        	r.message = system.label.mail_limit_exceeds;
+        	return r;
+        }
+        
+        List<Messaging.singleEmailMessage> mails = new List<Messaging.singleEmailMessage>();
+        for (guest__c g : session.guest__r){
+            //Initialize Messaging Object.
+            Messaging.singleEmailMessage mail = new Messaging.singleEmailMessage();
+                
+            //Set To:
+            list<string> to_addresses = new list<string>();
+            to_addresses.add(g.email__c);
+            mail.setToAddresses(to_addresses);
+                
+            //Set Sender:
+            mail.setSenderDisplayName(sender_address);
+                
+            //Set Reply-To:
+            mail.setReplyTo(sender_address);
+                
+            //Set Subject:
+            mail.setSubject(system.label.guest_pass_mail_subject + ': ' + session.name);
+            
+            //Set Message Body:
+            string g_date = session.date__c == null ? '' : session.date__c.format();
+            string g_name = g.name__c == null ? '' : g.name__c;
+            string g_company = g.company__c == null ? '' : g.company__c;
+            string mail_body = '<div style="text-align:center;"><img src="https://chart.googleapis.com/chart?cht=qr&chs=150x150&chl=' + g.id + '"></img></div><div>' + system.label.event + ': ' + session.name + '</div><div>' + system.label.event_date + ': ' + g_date + '</div><div>' + system.label.your_company + ': ' + g_company + '</div><div>' + system.label.your_name + ': ' + g_name + '</div>';
+            mail.setHtmlBody(mail_body);
+                
+            //Add to list
+            mails.add(mail);
+        }
+        
+        if (mails.size() > 0){
+        	// send
+            Messaging.SendEmailResult[] sers = Messaging.sendEmail(mails);
+            
+            for (Messaging.SendEmailResult ser : sers){
+                if (!ser.isSuccess()){
+                    r.status = false;
+                    Messaging.SendEmailError[] sees = ser.getErrors();
+                    for (Messaging.SendEmailError see : sees){
+                        r.message += see.getMessage() + ' ';
+                    }
+                    return r;
+                }
+            }
+            
+            // mark guest as delivered
+	        for (guest__c g : session.guest__r){
+	        	g.guest_pass_delivered__c = true;
+	        }
+	        update session.guest__r;
+        }
+        
+        r.status = true;
+        r.message = string.valueOf(mails.size());
+        return r;
+    }
+    
+    @remoteAction
+    public static r deliver_deck(id session_id, list<guest__c> guests){
         r r = new r();
         session__c session;
         
@@ -1033,41 +1179,36 @@ public with sharing class jr_session {
         
         ApexPages.StandardController sc = new ApexPages.StandardController(session);
         session_v2 i_session = new session_v2(sc);
-
-        //Set common address for sender and reply-to.
+        
+        // set common address for sender and reply-to.
         string sender_address;
         if (session.mass_mail_sender__c == null || session.mass_mail_sender__c == ''){
             sender_address = session.owner.email;
         } else {
             sender_address = session.mass_mail_sender__c;
         }
-                
-        //Generarte email list to be used for Bcc:
-        List<List<String>> bcc_addresses_list = new List<List<String>>();
-        List<String> bcc_addresses = new List<String>();
-        List<guest__c> all_addresses = new list<guest__c>();
-        for (guest__c guest : i_session.getDeliveryDestinations()){
-        	if (guest.handout_delivered__c == true){
-				continue;
-			}
-			all_addresses.add(guest);
-        }
-		for (guest__c guest : all_addresses){
-			if (bcc_addresses.size() <= 20) {
-                bcc_addresses.add(guest.email__c);
-                guest.handout_delivered__c = true;
-            } else {
-                bcc_addresses_list.add(bcc_addresses.clone());
-                bcc_addresses.clear();
-                bcc_addresses.add(guest.email__c);
-            }
-		}
-		if (bcc_addresses.size() > 0) {
-            bcc_addresses_list.add(bcc_addresses.clone());
-            bcc_addresses.clear();
+        
+        // get guests to be delivered.
+        // already delivered guests will be excluded.
+        // If guests are specified in advance, check if email__c has been set.
+        if (guests == null){
+        	guests = new list<guest__c>();
+	        for (guest__c g : i_session.getDeliveryDestinations()){
+	        	if (g.handout_delivered__c == false){
+	        		guests.add(g);
+	        	}
+	        }
+        } else {
+        	integer i = 0;
+        	for (guest__c g : guests){
+        		if (String.isEmpty(g.email__c) || g.handout_delivered__c == true){
+        			guests.remove(i);
+        		}
+        		i++;
+        	}
         }
  
-        //Retrieve Attachment:
+        // retrieve attachment:
         List<Messaging.emailFileAttachment> efas = new List<Messaging.emailFileAttachment>();
         for (attachment a : session.attachments){
             attachment aa = [select name, contenttype, body from attachment where id = :a.id];
@@ -1078,17 +1219,20 @@ public with sharing class jr_session {
             efa.setInline(false);
             efas.add(efa);
         }
-                
+           
+        // reserve mail resource.
+        Messaging.reserveSingleEmailCapacity(guests.size());
+        
         List<Messaging.singleEmailMessage> mails = new List<Messaging.singleEmailMessage>();
-        for (List<String> bcc_addresses1 : bcc_addresses_list){
-            //Reserve resource.
-            Messaging.reserveSingleEmailCapacity(bcc_addresses1.size());
-
+        for (guest__c g : guests){
+        	
             //Initialize Messaging Object.
             Messaging.singleEmailMessage mail = new Messaging.singleEmailMessage();
                 
-            //Set Bcc:
-            mail.setBccAddresses(bcc_addresses1);
+            //Set To:
+            list<string> to_addresses = new list<string>();
+            to_addresses.add(g.email__c);
+            mail.setToAddresses(to_addresses);
                 
             //Set Sender:
             mail.setSenderDisplayName(sender_address);
@@ -1097,11 +1241,8 @@ public with sharing class jr_session {
             mail.setReplyTo(sender_address);
                 
             //Set Subject:
-            if (session.mass_mail_title__c == null){
-            	mail.setSubject('');
-            } else {
-            	mail.setSubject(session.mass_mail_title__c);
-            }
+            string mail_subject = session.mass_mail_title__c == null ? '' : session.mass_mail_title__c;
+            mail.setSubject(mail_subject);
             
             //Set Message Body:
             mail.setHtmlBody(i_session.getMailBody());
@@ -1115,8 +1256,8 @@ public with sharing class jr_session {
             mails.add(mail);
         }
                 
-        //Send
-        if (mails.size() >= 1){
+        if (mails.size() > 0){
+        	// send
             Messaging.SendEmailResult[] sers = Messaging.sendEmail(mails);
             for (Messaging.SendEmailResult ser : sers){
                 if (!ser.isSuccess()){
@@ -1128,16 +1269,16 @@ public with sharing class jr_session {
                     return r;
                 }
             }
+            
+	        // mark guest as delivered
+	        for (guest__c g : guests){
+	        	g.handout_delivered__c = true;
+	        }
+	        update guests;
         }
         
-        // mark guest as delivered
-        // count total number of mail
-        for (guest__c guest : all_addresses){
-        	guest.handout_delivered__c = true;
-        }
-        update all_addresses;
         r.status = true;
-        r.message = string.valueOf(all_addresses.size());
+        r.message = string.valueOf(mails.size());
         return r;
     }
 }

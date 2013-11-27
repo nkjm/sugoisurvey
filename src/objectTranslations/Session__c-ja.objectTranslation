@@ -2,7 +2,7 @@
 <CustomObjectTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
     <caseValues>
         <plural>false</plural>
-        <value>イベント</value>
+        <value>すごいアンケート</value>
     </caseValues>
     <fields>
         <label><!-- 歩留まり --></label>
@@ -29,7 +29,7 @@
         <name>Enable_Rate__c</name>
     </fields>
     <fields>
-        <label><!-- イベントID --></label>
+        <label><!-- アンケートID --></label>
         <name>Event_Id__c</name>
     </fields>
     <fields>
@@ -81,7 +81,7 @@
     <fields>
         <label><!-- プレゼンター --></label>
         <name>Presenter__c</name>
-        <relationshipLabel><!-- イベント --></relationshipLabel>
+        <relationshipLabel><!-- すごいアンケート --></relationshipLabel>
     </fields>
     <fields>
         <label><!-- Rate 1 --></label>
@@ -118,6 +118,10 @@
     <fields>
         <label><!-- レポートを公開する --></label>
         <name>Report_Public__c</name>
+    </fields>
+    <fields>
+        <label><!-- アンケート提出後に自動送信 --></label>
+        <name>Send_Mail_On_Submittion__c</name>
     </fields>
     <fields>
         <label><!-- アンケート回答率 --></label>
@@ -178,6 +182,11 @@
             <section>メール配信設定</section>
         </sections>
     </layouts>
+    <nameFieldLabel>アンケート名</nameFieldLabel>
+    <quickActions>
+        <label><!-- アンケート質問 --></label>
+        <name>S1_act_new_question</name>
+    </quickActions>
     <webLinks>
         <label><!-- clone_session --></label>
         <name>clone_session</name>
@@ -189,6 +198,10 @@
     <webLinks>
         <label><!-- delete_session --></label>
         <name>delete_session</name>
+    </webLinks>
+    <webLinks>
+        <label><!-- deliver_guest_pass --></label>
+        <name>deliver_guest_pass</name>
     </webLinks>
     <webLinks>
         <label><!-- deliver_handout --></label>

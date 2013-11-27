@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <applicationVisibilities>
+        <application>sugoisurvey</application>
+        <visible>true</visible>
+    </applicationVisibilities>
     <classAccesses>
         <apexClass>RemoteTKController</apexClass>
         <enabled>false</enabled>
@@ -259,6 +263,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>Guest__c.Guest_Pass_Delivered__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>Guest__c.Handout_Delivered__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -468,6 +477,11 @@
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
+        <editable>true</editable>
+        <field>Session__c.Send_Mail_On_Submittion__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
         <editable>false</editable>
         <field>Session__c.Survey_Collection_Rate__c</field>
         <readable>true</readable>
@@ -576,6 +590,42 @@
         <viewAllRecords>false</viewAllRecords>
     </objectPermissions>
     <pageAccesses>
+        <apexPage>S1_act_new_question</apexPage>
+        <enabled>false</enabled>
+    </pageAccesses>
+    <pageAccesses>
+        <apexPage>S1_guest_detail</apexPage>
+        <enabled>true</enabled>
+    </pageAccesses>
+    <pageAccesses>
+        <apexPage>S1_guest_list</apexPage>
+        <enabled>true</enabled>
+    </pageAccesses>
+    <pageAccesses>
+        <apexPage>S1_mc_rate</apexPage>
+        <enabled>false</enabled>
+    </pageAccesses>
+    <pageAccesses>
+        <apexPage>S1_session_detail</apexPage>
+        <enabled>true</enabled>
+    </pageAccesses>
+    <pageAccesses>
+        <apexPage>S1_session_list</apexPage>
+        <enabled>true</enabled>
+    </pageAccesses>
+    <pageAccesses>
+        <apexPage>S1_tab_edit_survey</apexPage>
+        <enabled>true</enabled>
+    </pageAccesses>
+    <pageAccesses>
+        <apexPage>S1_tab_session_property</apexPage>
+        <enabled>true</enabled>
+    </pageAccesses>
+    <pageAccesses>
+        <apexPage>S1_tab_session_report</apexPage>
+        <enabled>true</enabled>
+    </pageAccesses>
+    <pageAccesses>
         <apexPage>deliver_deck</apexPage>
         <enabled>false</enabled>
     </pageAccesses>
@@ -644,6 +694,10 @@
         <visibility>Visible</visibility>
     </tabSettings>
     <tabSettings>
+        <tab>S1_session_list</tab>
+        <visibility>None</visibility>
+    </tabSettings>
+    <tabSettings>
         <tab>event_and_session</tab>
         <visibility>None</visibility>
     </tabSettings>
@@ -657,11 +711,27 @@
     </userPermissions>
     <userPermissions>
         <enabled>false</enabled>
+        <name>AllowEmailIC</name>
+    </userPermissions>
+    <userPermissions>
+        <enabled>false</enabled>
+        <name>AllowUniversalSearch</name>
+    </userPermissions>
+    <userPermissions>
+        <enabled>false</enabled>
+        <name>AllowViewKnowledge</name>
+    </userPermissions>
+    <userPermissions>
+        <enabled>false</enabled>
         <name>ApiEnabled</name>
     </userPermissions>
     <userPermissions>
         <enabled>false</enabled>
         <name>ApproveContract</name>
+    </userPermissions>
+    <userPermissions>
+        <enabled>false</enabled>
+        <name>AssignTopics</name>
     </userPermissions>
     <userPermissions>
         <enabled>false</enabled>
@@ -709,7 +779,15 @@
     </userPermissions>
     <userPermissions>
         <enabled>false</enabled>
+        <name>CreateCustomizeFilters</name>
+    </userPermissions>
+    <userPermissions>
+        <enabled>false</enabled>
         <name>CreatePackaging</name>
+    </userPermissions>
+    <userPermissions>
+        <enabled>false</enabled>
+        <name>CreateTopics</name>
     </userPermissions>
     <userPermissions>
         <enabled>false</enabled>
@@ -726,6 +804,10 @@
     <userPermissions>
         <enabled>false</enabled>
         <name>DeleteActivatedContract</name>
+    </userPermissions>
+    <userPermissions>
+        <enabled>false</enabled>
+        <name>DeleteTopics</name>
     </userPermissions>
     <userPermissions>
         <enabled>false</enabled>
@@ -789,6 +871,10 @@
     </userPermissions>
     <userPermissions>
         <enabled>false</enabled>
+        <name>EditTopics</name>
+    </userPermissions>
+    <userPermissions>
+        <enabled>false</enabled>
         <name>EmailMass</name>
     </userPermissions>
     <userPermissions>
@@ -805,7 +891,19 @@
     </userPermissions>
     <userPermissions>
         <enabled>false</enabled>
+        <name>ForceTwoFactor</name>
+    </userPermissions>
+    <userPermissions>
+        <enabled>false</enabled>
         <name>IPRestrictRequests</name>
+    </userPermissions>
+    <userPermissions>
+        <enabled>false</enabled>
+        <name>IdentityConnect</name>
+    </userPermissions>
+    <userPermissions>
+        <enabled>false</enabled>
+        <name>IdentityEnabled</name>
     </userPermissions>
     <userPermissions>
         <enabled>false</enabled>
@@ -969,6 +1067,10 @@
     </userPermissions>
     <userPermissions>
         <enabled>false</enabled>
+        <name>SalesConsole</name>
+    </userPermissions>
+    <userPermissions>
+        <enabled>false</enabled>
         <name>ScheduleReports</name>
     </userPermissions>
     <userPermissions>
@@ -990,6 +1092,10 @@
     <userPermissions>
         <enabled>false</enabled>
         <name>TransferAnyLead</name>
+    </userPermissions>
+    <userPermissions>
+        <enabled>false</enabled>
+        <name>TwoFactorApi</name>
     </userPermissions>
     <userPermissions>
         <enabled>false</enabled>

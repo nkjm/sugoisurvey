@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Layout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customButtons>deliver_guest_pass</customButtons>
     <customButtons>close_survey</customButtons>
     <customButtons>deliver_handout</customButtons>
     <customButtons>clone_session</customButtons>
@@ -31,10 +32,6 @@
                 <field>Presenter__c</field>
             </layoutItems>
             <layoutItems>
-                <behavior>Edit</behavior>
-                <field>Description__c</field>
-            </layoutItems>
-            <layoutItems>
                 <emptySpace>true</emptySpace>
             </layoutItems>
         </layoutColumns>
@@ -61,11 +58,11 @@
             </layoutItems>
             <layoutItems>
                 <behavior>Readonly</behavior>
-                <field>Attending_Guest_Sum__c</field>
+                <field>Attending_Guest_Percentage__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Readonly</behavior>
-                <field>Attending_Guest_Percentage__c</field>
+                <field>Survey_Collection_Rate__c</field>
             </layoutItems>
             <layoutItems>
                 <emptySpace>true</emptySpace>
@@ -102,6 +99,10 @@
             <layoutItems>
                 <behavior>Edit</behavior>
                 <field>Who_Can_Get_Handout__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Send_Mail_On_Submittion__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
@@ -164,6 +165,22 @@
         <layoutColumns/>
         <style>CustomLinks</style>
     </layoutSections>
+    <quickActionList>
+        <quickActionListItems>
+            <quickActionName>sugoisurvey4__Session__c.S1_act_new_question</quickActionName>
+        </quickActionListItems>
+    </quickActionList>
+    <relatedContent>
+        <relatedContentItems>
+            <layoutItem>
+                <height>320</height>
+                <page>S1_mc_rate</page>
+                <showLabel>false</showLabel>
+                <showScrollbars>false</showScrollbars>
+                <width>100%</width>
+            </layoutItem>
+        </relatedContentItems>
+    </relatedContent>
     <relatedLists>
         <fields>NAME</fields>
         <fields>Name__c</fields>

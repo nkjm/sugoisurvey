@@ -1,0 +1,10 @@
+<apex:component controller="session_report">
+<apex:attribute name="session_id" type="Id" assignTo="{!c_session_id}" description="Record Id of Session__c"/>
+<apex:attribute name="csq_id" type="Id" assignTo="{!c_csq_id}" description="Record Id of Custom_Survey_Question__c"/>
+
+<ul>
+    <apex:repeat value="{!free_answers}" var="fa">
+        <li><a href="#" onclick="navigate_to_guest_detail('{!fa.Guest__c}')">{!fa.Free_Form__c}</a></li>
+    </apex:repeat>
+</ul>
+</apex:component>

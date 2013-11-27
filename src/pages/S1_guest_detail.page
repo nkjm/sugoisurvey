@@ -1,0 +1,152 @@
+<apex:page readOnly="true" standardController="Guest__c" extensions="survey_for_guest" standardStyleSheets="false" showheader="false" applyBodyTag="false" applyHtmlTag="false" doctype="html-5.0" cache="false">
+
+<html class="ng-app" id="ng-app">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.2/css/bootstrap.min.css"></link>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.2/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.0/angular.min.js"></script>
+    <title>{!$label.sugoisurvey}</title>
+
+	<style>
+	#guest_detail h3 {
+		color: #999999;
+		margin-bottom: 20px;
+	}
+	#guest_detail h4 {
+		margin-bottom: 20px;
+		padding-bottom: 10px;
+		color: #666666;
+		border-bottom: solid 1px #666666;
+	}
+	#guest_detail h5 {
+		color: #666666;
+	}
+	#guest_detail .submit-complete, .submit-inprogress {
+		display: none;
+	}
+	#guest_detail .section {
+    	margin-bottom: 60px;
+	}
+	#guest_detail .q_and_a {
+		margin-bottom: 30px;
+	}
+	</style>
+	
+	<script>
+	j$ = jQuery.noConflict();
+	
+	function start_submit(){
+		j$("#guest_detail .submit-complete").hide();
+		j$("#guest_detail .submit-button").hide();
+		j$("#guest_detail .submit-inprogress").show();
+	}
+	
+	function stop_submit(){
+		j$("#guest_detail .submit-inprogress").hide();
+		j$("#guest_detail .submit-complete").show();
+		j$("#guest_detail .submit-button").show();
+	}
+	</script>
+</head>
+
+<body>
+
+<div class="container" id="guest_detail" style="margin-top: 20px; margin-bottom: 60px;">
+	<div class="row">
+		<div class="col-xs-12">
+			<h1>{!Guest.Name__c}</h1>
+			
+			<div class="section">
+				<apex:form >
+					<div style="margin-bottom:40px">
+						<apex:messages styleClass="alert alert-danger" />
+						<apex:actionStatus id="session_report_status" onstart="start_submit()" onstop="stop_submit()" />
+						
+						<div class="submit-complete alert alert-success">
+							{!$Label.update_has_been_saved}
+						</div>
+						
+						<div class="submit-inprogress progress progress-striped active" style="height: 35px;">
+						    <div class="progress-bar progress-bar-success"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%;"></div>
+						</div>
+						
+						<div>
+							&nbsp;<apex:commandButton status="session_report_status" styleClass="submit-button btn btn-success pull-right" rerender="tab_session_report" action="{!quicksave}" value="{!$Label.update}"></apex:commandButton>
+			        	</div>
+			        </div>
+			        
+		        	<h3>{!$Label.basic_config}</h3>
+					<div class="form-horizontal" role="form">
+						<apex:repeat value="{!$ObjectType.Guest__c.FieldSets.base_info}" var="f">
+							<div class="form-group">
+								<label class="col-sm-2 control-label">{!f.Label}</label>
+								<div class="col-sm-10">
+									<apex:inputField styleClass="form-control" value="{!Guest__c[f]}" rendered="{!f.Type != 'date' && f.Type != 'boolean'}"></apex:inputField>
+									<apex:inputField styleClass="form-control" type="date" value="{!Guest__c[f]}" rendered="{!f.Type == 'date'}"></apex:inputField>
+									<apex:inputField value="{!Guest__c[f]}" rendered="{!f.Type == 'boolean'}"></apex:inputField>
+								</div>
+							</div>
+						</apex:repeat>
+					</div>
+	        	</apex:form>
+	        </div><!-- section -->
+			        
+	        <div class="section">
+	        	<h3>{!$label.survey_answer}</h3>
+	        	<div class="row">
+	        	
+	        		<div class="col-sm-4"><!-- Rate -->
+			        	<h4>{!$label.rate}</h4>
+						<apex:repeat value="{!Guest__c.survey__r}" var="survey">
+				            <div style="font-weight: bold; font-size: 96pt; text-align:center;">
+				                <apex:outputText value="{! round(survey.Rate__c,0)}" />
+				            </div>
+				        </apex:repeat>
+	        		</div><!-- Rate -->
+	        		
+	        		<div class="col-sm-4"><!-- Questions and Answers -->
+				        <h4>{!$Label.q_a}</h4>
+				        <apex:repeat value="{!custom_survey_questions}" var="csq">
+				            <div class="q_and_a">
+				                <h5>{!csq.Question__c}</h5>
+				                <apex:repeat value="{!Guest__c.custom_survey_answer__r}" var="csa">
+				                    <apex:outputtext rendered="{!(csq.id == csa.custom_survey_option__r.Custom_Survey_Question__c)}" >
+				                        <div>
+				                            <apex:outputtext rendered="{! (csq.survey_type__c == 'checkbox' || csq.survey_type__c == 'radio') }">
+				                            	<span class="glyphicon glyphicon-check"></span>&nbsp;
+				                                <apex:outputText value="{!csa.custom_survey_option__r.Option__c}" />
+				                                <apex:outputtext rendered="{!((csq.Enable_Free_Form__c) && !ISBLANK(csa.Free_Form__c))}" value="({!csa.Free_Form__c})" />
+				                            </apex:outputtext>
+				                            <apex:outputtext rendered="{! (csq.survey_type__c == 'free') }">
+				                                <span class="glyphicon glyphicon-pencil"></span>&nbsp;
+				                                <apex:outputtext rendered="{! !ISBLANK(csa.Free_Form__c)}" value="{!csa.Free_Form__c}" />
+				                            </apex:outputtext>
+				                        </div>
+				                    </apex:outputtext>
+				                </apex:repeat>
+				            </div>
+				        </apex:repeat>
+	        		</div><!-- Questions and Answers -->
+
+	        		<div class="col-sm-4"><!-- Comments -->
+						<h4>{!$Label.comment}</h4>
+				        <apex:repeat value="{!Guest__c.comment__r}" var="comment">
+				            <div>
+				                {!comment.Comment__c}
+				            </div>
+				        </apex:repeat>
+	        		</div><!-- Comments -->
+	        		
+	        	</div>
+	        </div><!-- section -->
+
+		</div>
+	</div>
+</div>
+
+</body>
+</html>
+
+</apex:page>

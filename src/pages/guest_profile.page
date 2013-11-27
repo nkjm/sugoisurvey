@@ -183,7 +183,7 @@ function redirectToEditPage(guest_id){
 </div>
 <div id="button_container" class="container">
     <button style="width:170px;" class="white_button" onclick="redirectToEditPage('{!guest__c.id}')">{!$Label.edit}</button>
-    <apex:outputText rendered="{! ISNULL(guest.contact__c) }"><button style="width:170px;" class="green_button" onclick="invokeCreateLead()">{!$Label.create_lead}</button></apex:outputText>
+    <!--<apex:outputText rendered="{! ISNULL(guest.contact__c) }"><button style="width:170px;" class="green_button" onclick="invokeCreateLead()">{!$Label.create_lead}</button></apex:outputText>-->
 </div>
 
 </apex:page>

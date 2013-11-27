@@ -49,6 +49,10 @@
         <name>attending_the_event2</name>
     </customLabels>
     <customLabels>
+        <label>Base Info</label>
+        <name>basic_config</name>
+    </customLabels>
+    <customLabels>
         <label>Best Event</label>
         <name>best_event</name>
     </customLabels>
@@ -59,6 +63,10 @@
     <customLabels>
         <label>Cancel</label>
         <name>cancel</name>
+    </customLabels>
+    <customLabels>
+        <label>Chatter Setting</label>
+        <name>chatter_config</name>
     </customLabels>
     <customLabels>
         <label>Reset Delivery Status</label>
@@ -105,8 +113,16 @@
         <name>customSurveyQuestion</name>
     </customLabels>
     <customLabels>
+        <label>delete</label>
+        <name>delete</name>
+    </customLabels>
+    <customLabels>
         <label>Going to delete this event.</label>
         <name>deleting_event</name>
+    </customLabels>
+    <customLabels>
+        <label>Going to delete Question.</label>
+        <name>deleting_question</name>
     </customLabels>
     <customLabels>
         <label>Deleting Survey</label>
@@ -119,6 +135,10 @@
     <customLabels>
         <label>Mail will not be delivered to guests who have already been sent handout</label>
         <name>delivered_guest_will_not_be_delivered_again</name>
+    </customLabels>
+    <customLabels>
+        <label>Going to send Guest Pass.</label>
+        <name>delivering_guest_pass</name>
     </customLabels>
     <customLabels>
         <label>Delivery has been completed.</label>
@@ -185,6 +205,10 @@
         <name>guest_list</name>
     </customLabels>
     <customLabels>
+        <label>Guest Pass</label>
+        <name>guest_pass_mail_subject</name>
+    </customLabels>
+    <customLabels>
         <label>Handout Download URL</label>
         <name>handout_download_url</name>
     </customLabels>
@@ -211,6 +235,14 @@
     <customLabels>
         <label>Low</label>
         <name>low</name>
+    </customLabels>
+    <customLabels>
+        <label>Mail Setting</label>
+        <name>mail_config</name>
+    </customLabels>
+    <customLabels>
+        <label>Exceeds threshold for daily mail distribution.</label>
+        <name>mail_limit_exceeds</name>
     </customLabels>
     <customLabels>
         <label>Preview</label>
@@ -313,6 +345,14 @@
         <name>property</name>
     </customLabels>
     <customLabels>
+        <label>Questions and Answers</label>
+        <name>q_a</name>
+    </customLabels>
+    <customLabels>
+        <label>Please enter Question.</label>
+        <name>question_is_missing</name>
+    </customLabels>
+    <customLabels>
         <label>Rate</label>
         <name>rate</name>
     </customLabels>
@@ -397,7 +437,7 @@
         <name>subject_of_deck_delivery_mail</name>
     </customLabels>
     <customLabels>
-        <label>submit</label>
+        <label>Submit</label>
         <name>submit</name>
     </customLabels>
     <customLabels>
@@ -449,6 +489,10 @@
         <name>survey_list</name>
     </customLabels>
     <customLabels>
+        <label>Please enter Survey Title.</label>
+        <name>survey_name_is_missing</name>
+    </customLabels>
+    <customLabels>
         <label>Selectable (Multi)</label>
         <name>survey_type_checkbox</name>
     </customLabels>
@@ -459,6 +503,10 @@
     <customLabels>
         <label>Selectable (Single)</label>
         <name>survey_type_radio</name>
+    </customLabels>
+    <customLabels>
+        <label>Survey URL</label>
+        <name>survey_url</name>
     </customLabels>
     <customLabels>
         <label>There are not enough number of question to sort.</label>
@@ -489,6 +537,14 @@
         <name>up_to_255_letter</name>
     </customLabels>
     <customLabels>
+        <label>Update</label>
+        <name>update</name>
+    </customLabels>
+    <customLabels>
+        <label>Updates has been saved.</label>
+        <name>update_has_been_saved</name>
+    </customLabels>
+    <customLabels>
         <label>Rating (5 Point)</label>
         <name>xPointScale</name>
     </customLabels>
@@ -496,6 +552,18 @@
         <label>Yes</label>
         <name>yes</name>
     </customLabels>
+    <customLabels>
+        <label>Your Company</label>
+        <name>your_company</name>
+    </customLabels>
+    <customLabels>
+        <label>Your Name</label>
+        <name>your_name</name>
+    </customLabels>
+    <customTabs>
+        <label><!-- すごいアンケート --></label>
+        <name>S1_session_list</name>
+    </customTabs>
     <customTabs>
         <label>Surveys</label>
         <name>event_and_session</name>
@@ -504,4 +572,8 @@
         <label>Surveys</label>
         <name>session_list</name>
     </customTabs>
+    <quickActions>
+        <label><!-- すごいアンケート --></label>
+        <name>すごいアンケート</name>
+    </quickActions>
 </Translations>

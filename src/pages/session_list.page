@@ -76,7 +76,7 @@ function add_session(){
         </div>
         <div class="column_content">
             <div style="text-align:center;">
-            	<img id="plus_session" class="button_img" style="height:25px;" src="{!$resource.add_png}"></img>         
+                <img id="plus_session" class="button_img" style="height:25px;" src="{!$resource.add_png}"></img>         
             </div>
             <div id="form_new_session" style="display:none; position:relative; margin: 10px 0px; height: 50px;">
                 <input type="text" placeholder="{!$label.new_survey_name}" style="width:78%;"></input>

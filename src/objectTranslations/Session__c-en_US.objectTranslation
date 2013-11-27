@@ -9,7 +9,7 @@
         <value>Surveys</value>
     </caseValues>
     <fields>
-        <label><!-- 歩留まり --></label>
+        <label>Yield Rate</label>
         <name>Attending_Guest_Percentage__c</name>
     </fields>
     <fields>
@@ -124,6 +124,10 @@
         <name>Report_Public__c</name>
     </fields>
     <fields>
+        <label>Send Mail on Survey Submittion</label>
+        <name>Send_Mail_On_Submittion__c</name>
+    </fields>
+    <fields>
         <label>Percentage of submitted survey</label>
         <name>Survey_Collection_Rate__c</name>
     </fields>
@@ -183,6 +187,10 @@
         </sections>
     </layouts>
     <nameFieldLabel>Event Name</nameFieldLabel>
+    <quickActions>
+        <label><!-- アンケート質問 --></label>
+        <name>S1_act_new_question</name>
+    </quickActions>
     <startsWith>Vowel</startsWith>
     <webLinks>
         <label>Copy Event</label>
@@ -195,6 +203,10 @@
     <webLinks>
         <label>Delete Event</label>
         <name>delete_session</name>
+    </webLinks>
+    <webLinks>
+        <label>Send Guest Pass</label>
+        <name>deliver_guest_pass</name>
     </webLinks>
     <webLinks>
         <label>Mail</label>

@@ -5,6 +5,10 @@
         <type>Default</type>
     </actionOverrides>
     <actionOverrides>
+        <actionName>CancelEdit</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
         <actionName>Clone</actionName>
         <type>Default</type>
     </actionOverrides>
@@ -17,11 +21,19 @@
         <type>Default</type>
     </actionOverrides>
     <actionOverrides>
+        <actionName>Follow</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
         <actionName>List</actionName>
         <type>Default</type>
     </actionOverrides>
     <actionOverrides>
         <actionName>New</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>SaveEdit</actionName>
         <type>Default</type>
     </actionOverrides>
     <actionOverrides>
@@ -34,6 +46,7 @@
         <skipRecordTypeSelect>false</skipRecordTypeSelect>
         <type>Visualforce</type>
     </actionOverrides>
+    <compactLayoutAssignment>SYSTEM</compactLayoutAssignment>
     <deploymentStatus>Deployed</deploymentStatus>
     <deprecated>false</deprecated>
     <enableActivities>false</enableActivities>
@@ -41,6 +54,41 @@
     <enableFeeds>true</enableFeeds>
     <enableHistory>false</enableHistory>
     <enableReports>true</enableReports>
+    <fieldSets>
+        <fullName>base_info</fullName>
+        <description>S1_guest_detail</description>
+        <displayedFields>
+            <field>Last_Name__c</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </displayedFields>
+        <displayedFields>
+            <field>First_Name__c</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </displayedFields>
+        <displayedFields>
+            <field>Email__c</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </displayedFields>
+        <displayedFields>
+            <field>Company__c</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </displayedFields>
+        <displayedFields>
+            <field>Title__c</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </displayedFields>
+        <displayedFields>
+            <field>Phone__c</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </displayedFields>
+        <label>基本情報</label>
+    </fieldSets>
     <fields>
         <fullName>Attend__c</fullName>
         <defaultValue>false</defaultValue>
@@ -48,6 +96,7 @@
         <externalId>false</externalId>
         <label>deprecated_出席</label>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackTrending>false</trackTrending>
         <type>Checkbox</type>
     </fields>
     <fields>
@@ -57,6 +106,7 @@
         <formula>IF( TEXT(Status__c) = &apos;attended&apos; || TEXT(Status__c) = &apos;submitted&apos;,true,false)</formula>
         <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
         <label>出席</label>
+        <trackTrending>false</trackTrending>
         <type>Checkbox</type>
     </fields>
     <fields>
@@ -67,6 +117,7 @@
         <length>255</length>
         <required>false</required>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackTrending>false</trackTrending>
         <type>Text</type>
         <unique>false</unique>
     </fields>
@@ -81,6 +132,7 @@
         <relationshipName>Guest</relationshipName>
         <required>false</required>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackTrending>false</trackTrending>
         <type>Lookup</type>
     </fields>
     <fields>
@@ -90,6 +142,7 @@
         <label>Email</label>
         <required>false</required>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackTrending>false</trackTrending>
         <type>Email</type>
         <unique>false</unique>
     </fields>
@@ -101,8 +154,19 @@
         <length>30</length>
         <required>false</required>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackTrending>false</trackTrending>
         <type>Text</type>
         <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Guest_Pass_Delivered__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>受講票配信済み</label>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
     </fields>
     <fields>
         <fullName>Handout_Delivered__c</fullName>
@@ -111,6 +175,7 @@
         <externalId>false</externalId>
         <label>メール配信済み</label>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackTrending>false</trackTrending>
         <type>Checkbox</type>
     </fields>
     <fields>
@@ -121,6 +186,7 @@
         <length>30</length>
         <required>true</required>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackTrending>false</trackTrending>
         <type>Text</type>
         <unique>false</unique>
     </fields>
@@ -132,6 +198,7 @@
         <externalId>false</externalId>
         <label>複数の取引先責任者に該当</label>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackTrending>false</trackTrending>
         <type>Checkbox</type>
     </fields>
     <fields>
@@ -145,6 +212,7 @@ Last_Name__c + &apos; &apos; +  First_Name__c
         <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
         <label>名前</label>
         <required>false</required>
+        <trackTrending>false</trackTrending>
         <type>Text</type>
         <unique>false</unique>
     </fields>
@@ -155,6 +223,7 @@ Last_Name__c + &apos; &apos; +  First_Name__c
         <label>電話番号</label>
         <required>false</required>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackTrending>false</trackTrending>
         <type>Phone</type>
     </fields>
     <fields>
@@ -164,6 +233,7 @@ Last_Name__c + &apos; &apos; +  First_Name__c
         <label>プロフィール写真URL</label>
         <required>false</required>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackTrending>false</trackTrending>
         <type>Url</type>
     </fields>
     <fields>
@@ -177,6 +247,7 @@ Last_Name__c + &apos; &apos; +  First_Name__c
         <relationshipOrder>0</relationshipOrder>
         <reparentableMasterDetail>false</reparentableMasterDetail>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackTrending>false</trackTrending>
         <type>MasterDetail</type>
         <writeRequiresMasterRead>false</writeRequiresMasterRead>
     </fields>
@@ -201,6 +272,7 @@ Last_Name__c + &apos; &apos; +  First_Name__c
             <sorted>false</sorted>
         </picklist>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackTrending>false</trackTrending>
         <type>Picklist</type>
     </fields>
     <fields>
@@ -211,6 +283,7 @@ Last_Name__c + &apos; &apos; +  First_Name__c
         <length>255</length>
         <required>false</required>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackTrending>false</trackTrending>
         <type>Text</type>
         <unique>false</unique>
     </fields>
@@ -221,6 +294,7 @@ Last_Name__c + &apos; &apos; +  First_Name__c
         <externalId>false</externalId>
         <label>Chatterに投稿する必要有り</label>
         <trackFeedHistory>false</trackFeedHistory>
+        <trackTrending>false</trackTrending>
         <type>Checkbox</type>
     </fields>
     <label>ゲスト</label>

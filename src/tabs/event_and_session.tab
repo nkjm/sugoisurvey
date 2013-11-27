@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
-    <label>アンケート</label>
+    <label>deprecated アンケート</label>
     <mobileReady>false</mobileReady>
     <motif>Custom70: Handsaw</motif>
     <page>session_list</page>

@@ -1,0 +1,160 @@
+<apex:page readOnly="true" standardController="Session__c" standardStyleSheets="false" showheader="false" applyBodyTag="false" applyHtmlTag="false" doctype="html-5.0" cache="false">
+
+<html class="ng-app" id="ng-app">
+<head>
+    <meta charset="utf-8"></meta>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+    <title>{!$label.sugoisurvey}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.2/css/bootstrap.min.css"></link>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.2/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.1/angular.min.js"></script>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <style>
+    h4 {
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+        color: #666666;
+        border-bottom: solid 1px #666666;
+        
+    }
+    </style>
+</head>
+
+<body>
+<c:RemoteTK />
+
+<script>
+google.load('visualization', '1.0', {'packages':['corechart']});
+
+j$ = jQuery.noConflict();
+
+function session_report($scope){
+    $scope.draw_pie_chart = function(rate_data){
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', '{!$Label.rate}');
+        data.addColumn('number', '{!$Label.sum}');
+        data.addRows(rate_data);
+        var options = {
+            'width':250,
+            'height':280,
+            'chartArea':{width:'90%',height:'80%'},
+            'legend':{position:'top'},
+            'is3D':true
+        };
+        var chart = new google.visualization.PieChart(document.getElementById('rating_chart'));
+        chart.draw(data, options);
+    
+        google.visualization.events.addListener(chart, 'select', function(){
+            var selectedData = chart.getSelection(), row, item;
+            row = selectedData[0].row;
+            if (row == 0){
+                rate = 5;
+            } else if (row == 1){
+                rate = 4;
+            } else if (row == 2){
+                rate = 3;
+            } else if (row == 3){
+                rate = 2;
+            } else if (row == 4){
+                rate = 1;
+            }
+            
+            if (typeof sforce == "undefined"){
+                window.location = "/apex/sugoisurvey4__S1_guest_list?session_id=" + $scope.session.Id + "&search_by=rate&rate=" + rate;
+            } else {
+                sforce.one.navigateToURL("/apex/sugoisurvey4__S1_guest_list?session_id=" + $scope.session.Id + "&search_by=rate&rate=" + rate);
+            }
+        });
+    };
+
+    
+    $scope.generate_report_rating = function(){
+        var rate_data = [];
+        rate_data.push(['5pt', $scope.session.sugoisurvey4__Rate_5__c]);
+        rate_data.push(['4pt', $scope.session.sugoisurvey4__Rate_4__c]);
+        rate_data.push(['3pt', $scope.session.sugoisurvey4__Rate_3__c]);
+        rate_data.push(['2pt', $scope.session.sugoisurvey4__Rate_2__c]);
+        rate_data.push(['1pt', $scope.session.sugoisurvey4__Rate_1__c]);
+        $scope.draw_pie_chart(rate_data);
+    };
+    
+    $scope.update_chart = function(){
+        // Draw Pie Chart for Rating
+        if ($scope.session.sugoisurvey4__Enable_Rate__c == true && $scope.session.sugoisurvey4__Rate_Avg__c != null && $scope.session.sugoisurvey4__Rate_Avg__c != 0.00){
+            $scope.generate_report_rating();
+        }
+        
+        $scope.$apply();
+    };
+    
+    $scope.retrieve_session = function(callback){
+        var update_view = function(){
+            $scope.$apply();
+        };
+        
+        var soql = "select Id, Name, sugoisurvey4__Rate_1__c, sugoisurvey4__Rate_2__c, sugoisurvey4__Rate_3__c, sugoisurvey4__Rate_4__c, sugoisurvey4__Rate_5__c, sugoisurvey4__Rate_Avg__c, sugoisurvey4__Survey_Sum__c, sugoisurvey4__Guest_Sum__c, sugoisurvey4__Attending_Guest_Sum__c, sugoisurvey4__Enable_Rate__c, sugoisurvey4__Survey_Collection_Rate__c \
+                    from sugoisurvey4__Session__c where Id = '" + $scope.session.Id + "'";
+        $scope.force.query(
+            soql,
+            function(result){
+                $scope.rtk.submitting = false;
+                $scope.session = result.records[0];
+                if (callback == null){
+                    update_view();
+                } else {
+                    callback();
+                }
+            },
+            function(result){
+                console.log(result);
+                $scope.rtk.submitting = false;
+                $scope.rtk.result = 'error';
+                $scope.rtk.message = result;
+                update_view();
+            }
+        );
+    };
+
+    $scope.init = function(){
+        $scope.session = {};
+        $scope.session.Id = '{!Session__c.Id}';
+        $scope.rtk = {};
+        $scope.rtk.submitting = true;
+        $scope.retrieve_session($scope.update_chart);
+    }
+    
+    $scope.force = new remotetk.Client();
+    $scope.init();
+}
+</script>
+
+<div ng-controller="session_report" class="container">
+
+<!-- Rating -->
+<apex:outputText rendered="{!Session__c.Enable_Rate__c}">
+    <div class="row">
+        <div class="col-sm-12">
+            <h4>{!$label.rate}</h4>
+            
+            <!-- NO DATA for Rating -->
+            <div ng-show="session.sugoisurvey4__Rate_Avg__c == null || session.sugoisurvey4__Rate_Avg__c == 0.00" style="text-align: center; font-size: 72px; color: #cccccc; font-weight: bold; padding: 60px 0;">
+                {!$Label.no_data}
+            </div>
+            
+            <!-- Score and Chart for Rating -->
+            <div ng-show="session.sugoisurvey4__Rate_Avg__c != null && session.sugoisurvey4__Rate_Avg__c != 0.00">
+                <div style="margin: 0 auto; width: 250px;" id="rating_chart">
+                    <!-- Rating Chart will be inserted here -->
+                </div>
+            </div>
+            
+        </div>
+    </div><!-- row -->
+</apex:outputText>
+
+</div>
+
+</body>
+</html>
+</apex:page>

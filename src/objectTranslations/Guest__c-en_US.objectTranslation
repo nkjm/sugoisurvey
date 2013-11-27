@@ -34,6 +34,10 @@
         <name>First_Name__c</name>
     </fields>
     <fields>
+        <label>Guest Pass Delivered</label>
+        <name>Guest_Pass_Delivered__c</name>
+    </fields>
+    <fields>
         <label>Handout Delivered</label>
         <name>Handout_Delivered__c</name>
     </fields>

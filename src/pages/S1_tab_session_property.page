@@ -1,0 +1,109 @@
+<apex:page readOnly="true" standardController="Session__c" extensions="session_v2" standardStyleSheets="false" showheader="false" applyBodyTag="false" applyHtmlTag="false" doctype="html-5.0" cache="false">
+<style>
+#tab_session_property .submit-complete, .submit-inprogress {
+	display: none;
+}
+#tab_session_property .config_container {
+    margin-bottom: 60px;
+}
+</style>
+<script>
+j$ = jQuery.noConflict();
+
+function start_submit(){
+	j$("#tab_session_property .submit-complete").hide();
+	j$("#tab_session_property .submit-button").hide();
+	j$("#tab_session_property .submit-inprogress").show();
+}
+
+function stop_submit(){
+	j$("#tab_session_property .submit-inprogress").hide();
+	j$("#tab_session_property .submit-complete").show();
+	j$("#tab_session_property .submit-button").show();
+}
+</script>
+
+<apex:form >
+<apex:messages styleClass="alert alert-danger" />
+<apex:actionStatus id="session_report_status" onstart="start_submit()" onstop="stop_submit()" />
+
+<div class="submit-complete alert alert-success">
+	{!$Label.update_has_been_saved}
+</div>
+
+<div class="row">
+	<div class="col-md-12">
+		<div class="submit-inprogress progress progress-striped active" style="height: 35px;">
+		    <div class="progress-bar progress-bar-success"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%;"></div>
+		</div>
+		<apex:commandButton status="session_report_status" styleClass="submit-button btn btn-success pull-right" rerender="tab_session_report" action="{!quicksave}" value="{!$Label.save}"></apex:commandButton>
+	</div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+    
+        <div class="config_container">
+            <h3>{!$Label.survey_url}</h3>
+            <apex:outputText rendered="{! !ISNULL(config.survey_sites_url__c) }">
+                <div style="text-align: center;">
+                    <img src="https://chart.googleapis.com/chart?cht=qr&chs=200x200&chl={!HTMLENCODE(config.survey_sites_url__c + '?id=' + session.id)}" />
+                </div>
+                <div style="text-align: center;">
+                    <a href="{!HTMLENCODE(config.survey_sites_url__c + '?id=' + session.id)}" target="_blank">{!HTMLENCODE(config.survey_sites_url__c + '?id=' + session.id)}</a>
+                </div>
+            </apex:outputText>
+        </div>
+    
+        <div class="config_container">
+        	<h3>{!$Label.basic_config}</h3>
+			<div class="form-horizontal" role="form">
+				<apex:repeat value="{!$ObjectType.Session__c.FieldSets.Base_Info}" var="f">
+					<div class="form-group">
+						<label class="col-sm-4 control-label">{!f.Label}</label>
+						<div class="col-sm-8">
+							<apex:inputField styleClass="form-control" value="{!Session__c[f]}" rendered="{!f.Type != 'date' && f.Type != 'boolean'}"></apex:inputField>
+							<apex:inputField styleClass="form-control" type="date" value="{!Session__c[f]}" rendered="{!f.Type == 'date'}"></apex:inputField>
+							<apex:inputField value="{!Session__c[f]}" rendered="{!f.Type == 'boolean'}"></apex:inputField>
+						</div>
+					</div>
+				</apex:repeat>
+			</div>
+        </div>
+             
+        <div class="config_container">
+            <h3>{!$Label.chatter_config}</h3>
+			<div class="form-horizontal" role="form">
+				<apex:repeat value="{!$ObjectType.Session__c.FieldSets.Chatter_Setting}" var="f">
+					<div class="form-group">
+						<label class="col-sm-4 control-label">{!f.Label}</label>
+						<div class="col-sm-8">
+							<apex:inputField styleClass="form-control" value="{!Session__c[f]}" rendered="{!f.Type != 'date' && f.Type != 'boolean'}"></apex:inputField>
+							<apex:inputField styleClass="form-control" type="date" value="{!Session__c[f]}" rendered="{!f.Type == 'date'}"></apex:inputField>
+							<apex:inputField value="{!Session__c[f]}" rendered="{!f.Type == 'boolean'}"></apex:inputField>
+						</div>
+					</div>
+				</apex:repeat>
+			</div>
+        </div>
+        
+        <div class="config_container">
+            <h3>{!$Label.mail_config}</h3>
+			<div class="form-horizontal" role="form">
+				<apex:repeat value="{!$ObjectType.Session__c.FieldSets.Mail_Setting}" var="f">
+					<div class="form-group">
+						<label class="col-sm-4 control-label">{!f.Label}</label>
+						<div class="col-sm-8">
+							<apex:inputField styleClass="form-control" value="{!Session__c[f]}" rendered="{!f.Type != 'date' && f.Type != 'boolean'}"></apex:inputField>
+							<apex:inputField styleClass="form-control" type="date" value="{!Session__c[f]}" rendered="{!f.Type == 'date'}"></apex:inputField>
+							<apex:inputField value="{!Session__c[f]}" rendered="{!f.Type == 'boolean'}"></apex:inputField>
+						</div>
+					</div>
+				</apex:repeat>
+			</div>
+        </div>
+        
+    </div>
+</div>
+</apex:form>
+</apex:page>

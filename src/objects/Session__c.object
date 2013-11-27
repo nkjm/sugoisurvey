@@ -5,6 +5,10 @@
         <type>Default</type>
     </actionOverrides>
     <actionOverrides>
+        <actionName>CancelEdit</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
         <actionName>Clone</actionName>
         <type>Default</type>
     </actionOverrides>
@@ -17,11 +21,19 @@
         <type>Default</type>
     </actionOverrides>
     <actionOverrides>
+        <actionName>Follow</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
         <actionName>List</actionName>
         <type>Default</type>
     </actionOverrides>
     <actionOverrides>
         <actionName>New</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>SaveEdit</actionName>
         <type>Default</type>
     </actionOverrides>
     <actionOverrides>
@@ -34,6 +46,7 @@
         <skipRecordTypeSelect>false</skipRecordTypeSelect>
         <type>Visualforce</type>
     </actionOverrides>
+    <compactLayoutAssignment>SYSTEM</compactLayoutAssignment>
     <deploymentStatus>Deployed</deploymentStatus>
     <deprecated>false</deprecated>
     <enableActivities>false</enableActivities>
@@ -41,6 +54,121 @@
     <enableFeeds>true</enableFeeds>
     <enableHistory>true</enableHistory>
     <enableReports>true</enableReports>
+    <fieldSets>
+        <fullName>Base_Info</fullName>
+        <availableFields>
+            <field>Attending_Guest_Percentage__c</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </availableFields>
+        <availableFields>
+            <field>Event_Id__c</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </availableFields>
+        <availableFields>
+            <field>Presenter__c</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </availableFields>
+        <availableFields>
+            <field>Survey_Collection_Rate__c</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </availableFields>
+        <description>VF: S1_tab_session_property</description>
+        <displayedFields>
+            <field>Open__c</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </displayedFields>
+        <displayedFields>
+            <field>Name</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </displayedFields>
+        <displayedFields>
+            <field>Date__c</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </displayedFields>
+        <displayedFields>
+            <field>Enable_Rate__c</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </displayedFields>
+        <displayedFields>
+            <field>Label_For_Rate__c</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </displayedFields>
+        <displayedFields>
+            <field>Who_Can_Submit_Survey__c</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </displayedFields>
+        <displayedFields>
+            <field>Guest_Sum__c</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </displayedFields>
+        <label>基本情報</label>
+    </fieldSets>
+    <fieldSets>
+        <fullName>Chatter_Setting</fullName>
+        <description>VF: S1_tab_session_property</description>
+        <displayedFields>
+            <field>Post_To_Account_Record_Feed__c</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </displayedFields>
+        <displayedFields>
+            <field>Post_To_Contact_Record_Feed__c</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </displayedFields>
+        <label>Chatter設定</label>
+    </fieldSets>
+    <fieldSets>
+        <fullName>Mail_Setting</fullName>
+        <description>VF: S1_tab_session_property</description>
+        <displayedFields>
+            <field>Who_Can_Get_Handout__c</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </displayedFields>
+        <displayedFields>
+            <field>Send_Mail_On_Submittion__c</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </displayedFields>
+        <displayedFields>
+            <field>Mass_Mail_Title__c</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </displayedFields>
+        <displayedFields>
+            <field>Mass_Mail_Additional_Body__c</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </displayedFields>
+        <displayedFields>
+            <field>Mass_Mail_Sender__c</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </displayedFields>
+        <displayedFields>
+            <field>Handout_URL__c</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </displayedFields>
+        <displayedFields>
+            <field>Handout_Password__c</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </displayedFields>
+        <label>メール設定</label>
+    </fieldSets>
     <fields>
         <fullName>Attending_Guest_Percentage__c</fullName>
         <deprecated>false</deprecated>
@@ -53,6 +181,7 @@
         <required>false</required>
         <scale>0</scale>
         <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
         <type>Percent</type>
     </fields>
     <fields>
@@ -68,6 +197,7 @@
         <summaryForeignKey>Guest__c.Session__c</summaryForeignKey>
         <summaryOperation>count</summaryOperation>
         <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
         <type>Summary</type>
     </fields>
     <fields>
@@ -78,6 +208,7 @@
         <required>false</required>
         <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
         <type>Email</type>
         <unique>false</unique>
     </fields>
@@ -89,6 +220,7 @@
         <required>false</required>
         <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
         <type>Date</type>
     </fields>
     <fields>
@@ -99,6 +231,7 @@
         <length>1000</length>
         <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
         <type>LongTextArea</type>
         <visibleLines>7</visibleLines>
     </fields>
@@ -110,6 +243,7 @@
         <label>5段階評価を実施</label>
         <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
         <type>Checkbox</type>
     </fields>
     <fields>
@@ -117,9 +251,10 @@
         <deprecated>false</deprecated>
         <externalId>false</externalId>
         <formula>Id</formula>
-        <label>イベントID</label>
+        <label>アンケートID</label>
         <required>false</required>
         <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
         <type>Text</type>
         <unique>false</unique>
     </fields>
@@ -131,6 +266,7 @@
         <summaryForeignKey>Guest__c.Session__c</summaryForeignKey>
         <summaryOperation>count</summaryOperation>
         <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
         <type>Summary</type>
     </fields>
     <fields>
@@ -142,6 +278,7 @@
         <required>false</required>
         <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
         <type>Text</type>
         <unique>false</unique>
     </fields>
@@ -153,6 +290,7 @@
         <required>false</required>
         <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
         <type>Url</type>
     </fields>
     <fields>
@@ -165,6 +303,7 @@
         <required>false</required>
         <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
         <type>Text</type>
         <unique>true</unique>
     </fields>
@@ -177,6 +316,7 @@
         <required>false</required>
         <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
         <type>Text</type>
         <unique>false</unique>
     </fields>
@@ -188,6 +328,7 @@
         <length>32768</length>
         <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
         <type>LongTextArea</type>
         <visibleLines>6</visibleLines>
     </fields>
@@ -199,6 +340,7 @@
         <required>false</required>
         <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
         <type>Email</type>
         <unique>false</unique>
     </fields>
@@ -211,6 +353,7 @@
         <required>false</required>
         <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
         <type>Text</type>
         <unique>false</unique>
     </fields>
@@ -222,6 +365,7 @@
         <label>オープン</label>
         <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
         <type>Checkbox</type>
     </fields>
     <fields>
@@ -233,6 +377,7 @@
         <label>取引先のレコードフィードにゲストの活動を投稿</label>
         <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
         <type>Checkbox</type>
     </fields>
     <fields>
@@ -244,6 +389,7 @@
         <label>取引先責任者のレコードフィードにゲストの活動を投稿</label>
         <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
         <type>Checkbox</type>
     </fields>
     <fields>
@@ -257,6 +403,7 @@
         <required>false</required>
         <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
         <type>Lookup</type>
     </fields>
     <fields>
@@ -272,6 +419,7 @@
         <summaryForeignKey>Survey__c.Session__c</summaryForeignKey>
         <summaryOperation>count</summaryOperation>
         <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
         <type>Summary</type>
     </fields>
     <fields>
@@ -287,6 +435,7 @@
         <summaryForeignKey>Survey__c.Session__c</summaryForeignKey>
         <summaryOperation>count</summaryOperation>
         <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
         <type>Summary</type>
     </fields>
     <fields>
@@ -302,6 +451,7 @@
         <summaryForeignKey>Survey__c.Session__c</summaryForeignKey>
         <summaryOperation>count</summaryOperation>
         <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
         <type>Summary</type>
     </fields>
     <fields>
@@ -317,6 +467,7 @@
         <summaryForeignKey>Survey__c.Session__c</summaryForeignKey>
         <summaryOperation>count</summaryOperation>
         <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
         <type>Summary</type>
     </fields>
     <fields>
@@ -332,6 +483,7 @@
         <summaryForeignKey>Survey__c.Session__c</summaryForeignKey>
         <summaryOperation>count</summaryOperation>
         <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
         <type>Summary</type>
     </fields>
     <fields>
@@ -345,6 +497,7 @@
         <required>false</required>
         <scale>2</scale>
         <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
         <type>Number</type>
         <unique>false</unique>
     </fields>
@@ -361,6 +514,7 @@
         <summaryForeignKey>Survey__c.Session__c</summaryForeignKey>
         <summaryOperation>count</summaryOperation>
         <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
         <type>Summary</type>
     </fields>
     <fields>
@@ -372,6 +526,7 @@
         <summaryForeignKey>Survey__c.Session__c</summaryForeignKey>
         <summaryOperation>sum</summaryOperation>
         <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
         <type>Summary</type>
     </fields>
     <fields>
@@ -382,6 +537,18 @@
         <label>レポートを公開する</label>
         <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Send_Mail_On_Submittion__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>アンケート提出後に自動送信</label>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
         <type>Checkbox</type>
     </fields>
     <fields>
@@ -395,6 +562,7 @@
         <required>false</required>
         <scale>0</scale>
         <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
         <type>Percent</type>
     </fields>
     <fields>
@@ -405,6 +573,7 @@
         <summaryForeignKey>Survey__c.Session__c</summaryForeignKey>
         <summaryOperation>count</summaryOperation>
         <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
         <type>Summary</type>
     </fields>
     <fields>
@@ -419,16 +588,17 @@
             </picklistValues>
             <picklistValues>
                 <fullName>出席者</fullName>
-                <default>false</default>
+                <default>true</default>
             </picklistValues>
             <picklistValues>
                 <fullName>アンケートの入力が必要</fullName>
-                <default>true</default>
+                <default>false</default>
             </picklistValues>
             <sorted>false</sorted>
         </picklist>
         <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
         <type>Picklist</type>
     </fields>
     <fields>
@@ -453,30 +623,43 @@
         </picklist>
         <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
         <type>Picklist</type>
     </fields>
-    <label>イベント</label>
+    <label>すごいアンケート</label>
     <listViews>
         <fullName>All</fullName>
-        <columns>NAME</columns>
-        <columns>Date__c</columns>
-        <columns>Hash_Tag__c</columns>
-        <columns>Rate_Avg__c</columns>
-        <columns>Open__c</columns>
-        <columns>Who_Can_Submit_Survey__c</columns>
-        <columns>Who_Can_Get_Handout__c</columns>
-        <columns>OWNER.ALIAS</columns>
         <filterScope>Everything</filterScope>
         <label>すべて選択</label>
+    </listViews>
+    <listViews>
+        <fullName>Available</fullName>
+        <columns>NAME</columns>
+        <columns>Date__c</columns>
+        <filterScope>Everything</filterScope>
+        <filters>
+            <field>Open__c</field>
+            <operation>equals</operation>
+            <value>1</value>
+        </filters>
+        <label>公開中のアンケート</label>
         <language>ja</language>
     </listViews>
     <listViews>
-        <fullName>All1</fullName>
+        <fullName>Closed</fullName>
+        <columns>NAME</columns>
+        <columns>Date__c</columns>
         <filterScope>Everything</filterScope>
-        <label>All</label>
+        <filters>
+            <field>Open__c</field>
+            <operation>equals</operation>
+            <value>0</value>
+        </filters>
+        <label>終了したアンケート</label>
+        <language>ja</language>
     </listViews>
     <nameField>
-        <label>イベント名</label>
+        <label>アンケートタイトル</label>
         <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
         <type>Text</type>
@@ -496,7 +679,7 @@
         <availability>online</availability>
         <displayType>button</displayType>
         <linkType>javascript</linkType>
-        <masterLabel>イベントをコピー</masterLabel>
+        <masterLabel>アンケートをコピー</masterLabel>
         <openType>onClickJavaScript</openType>
         <protected>false</protected>
         <url>if(confirm(&apos;{!$Label.cloning_event} {!$Label.are_you_sure}&apos;)){ 
@@ -536,7 +719,7 @@ alert(event.message);
         <availability>online</availability>
         <displayType>button</displayType>
         <linkType>javascript</linkType>
-        <masterLabel>イベントを削除</masterLabel>
+        <masterLabel>アンケートを削除</masterLabel>
         <openType>onClickJavaScript</openType>
         <protected>false</protected>
         <url>if(confirm(&apos;{!$Label.deleting_event} {!$Label.are_you_sure}&apos;)){
@@ -548,6 +731,32 @@ sugoisurvey4.jr_session.delete_session(&apos;{!Session__c.Id}&apos;,
             alert(event.message);
         }
     },{escape:true}
+);
+}</url>
+    </webLinks>
+    <webLinks>
+        <fullName>deliver_guest_pass</fullName>
+        <availability>online</availability>
+        <displayType>button</displayType>
+        <linkType>javascript</linkType>
+        <masterLabel>受講票送付</masterLabel>
+        <openType>onClickJavaScript</openType>
+        <protected>false</protected>
+        <url>if(confirm(&apos;{!$Label.delivering_guest_pass} {!$Label.are_you_sure}&apos;)){
+sugoisurvey4.jr_session.deliver_guest_pass(&apos;{!Session__c.Id}&apos;,
+function(result, event){
+if (event.status){
+  if (result.status){
+    alert(result.message + &apos; {!$Label.has_been_delivered}&apos;);
+    return;
+  } else {
+    alert(result.message);
+    return;
+  }
+} else {
+alert(event.message);
+}
+},{escape:true}
 );
 }</url>
     </webLinks>

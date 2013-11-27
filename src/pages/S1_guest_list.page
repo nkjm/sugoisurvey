@@ -1,0 +1,51 @@
+<apex:page standardController="Guest__c" extensions="survey_for_guest,guest_list" readOnly="true" showHeader="false" standardStylesheets="false" applyhtmlTag="false" applyBodyTag="false" docType="html-5.0">
+
+<html class="ng-app" id="ng-app">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.2/css/bootstrap.min.css"></link>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.2/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.0/angular.min.js"></script>
+    <title>{!$label.sugoisurvey}</title>
+	<style>
+	a, a:hover, a:active {
+	    color: #666666;
+	    text-decoration: none;
+	}
+	.row_guest_selected {
+		background-color: #eeeeee;
+	}
+	</style>
+	<script>
+	j$ = jQuery.noConflict();
+	function navigate_to_guest_detail(guest_id){
+		j$("#row_guest_" + guest_id).addClass("row_guest_selected");
+		
+		if (typeof sforce == "undefined"){
+			window.location = '/apex/sugoisurvey4__S1_guest_detail?id=' + guest_id;
+		} else {
+			sforce.one.navigateToURL('/apex/sugoisurvey4__S1_guest_detail?id=' + guest_id);
+		}
+	}
+	</script>
+</head>
+<body>
+<apex:repeat value="{!guests}" var="guest">
+	<div id="row_guest_{!guest.Id}" style="height:60px; padding: 10px; border-bottom: solid 1px #dddddd;" onclick="navigate_to_guest_detail('{!guest.Id}')">
+        <span class="glyphicon glyphicon-chevron-right pull-right" style="margin-top:10px;"></span>
+        <div>
+            <apex:outputText rendered="{!language_locale_key == 'ja'}" value="{!guest.Name__c}" />
+            <apex:outputText rendered="{!language_locale_key != 'ja'}" value="{!guest.First_Name__c} {!guest.Last_Name__c}" />
+            <apex:outputText rendered="{! !ISBLANK(guest.Email__c)}">
+            	&nbsp;&lt;{!guest.Email__c}&gt;
+            </apex:outputText>
+        </div>
+       	<div>
+        	{!guest.Company__c}
+        </div>
+	</div>
+</apex:repeat>
+</body>
+</html>
+</apex:page>

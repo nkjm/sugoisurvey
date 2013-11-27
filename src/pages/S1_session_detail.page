@@ -1,0 +1,101 @@
+<apex:page readOnly="true" standardController="Session__c" standardStyleSheets="false" showheader="false" applyBodyTag="false" applyHtmlTag="false" doctype="html-5.0" cache="false">
+
+<html class="ng-app" id="ng-app">
+<head>
+	<meta charset="utf-8"></meta>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+    <title>{!$label.sugoisurvey}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.2/css/bootstrap.min.css"></link>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.2/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.1/angular.min.js"></script>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<style>
+h1, h2 {
+    color: #999999;
+}
+h3 {
+	padding-bottom: 10px;
+	color: #999999;
+    border-bottom: solid 1px #999999;
+}
+h4, h5 {
+    color: #666666;
+}
+a {
+    color: #000000;
+    text-decolation: none;
+}
+.config_container {
+    margin-bottom: 60px;
+}
+.btn-selected {
+	background-color: #F6EDF2;
+	border-color: #f4a4d4;
+}
+@media screen and (min-width: 320px) {
+    #root_container h1 {
+    	font-size: 16pt;
+    }
+    
+    #root_container .tab_label {
+        font-size: 0.9em;
+        padding: 8px;
+    }
+}
+@media screen and (min-width: 768px) {
+    #root_container h1 {
+    	font-size: 24pt;
+    }
+    #root_container .tab_label {
+        font-size: 1.0em;
+        padding: 12px;
+    }
+}
+</style>
+
+<c:RemoteTK />
+<script>
+
+</script>
+</head>
+
+<body>
+
+<div class="container" id="root_container">
+	<!-- Survey Title -->
+    <div class="row" style="margin-bottom: 20px;">
+        <div class="col-sm-12">
+        	<h1>{!Session__c.Name}</h1>
+        </div>
+    </div>
+    
+    <!--  Tab Bar -->
+    <div class="row" style="margin-bottom: 20px;" id="tab_bar">
+        <div class="col-sm-12">
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="#tab_edit_survey" data-toggle="tab" class="tab_label">{!$label.edit_survey}</a></li>
+                <li><a href="#tab_session_report" data-toggle="tab" class="tab_label">{!$label.report}</a></li>
+                <li><a href="#tab_session_property" data-toggle="tab" class="tab_label">{!$label.property}</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!--  Tab Content -->
+    <div class="row tab-content" style="margin: 0 auto;">
+        <div id="tab_edit_survey" class="col-sm-12 tab-pane active" style="padding:0 5px; display:none;" ng-controller="survey" >
+            <apex:include pageName="S1_tab_edit_survey" />
+        </div>
+    
+        <div id="tab_session_report" class="col-sm-12 tab-pane" style="padding:0 5px;" ng-controller="session_report">
+            <apex:include pageName="S1_tab_session_report" />
+        </div>
+        
+        <div id="tab_session_property" class="col-sm-12 tab-pane" style="padding:0 5px;">
+            <apex:include pageName="S1_tab_session_property" />
+        </div>
+    </div>
+</div>
+</body>
+</html>
+</apex:page>

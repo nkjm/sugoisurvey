@@ -30,6 +30,10 @@
         <name>First_Name__c</name>
     </fields>
     <fields>
+        <label><!-- 受講票配信済み --></label>
+        <name>Guest_Pass_Delivered__c</name>
+    </fields>
+    <fields>
         <label><!-- メール配信済み --></label>
         <name>Handout_Delivered__c</name>
     </fields>
