@@ -1,0 +1,35 @@
+<apex:component >
+<div class="modal fade modal_progress" tabindex="-1" role="dialog" aria-labelledby="modal_progress" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <div style="font-size:14pt;" class="modal-title" id="myModalLabel">
+                    <span ng-show="rtk.submitting == true">{!$label.processing}</span>
+                    <span ng-show="rtk.submitting == false && rtk.result == 'success'">{!$label.complete}</span>
+                    <span ng-show="rtk.submitting == false && rtk.result == 'error'">{!$label.error}</span>
+				</div>
+			</div>
+            <div class="modal-body">
+                <div ng-show="rtk.result == null">
+                    {!$label.pls_wait_for_a_while}
+                </div>
+                <div ng-show="rtk.result == 'success'" class="alert alert-success">
+                    {{rtk.message}}
+                </div>
+                <div ng-show="rtk.result == 'error'" class="alert alert-danger">
+                    {{rtk.message}}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div ng-show="rtk.submitting == true" class="progress progress-striped active" style="height: 30px; margin-bottom:10px;">
+                    <div class="progress-bar progress-bar-{{modal.button_class}}"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%;"></div>
+                </div>
+                <div ng-show="rtk.submitting == false">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">{!$label.close}</button>
+                </div>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+</apex:component>

@@ -24,7 +24,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-public class RemoteTKController {
+public with sharing class RemoteTKController {
     private static String makeError(String message, String errorCode) {
         JSONGenerator gen = JSON.createGenerator(false);
         gen.writeStartArray();
@@ -37,117 +37,18 @@ public class RemoteTKController {
         return gen.getAsString();
     }
     
-    private static String writeFields(String objtype, SObject obj, String fields) {
-        Map<String, Object> fieldMap = null;
-        try {
-            fieldMap = (Map<String, Object>)JSON.deserializeUntyped(fields);
-        } catch (JSONException je) {
-            return makeError(je.getMessage(), 'JSON_PARSER_ERROR');
-        }
-        
-        Schema.SObjectType targetType = Schema.getGlobalDescribe().get(objtype);
-        
-        Map<String, Schema.sObjectField> targetFields = targetType.getDescribe().fields.getMap();
-        
-        try {
-            for (String key : fieldMap.keySet()) {
-                if (targetFields.get(key) == null) {
-                    return '[{"message":"Field '+key+' does not exist on object type '+objtype+'","errorCode":"INVALID_FIELD"}]';
-                }
-                
-                Object value = fieldMap.get(key);
-                Schema.DisplayType valueType = targetFields.get(key).getDescribe().getType();
-                
-                if (value instanceof String && valueType != Schema.DisplayType.String) {
-                    // Coerce an incoming String to the correct type
-                    String svalue = (String)value;
-                    
-                    if (valueType == Schema.DisplayType.Date) {
-                        obj.put(key, Date.valueOf(svalue));
-                    } else if (valueType == Schema.DisplayType.Percent ||
-                           valueType == Schema.DisplayType.Currency) {
-                        obj.put(key, svalue == '' ? null : Decimal.valueOf(svalue));
-                    } else if (valueType == Schema.DisplayType.Double) {
-                        obj.put(key, svalue == '' ? null : Double.valueOf(svalue));
-                    } else if (valueType == Schema.DisplayType.Integer) {
-                        obj.put(key, Integer.valueOf(svalue));
-                    } else {
-                        obj.put(key, svalue);
-                    }
-                } else {
-                    // Just try putting the incoming value on the object
-                    obj.put(key, value);
-                }
-            }
-        } catch (SObjectException soe) {
-            return makeError(soe.getMessage(), 'INVALID_FIELD');
-        }
-        
-        return null;
-    }
-    
-    @remoteAction
-    public static String describe(String objtype) {
-        // Just enough to make the sample app work!
-        Schema.SObjectType targetType = Schema.getGlobalDescribe().get(objtype);
-        if (targetType == null) {
-            return makeError('The requested resource does not exist', 'NOT_FOUND');
-        }
-        
-        Schema.DescribeSObjectResult sobjResult = targetType.getDescribe();
-        
-        Map<String, Schema.SObjectField> fieldMap = sobjResult.fields.getMap();
-        
-        List<Object> fields = new List<Object>();
-        for (String key : fieldMap.keySet()) {
-            Schema.DescribeFieldResult descField = fieldMap.get(key).getDescribe();
-            Map<String, Object> field = new Map<String, Object>();
-            
-            field.put('type', descField.getType().name().toLowerCase());
-            field.put('name', descField.getName());
-            field.put('label', descField.getLabel());
-            List<String> references = new List<String>();
-            for (Schema.sObjectType t: descField.getReferenceTo()) {
-                references.add(t.getDescribe().getName());
-            }
-            if (!references.isEmpty()) {
-                field.put('referenceTo', references);
-            }
-            
-            fields.add(field);
-        }
-        
-        Map<String, Object> result = new Map<String, Object>();
-        result.put('fields', fields);
-        
-        return JSON.serialize(result);
-    }
-    
     @remoteAction
     public static String create(String objtype, String fields) {
         Schema.SObjectType targetType = Schema.getGlobalDescribe().get(objtype);
         if (targetType == null) {
             return makeError('The requested resource does not exist', 'NOT_FOUND');
         }
-        
-        SObject obj = targetType.newSObject();
 
-        String error = writeFields(objType, obj, fields);
-        if (error != null) {
-            return error;
-        }
-
+        SObject obj = (SObject)JSON.deserialize(fields, type.forName(objtype));
         try {
-            insert obj;
-        } catch (DMLException dmle) {
-            String fieldNames = '';
-            for (String field : dmle.getDmlFieldNames(0)) {
-                if (fieldNames.length() > 0) {
-                    fieldNames += ',';
-                }
-                fieldNames += '"'+field+'"';
-            }
-            return '[{"fields":['+fieldNames+'],"message":"'+dmle.getDmlMessage(0)+'","errorCode":"'+dmle.getDmlType(0).name()+'"}]';
+            scrud.screate(obj);
+        } catch (Exception e) {
+            return '[{"message":"'+e.getMessage()+'","errorCode":"400"}]';
         }
         
         Map<String, Object> result = new Map<String, Object>();
@@ -160,95 +61,48 @@ public class RemoteTKController {
     
     @remoteAction
     public static String retrieve(String objtype, String id, String fieldlist) {
-        // retrieve all fields if fieldlist is null
+        sObject o;
         if (fieldlist == null){
-            fieldlist = '';
-            Schema.SObjectType targetType = Schema.getGlobalDescribe().get(objtype);
-            if (targetType == null) {
-                return makeError('The requested resource does not exist', 'NOT_FOUND');
+            try {
+                o = scrud.sread(objtype, id);
+            } catch (Exception e){
+                return makeError(e.getMessage(), 'INVALID_QUERY');
             }
-            Schema.DescribeSObjectResult sobjResult = targetType.getDescribe();
-            Map<String, Schema.SObjectField> fieldMap = sobjResult.fields.getMap();
-            for (String key : fieldMap.keySet()) {
-                Schema.DescribeFieldResult descField = fieldMap.get(key).getDescribe();
-                fieldlist += descField.getName() + ',';
-            }
-            fieldlist = fieldlist.removeEnd(',');
-        }
-        
-        Boolean containsId = false;
-        for (String field : fieldlist.split(',')) {
-            if (field.equalsIgnoreCase('id')){
-                containsId = true;
-                break;
+        } else {
+            try {
+                o = scrud.sread(objtype, id, fieldlist.split(','));
+            } catch (Exception e){
+                return makeError(e.getMessage(), 'INVALID_QUERY');
             }
         }
-        
-        if (!containsId) {
-            fieldlist = 'Id,'+fieldlist;
-        }
-        
-        String soql = 'SELECT '+fieldlist+' FROM '+objtype+' WHERE Id = \''+id+'\'';
-        system.debug(soql);
-        List<sObject> records;
+        return JSON.serialize(o);
+    }
+
+    @remoteAction
+    public static String lis(String objtype) {
+        list<sobject> os;
         try {
-            records = Database.query(soql);
-        } catch (QueryException qe) {
-            return makeError(qe.getMessage(), 'INVALID_QUERY');
+            os = scrud.slist(objtype);
+        } catch (Exception e){
+            return '[{"message":"'+e.getMessage()+'","errorCode":"400"}]';
         }
-        
-        return JSON.serialize(records[0]);
+        return JSON.serialize(os);
     }
     
     @remoteAction
-    public static String upser(String objtype, String externalIdField, String externalId, String fields) {
-        Schema.SObjectType targetType = Schema.getGlobalDescribe().get(objtype);
-        if (targetType == null) {
-            return makeError('The requested resource does not exist', 'NOT_FOUND');
-        }
-        
-        SObject obj = targetType.newSObject();
-        obj.put(externalIdField, externalId);
-        
-        String error = writeFields(objType, obj, fields);
-        if (error != null) {
-            return error;
-        }
-        
-        Schema.SObjectField sobjField = targetType.getDescribe().fields.getMap().get(externalIdField);
-        
-        Database.Upsert(obj, sobjField);
-        
-        return null;
-    }
-
-    @remoteAction
     public static String updat(String objtype, String id, String fields) {
-        Schema.SObjectType targetType = Schema.getGlobalDescribe().get(objtype);
-        if (targetType == null) {
-            return makeError('The requested resource does not exist', 'NOT_FOUND');
-        }
-        
-        SObject obj = targetType.newSObject(id);
-        
-        String error = writeFields(objType, obj, fields);
-        if (error != null) {
-            return error;
+        SObject obj;
+        try {
+            obj = (SObject)JSON.deserialize(fields, type.forName(objtype));
+        } catch (Exception e){
+            return '[{"message":"'+e.getMessage()+'","errorCode":"400"}]';
         }
 
         try {
-            update obj;
-        } catch (DMLException dmle) {
-            String fieldNames = '';
-            for (String field : dmle.getDmlFieldNames(0)) {
-                if (fieldNames.length() > 0) {
-                    fieldNames += ',';
-                }
-                fieldNames += '"'+field+'"';
-            }
-            return '[{"fields":['+fieldNames+'],"message":"'+dmle.getDmlMessage(0)+'","errorCode":"'+dmle.getDmlType(0).name()+'"}]';
+            scrud.supdate(obj);
+        } catch (Exception e) {
+            return '[{"message":"'+e.getMessage()+'","errorCode":"400"}]';
         }
-        
         return null;
     }
 
@@ -260,51 +114,11 @@ public class RemoteTKController {
         }
         
         SObject obj = targetType.newSObject(id);
-        
         try {
-            delete obj;
-        } catch (DMLException dmle) {
-            String fieldNames = '';
-            for (String field : dmle.getDmlFieldNames(0)) {
-                if (fieldNames.length() > 0) {
-                    fieldNames += ',';
-                }
-                fieldNames += '"'+field+'"';
-            }
-            return '[{"fields":['+fieldNames+'],"message":"'+dmle.getDmlMessage(0)+'","errorCode":"'+dmle.getDmlType(0).name()+'"}]';
+            scrud.sdelete(obj);
+        } catch (Exception e) {
+            return '[{"message":"'+e.getMessage()+'","errorCode":"400"}]';
         }
-        
         return null;
-    }
-
-    @remoteAction
-    public static String query(String soql) {
-        List<sObject> records;
-        try {
-            records = Database.query(soql);
-        } catch (QueryException qe) {
-            return makeError(qe.getMessage(), 'INVALID_QUERY');
-        }
-        
-        Map<String, Object> result = new Map<String, Object>();
-        result.put('records', records);
-        result.put('totalSize', records.size());
-        result.put('done', true);
-        
-        return JSON.serialize(result);
-    }
-
-    @remoteAction
-    public static String search(String sosl) {
-        List<List<SObject>> result;        
-        try {
-            result = Search.query(sosl);
-        } catch (QueryException qe) {
-            return makeError(qe.getMessage(), 'INVALID_SEARCH');
-        } catch (SearchException se) {
-            return makeError(se.getMessage(), 'INVALID_SEARCH');
-        }
-        
-        return JSON.serialize(result);
     }
 }

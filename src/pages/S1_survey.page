@@ -1,0 +1,98 @@
+<apex:page readOnly="true" showHeader="false" standardStylesheets="false" applyhtmlTag="false" applyBodyTag="false" docType="html-5.0">
+
+<html ng-app="sugoisurvey4">
+<head>
+    <meta charset="utf-8"></meta>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+    <title>{!$label.sugoisurvey}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.2/css/bootstrap.min.css"></link>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.2/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.1/angular.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.9.0/ui-bootstrap-tpls.min.js"></script>
+    <c:RemoteTK />
+<style>
+@media screen and (min-width: 320px) {
+    h1 {
+		color: #666666;
+		font-size: 14pt;
+    }
+    .tab_label {
+        font-size: 0.8em;
+        padding: 7px;
+    }
+}
+@media screen and (min-width: 768px) {
+    h1 {
+		color: #666666;
+		font-size: 16pt;
+    }
+    .tab_label {
+        font-size: 1.0em;
+        padding: 12px;
+    }
+}
+h2 {
+    color: #666666;
+    font-size: 14pt;
+    border-bottom: solid 1px #999999;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+h3 {
+    color: #333333;
+    font-size: 12pt;
+}
+h4, h5 {
+    color: #333333;
+    font-size: 10pt;
+}
+</style>
+
+<script>
+angular.module('sugoisurvey4', ['ui.bootstrap']);
+</script>
+
+</head>
+<body>
+
+<div class="container" style="margin-top: 10px;">
+	<apex:outputText rendered="{! ISNULL($CurrentPage.parameters.Id) }">
+		<div class="row">
+			<div class="col-xs-12">
+
+				<!--  Tab Bar -->
+				<ul class="nav nav-tabs">
+				    <li class="active"><a href="#tab_session" data-toggle="tab" class="tab_label">{!$label.survey}</a></li>
+				    <li><a href="#tab_presenter" data-toggle="tab" class="tab_label">{!$label.presenter}</a></li>
+				</ul>
+
+				<!-- Tab Content (Session or Presenter List) -->
+				<div class="tab-content">
+					<div id="tab_session" class="tab-pane active">
+						<apex:include pageName="S1_session_list" />
+					</div>
+					<div id="tab_presenter" class="tab-pane">
+						<apex:include pageName="S1_presenter_list" />
+					</div>
+				</div>
+				
+			</div>
+		</div>
+	</apex:outputText>
+
+	<!-- Session Detail -->
+	<apex:outputText rendered="{! !ISNULL($CurrentPage.parameters.Id) && $CurrentPage.parameters.tab == 'session' }">
+		<apex:include pageName="S1_session_detail" />
+	</apex:outputText>
+
+	<!-- Presenter Detail -->
+	<apex:outputText rendered="{! !ISNULL($CurrentPage.parameters.Id) && $CurrentPage.parameters.tab == 'presenter' }">
+		<apex:include pageName="S1_presenter_detail" />
+	</apex:outputText>
+
+</div>
+
+</body>
+</html>
+</apex:page>

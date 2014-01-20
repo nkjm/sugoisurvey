@@ -1,46 +1,50 @@
-<apex:page readOnly="true" showHeader="false" standardStylesheets="false" applyhtmlTag="false" applyBodyTag="false" docType="html-5.0">
+<apex:page standardController="Session__c" extensions="jr_session" readOnly="true" showHeader="false" standardStylesheets="false" applyhtmlTag="false" applyBodyTag="false" docType="html-5.0">
 
-<html class="ng-app" id="ng-app">
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.2/css/bootstrap.min.css"></link>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.2/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.0/angular.min.js"></script>
-    <title>{!$label.sugoisurvey}</title>
-<c:RemoteTK />
+<style>
+#session_list .row_session_selected {
+	background-color: #eeeeee;
+}
+#session_list .row_session:hover {
+	background-color: #F6EDF2;
+	border-bottom: solid 1px #f4a4d4;
+	cursor: pointer;
+}
+</style>
+
 <script>
 j$ = jQuery.noConflict();
-function sessions($scope){
+
+function session_list($scope, $filter){
 	$scope.toggle_new_session_form = function(){
 		j$("#form_new_session").slideToggle();
 		$scope.new_session = !$scope.new_session;
 	};
 	
 	$scope.retrieve_sessions = function(){
-		var update_view = function(){
-			$scope.$apply();
-		};
+		$scope.rtk.action = 'retrieve_sessions';
 		
-		var soql = "select Id, Name, sugoisurvey4__Date__c from sugoisurvey4__Session__c order by sugoisurvey4__Date__c desc, CreatedDate desc";
-		delete $scope.rtk_result;
-		delete $scope.rtk_message;
-		$scope.force.query(
-			soql,
-			function(result){
-				$scope.sessions = result.records;
-				update_view();
-			},
-			function(result){
-				//console.log(result);
-				$scope.rtk.result = 'error';
-				$scope.rtk.message = result;
-				update_view();
-			}
+		$scope.rtk.submitting = true;
+		sugoisurvey4.jr_session.get_sessions(
+			function(result, event){
+				if (event.status){
+					$scope.rtk.submitting = false;
+					$scope.rtk.result = 'success'
+					$scope.sessions = result;
+					$scope.$apply();
+					j$("#session_list").show();
+				} else {
+					$scope.rtk.submitting = false;
+					$scope.rtk.result = 'error';
+					$scope.rtk.message = event.message;
+					$scope.$apply();
+				}
+			},{escape: true}
 		);
 	};
 	
 	$scope.create_session = function(){
+		$scope.rtk.action = 'create_session';
+		
 		var update_view = function(){
 			$scope.submitting = false;
 			$scope.$apply();
@@ -52,33 +56,32 @@ function sessions($scope){
 			return;
 		}
 		
-		$scope.submitting = true;
-		delete $scope.rtk_result;
-		delete $scope.rtk_message;
+		$scope.rtk.submitting = true;
 		$scope.force.create(
 			'sugoisurvey4__Session__c',
 			$scope.session,
 			function(result){
+				$scope.rtk.submitting = false;
 				$scope.init();
                	$scope.toggle_new_session_form();
                 update_view();
 			},
 			function(result){
-				//console.log(result);
+				$scope.rtk.submitting = false;
 				$scope.rtk.result = 'error';
-				$scope.rtk.message = result;
+				$scope.rtk.message = result[0].message;
 				update_view();
 			}
 		);
 	};
 	
 	$scope.navigate_to_session_detail = function(session_id){
-		j$("#row_session_" + session_id).addClass("row_session_selected");
+		j$("#session_list .row_session_" + session_id).addClass("row_session_selected");
 		
 		if (typeof sforce == "undefined"){
-			window.location = '/apex/sugoisurvey4__S1_session_detail?id=' + session_id;
+			window.location = '/apex/sugoisurvey4__survey?id=' + session_id;
 		} else {
-			sforce.one.navigateToURL('/apex/sugoisurvey4__S1_session_detail?id=' + session_id);
+			sforce.one.navigateToURL('/apex/sugoisurvey4__S1_survey?id=' + session_id + '&tab=session');
 		}
 	};
 	
@@ -89,7 +92,7 @@ function sessions($scope){
 		$scope.submitting = false;
 		
 		$scope.rtk = {};
-		$scope.rtk.submitting = null;
+		$scope.rtk.submitting = false;
 		$scope.rtk.result = null;
 		$scope.rtk.message = null;
 		
@@ -101,46 +104,43 @@ function sessions($scope){
 	$scope.init();
 }
 </script>
-<style>
-.row_session_selected {
-	background-color: #eeeeee;
-}
-</style>
-</head>
 
-<body>
-<div ng-controller="sessions">
+<div id="session_list" ng-controller="session_list" style="display:none;">
 	<div style="width: 95%; margin: 10px auto 20px auto;">
-		<div style="height: 45px; margin-bottom: 10px;">
-			<button type="button" class="btn btn-lg btn-success pull-right" ng-class="(new_session == true) ? 'btn-default' : 'btn-success'" ng-click="toggle_new_session_form()">
-				<span class="glyphicon glyphicon-plus-sign"></span>
+		<div style="margin-bottom: 10px;">
+			<button type="button" class="btn btn-success btn-block" ng-class="(new_session == true) ? 'btn-default' : 'btn-success'" ng-click="toggle_new_session_form()">
+				<span class="glyphicon glyphicon-plus-sign"></span>&nbsp; {!$label.new_survey}
 			</button>
 		</div>
 		<div id="form_new_session" style="display:none;">
-			<input ng-model="session.Name" type="text" class="form-control input-lg" placeholder="{!$ObjectType.Session__c.fields.Name.Label}" style="margin-bottom: 10px;"></input>
-			<button ng-show="rtk.submitting != true" type="button" class="btn btn-lg btn-success btn-block" ng-click="create_session()" style="margin-bottom: 10px;">
-				<span class="glyphicon glyphicon-ok-sign"></span>
-				{!$label.create}
-			</button>
-			<div ng-show="rtk.submitting == true" class="progress progress-striped active" style="height: 45px; margin-bottom:10px;">
-				<div class="progress-bar progress-bar-success"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%;"></div>
-			</div>
-			<div ng-show="rtk.result == 'error'" class="alert alert-danger">
+			<div ng-show="rtk.action == 'create_session' && rtk.result == 'error'" class="alert alert-danger">
 				<a href="#" class="close" data-dismiss="alert">&times;</a>
-				{{rtk.message | json}}
+				{{rtk.message}}
+			</div>
+			<div class="row">
+				<div class="col-md-8 col-sm-10 col-xs-8">
+					<input ng-model="session.Name" type="text" class="form-control" placeholder="{!$ObjectType.Session__c.fields.Name.Label}" style="margin-bottom: 10px;"></input>
+				</div>
+				<div class="col-md-4 col-sm-2 col-xs-4">
+					<div ng-show="rtk.action == 'create_session' && rtk.submitting == true" class="progress progress-striped active" style="height: 35px; margin-bottom:10px;">
+						<div class="progress-bar progress-bar-success"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%;"></div>
+					</div>
+					<button ng-show="rtk.action != 'create_session' || rtk.submitting == false" type="button" class="btn btn-success btn-block" ng-click="create_session()" style="margin-bottom: 10px;">
+						<span class="glyphicon glyphicon-ok-sign"></span>&nbsp;{!$label.create}
+					</button>
+				</div>
 			</div>
 		</div>
 	</div>
 	<div ng-repeat="session in sessions">
-		<div id="row_session_{{session.Id}}" style="overflow: hidden; height:60px; padding: 10px; border-bottom: solid 1px #dddddd;" ng-click="navigate_to_session_detail(session.Id)">
+		<div class="row_session row_session_{{session.Id}}" style="overflow: hidden; height:60px; padding: 10px; border-bottom: solid 1px #dddddd;" ng-click="navigate_to_session_detail(session.Id)">
 	        <span class="glyphicon glyphicon-chevron-right pull-right" style="margin-top:10px;"></span>
 	        <div style="overflow: hidden; height:20px;"><span style="font-size:1.1em;">{{session.Name}}</span></div>
 	        <div ng-show="session.sugoisurvey4__Date__c != null">
-	        	{{session.sugoisurvey4__Date__c}}
+	        	{{session.sugoisurvey4__Date__c | date:'yyyy/MM/dd'}}
 	        </div>
         </div>
     </div>
 </div>
-</body>
-</html>
+
 </apex:page>

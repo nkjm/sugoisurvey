@@ -1,117 +1,109 @@
-<apex:page standardController="Session__c" extensions="session_v2,jr_session" sidebar="false" showheader="true" standardStylesheets="false" docType="html-5.0">
-<apex:styleSheet value="{!URLFOR($Resource.reusable_class_css)}" />
-<apex:styleSheet value="{!URLFOR($Resource.jquery_confirm_zip, 'jquery.confirm/jquery.confirm.css')}" />
-<apex:stylesheet value="{!$Resource.init_css}" />
-<apex:includeScript value="{!URLFOR($Resource.jqueryui_1_9_2_custom_zip, 'jquery-ui-1.9.2.custom/js/jquery-1.8.3.js')}" />
-<apex:includeScript value="{!URLFOR($Resource.jquery_confirm_zip, 'jquery.confirm/jquery.activity-indicator-1.0.0.js')}" />
-<apex:includeScript value="{!URLFOR($Resource.jquery_confirm_zip, 'jquery.confirm/jquery.confirm.js')}" />
+<apex:page standardController="Session__c" extensions="session_v2,jr_session" readOnly="true" showHeader="false" standardStylesheets="false" applyhtmlTag="false" applyBodyTag="false" docType="html-5.0">
+
+<html class="ng-app" id="ng-app">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+    <meta charset="utf-8"></meta>
+    <title>{!$label.sugoisurvey}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.2/css/bootstrap.min.css"></link>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.2/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.1/angular.min.js"></script>
+</head>
+<body>
 
 <script type="text/javascript">
-j$ = jQuery.noConflict();
+function init($scope){
+	$scope.callback_error = function(message){
+    	$scope.rtk.submitting = false;
+    	$scope.rtk.result = 'error';
+    	$scope.rtk.message = message;
+		$scope.$apply();
+	}
 
-function init(){
-    j$.confirm.status({
-        'title' : '{!$Label.processing}...',
-        'message' : '{!$Label.pls_wait_for_a_while}'
-    });
-    start_init();
-}
-
-function start_init(){
-    sugoisurvey4.jr_session.start_init("{!JSENCODE($CurrentPage.Url)}",
-        function(result, event){
-            if (event.status){
-                if (result.status == false){
-                    j$.confirm.alert({
-                        'title':'{!$Label.error}',
-                        'message':result.message,
-                        'color':'#ff0000',
-                        'button_label':'{!$Label.close}'
-                    });
-                    return;
-                } else {
-                    assign_permission_set();
-                }
-            } else {
-                j$.confirm.alert({
-                    'title':'{!$Label.error}',
-                    'message':event.message,
-                    'color':'#ff0000',
-                    'button_label':'{!$Label.close}'
-                });
-                return;
-            }
-        },{escape:true}
-    );
-}
-
-function assign_permission_set(){
-    sugoisurvey4.jr_session.assign_permission_set(
-        function(result, event){
-            if (event.status){
-                if (result.status == false){
-                    j$.confirm.alert({
-                        'title':'{!$Label.error}',
-                        'message':result.message,
-                        'color':'#ff0000',
-                        'button_label':'{!$Label.close}'
-                    });
-                    return;
-                } else {
-                    finish_init();
-                }
-            } else {
-                j$.confirm.alert({
-                    'title':'{!$Label.error}',
-                    'message':event.message,
-                    'color':'#ff0000',
-                    'button_label':'{!$Label.close}'
-                });
-                return;
-            }
-        },{escape:true}
-    ); 
-}
-
-function finish_init(){
-    sugoisurvey4.jr_session.finish_init(
-        function(result, event){
-            if (event.status){
-                if (result.status == false){
-                    j$.confirm.alert({
-                        'title':'{!$Label.error}',
-                        'message':result.message,
-                        'color':'#ff0000',
-                        'button_label':'{!$Label.close}'
-                    });
-                    return;
-                } else {
-                    window.location = '/apex/sugoisurvey4__session_list';
-                }
-            } else {
-                j$.confirm.alert({
-                    'title':'{!$Label.error}',
-                    'message':event.message,
-                    'color':'#ff0000',
-                    'button_label':'{!$Label.close}'
-                });
-                return;
-            }
-        },{escape:true}
-    );  
+	$scope.start_init = function(){
+		$scope.rtk.action = 'start_init';
+		$scope.rtk.result = null;
+		$scope.rtk.message = '{!$label.start_init_inprogress}';
+		$scope.rtk.submitting = true;
+	    sugoisurvey4.jr_session.start_init("{!JSENCODE($CurrentPage.Url)}",
+	        function(result, event){
+	            if (event.status){
+	                $scope.assign_permission_set();
+	            } else {
+	            	$scope.callback_error(event.message);
+	            }
+	        },{escape:true}
+	    );
+	};
+	
+	$scope.assign_permission_set = function(){
+		$scope.rtk.message = '{!$label.assign_perm_set_inprogress}';
+		$scope.rtk.action = 'assign_permission_set';
+		$scope.$apply();
+	    sugoisurvey4.jr_session.assign_permission_set(
+	        function(result, event){
+	            if (event.status){
+	                $scope.finish_init();
+	            } else {
+                	$scope.callback_error(event.message);
+	            }
+	        },{escape:true}
+	    ); 
+	};
+	
+	$scope.finish_init = function(){
+		$scope.rtk.message = '{!$label.finish_init_inprogress}';
+		$scope.rtk.action = 'finish_init';
+		$scope.$apply();
+	    sugoisurvey4.jr_session.finish_init(
+	        function(result, event){
+	            if (event.status){
+                	$scope.rtk.message = '{!$label.init_completed} {!$label.redirecting_to_top_page}';
+                	$scope.$apply();
+                    if (typeof sforce == 'undefined'){
+						window.location = '/apex/sugoisurvey4__survey';
+					} else {
+						sforce.one.navigateToURL('/apex/sugoisurvey4__S1_survey');
+                	}
+	            } else {
+                	$scope.callback_error(event.message);
+	            }
+	        },{escape:true}
+	    );  
+	};
+	
+	$scope.rtk = {};
+	$scope.rtk.submitting = false;
 }
 
 </script>
 
-<div id="top">
-    <span class="gradient_tagline">
+<div class="container" style="padding-top: 40px; text-align: center; width: 35%;" ng-controller="init">
+    <h2>
         <apex:outputText value="{! IF(config.need_re_initialization__c,$label.app_updated,$label.sugoisurvey)}" />
-    </span>
+    </h2>
+	<div style="padding: 60px 0;">
+	    <div style="margin-bottom: 10px;">
+	    	<div ng-show="rtk.submitting == true" class="progress progress-striped active" style="height: 50px; margin-bottom:10px;">
+				<div class="progress-bar progress-bar-success"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%;"></div>
+			</div>
+	    	<input ng-show="rtk.submitting == false" type="button" ng-click="start_init()" class="btn btn-success btn-lg btn-block" value="{!IF(config.need_re_initialization__c,$label.re_initialize,$label.start)}" />
+	    </div>	
+	    <div style="margin-bottom: 10px;">
+			<div ng-show="rtk.submitting == true && rtk.result != 'error' && rtk.message != null" class="alert alert-success">
+				{{rtk.message}}
+			</div>
+			<div ng-show="rtk.submitting == false && rtk.result == 'error' && rtk.message != null" class="alert alert-danger">
+				{{rtk.message}}
+			</div>
+	    </div>	
+    </div>
+	<div>
+	    <span style="font-style:italic; font-size: 10pt;">All Rights Reserved. Copy Right Kazuki Nakajima, 2013</span>
+	</div>
 </div>
-<div id="middle">
-    <input type="button" onclick="init()" class="green_button" value="{!IF(config.need_re_initialization__c,$label.re_initialize,$label.start)}" style="width:100%;"/>
-</div>
-<div id="bottom">
-    <span class="copyright">All Rights Reserved. Copy Right Kazuki Nakajima, 2013</span>
-</div>
+
+</body>
+</html>
 </apex:page>

@@ -9,8 +9,39 @@ public with sharing class presenter {
         public session__c best_session {get;set;}
     }
 
+    private class sexception extends exception {}
+
     public presenter(ApexPages.StandardController controller) {
         this.presenter = (presenter__c)controller.getRecord();
+    }
+
+    @remoteAction 
+    public static presenter__c get_presenter(id presenter_id){
+        presenter__c presenter;
+        
+        if (presenter_id == null){
+            sexception e = new sexception();
+            e.setMessage('Presenter Id is null');
+            throw e;
+        }
+        
+        string soql_presenter_flds = scrud.getAccessibleFieldsInCSV('sugoisurvey4__Presenter__c');
+        string soql_session_flds = '(select ' + scrud.getAccessibleFieldsInCSV('sugoisurvey4__Session__c') + ' from session__r where enable_rate__c = true and rate_avg__c != 0.00 order by open__c desc, date__c desc, createdDate desc)';
+
+        string soql_flds = soql_presenter_flds + ',' + soql_session_flds;
+        string soql = 'select ' + soql_flds + ' from presenter__c where id = :presenter_id';
+        presenter = Database.query(soql);
+        
+        return presenter;
+    }
+
+    @remoteAction
+    public static list<presenter__c> get_presenters(){
+        return scrud.slist('sugoisurvey4__Presenter__c');
+    }
+    
+    public list<session__c> getSessions(){
+        return get_presenter(this.presenter.id).session__r;
     }
     
     public performance_stat getPerformance_stat(){
@@ -66,58 +97,4 @@ public with sharing class presenter {
         return rate_chart_data;
     }
     */
-    
-    public list<session__c> getSessions(){
-        if (this.presenter.id == null){
-            return null;
-        }
-        try {
-            return [
-                select 
-                    id, 
-                    name, 
-                    date__c, 
-                    rate_avg__c,
-                    rate_5__c,
-                    rate_4__c,
-                    rate_3__c,
-                    rate_2__c,
-                    rate_1__c,
-                    guest_sum__c
-                from session__c 
-                where 
-                    presenter__c = :this.presenter.id and
-                    enable_rate__c = true and
-                    rate_avg__c != 0.00
-                order by date__c desc
-            ];
-        } catch (Exception e){
-            return null;
-        }
-    }
-    
-    public string getSessions_json(){
-        list<session__c> sessions = getSessions();
-        if (sessions == null || sessions.size() < 1){
-            return null;
-        }
-        return JSON.serialize(sessions);
-    }
-    
-    public string getSessions_desc_json(){
-        list<session__c> sessions = getSessions();
-        if (sessions == null || sessions.size() < 1){
-            return null;
-        }
-        
-        list<session__c> sessions_desc = new list<session__c>();
-        integer offset = sessions.size() - 1;
-        do {
-            sessions_desc.add(sessions[offset]);
-            offset--;
-        } while (offset >= 0);
-        
-        return JSON.serialize(sessions_desc);
-    }
-
 }

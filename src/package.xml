@@ -10,48 +10,57 @@
         <members>chatter_notification</members>
         <members>cron_trigger</members>
         <members>device_detector</members>
-        <members>guest_list</members>
+        <members>guest</members>
+        <members>inputPicklist</members>
         <members>jr_session</members>
         <members>post_install</members>
         <members>presenter</members>
         <members>schedule_copy_comment_to_feedItem</members>
+        <members>scrud</members>
         <members>session_report</members>
         <members>session_v2</members>
-        <members>sites_mobile_session_detail</members>
-        <members>survey_for_guest</members>
         <members>testEncoder</members>
         <members>validate_chatter_notification</members>
+        <members>validate_guest</members>
         <members>validate_guest_cascade_delete</members>
         <members>validate_jr_session</members>
         <members>validate_link_to_contact</members>
         <members>validate_presenter</members>
         <members>validate_session</members>
-        <members>validate_survey_for_guest</members>
         <name>ApexClass</name>
     </types>
     <types>
         <members>RemoteTK</members>
+        <members>S1_modal_confirm</members>
+        <members>S1_modal_progress</members>
         <members>S1_session_report_free_answer</members>
+        <members>ng_form_element</members>
+        <members>ng_form_picklist</members>
         <members>session_report_free_answer</members>
         <members>sites_mobile_custom_survey_container</members>
-        <members>sites_mobile_session_detail</members>
         <members>sites_non_mobile_custom_survey_container</members>
         <name>ApexComponent</name>
     </types>
     <types>
         <members>S1_act_new_question</members>
+        <members>S1_guest</members>
         <members>S1_guest_detail</members>
         <members>S1_guest_list</members>
-        <members>S1_mc_rate</members>
+        <members>S1_presenter</members>
+        <members>S1_presenter_detail</members>
+        <members>S1_presenter_list</members>
         <members>S1_session_detail</members>
         <members>S1_session_list</members>
+        <members>S1_survey</members>
         <members>S1_tab_edit_survey</members>
+        <members>S1_tab_guest_list</members>
         <members>S1_tab_session_property</members>
         <members>S1_tab_session_report</members>
         <members>deliver_deck</members>
         <members>deliver_handout</members>
         <members>edit_survey</members>
         <members>event_id</members>
+        <members>guest</members>
         <members>guest_list</members>
         <members>guest_profile</members>
         <members>init</members>
@@ -63,6 +72,7 @@
         <members>sites_non_mobile</members>
         <members>sites_rwd</members>
         <members>sites_top</members>
+        <members>survey</members>
         <members>survey_site_link</members>
         <name>ApexPage</name>
     </types>
@@ -113,12 +123,14 @@
         <members>Guest__c.Guest_Pass_Delivered__c</members>
         <members>Guest__c.Handout_Delivered__c</members>
         <members>Guest__c.Last_Name__c</members>
+        <members>Guest__c.Mail_Delivered__c</members>
         <members>Guest__c.Multiple_Contacts__c</members>
         <members>Guest__c.Name__c</members>
         <members>Guest__c.Phone__c</members>
         <members>Guest__c.Profile_Photo__c</members>
         <members>Guest__c.Session__c</members>
         <members>Guest__c.Status__c</members>
+        <members>Guest__c.Survey_Link_Delivered__c</members>
         <members>Guest__c.Title__c</members>
         <members>Guest__c.To_Be_Posted_To_Record_Feed__c</members>
         <members>Lead.Guest__c</members>
@@ -137,10 +149,32 @@
         <members>Session__c.Handout_URL__c</members>
         <members>Session__c.Hash_Tag__c</members>
         <members>Session__c.Label_For_Rate__c</members>
+        <members>Session__c.Mail_Body_L__c</members>
+        <members>Session__c.Mail_Body__c</members>
+        <members>Session__c.Mail_Guest_Pass_Body_L__c</members>
+        <members>Session__c.Mail_Guest_Pass_Body__c</members>
+        <members>Session__c.Mail_Guest_Pass_Sender__c</members>
+        <members>Session__c.Mail_Guest_Pass_Subject__c</members>
+        <members>Session__c.Mail_Guest_Pass_To__c</members>
+        <members>Session__c.Mail_Handout_Body_L__c</members>
+        <members>Session__c.Mail_Handout_Body__c</members>
+        <members>Session__c.Mail_Handout_Send_On_Submission__c</members>
+        <members>Session__c.Mail_Handout_Sender__c</members>
+        <members>Session__c.Mail_Handout_Subject__c</members>
+        <members>Session__c.Mail_Handout_To__c</members>
+        <members>Session__c.Mail_Sender__c</members>
+        <members>Session__c.Mail_Subject__c</members>
+        <members>Session__c.Mail_Survey_Link_Body_L__c</members>
+        <members>Session__c.Mail_Survey_Link_Body__c</members>
+        <members>Session__c.Mail_Survey_Link_Sender__c</members>
+        <members>Session__c.Mail_Survey_Link_Subject__c</members>
+        <members>Session__c.Mail_Survey_Link_To__c</members>
+        <members>Session__c.Mail_To__c</members>
         <members>Session__c.Mass_Mail_Additional_Body__c</members>
         <members>Session__c.Mass_Mail_Sender__c</members>
         <members>Session__c.Mass_Mail_Title__c</members>
         <members>Session__c.Open__c</members>
+        <members>Session__c.Post_Comment_To_Session_Record_Feed__c</members>
         <members>Session__c.Post_To_Account_Record_Feed__c</members>
         <members>Session__c.Post_To_Contact_Record_Feed__c</members>
         <members>Session__c.Presenter__c</members>
@@ -181,36 +215,53 @@
         <members>already_initialized</members>
         <members>already_submitted</members>
         <members>answer_required</members>
+        <members>anyone</members>
         <members>app_updated</members>
         <members>are_you_sure</members>
+        <members>assign_perm_set_inprogress</members>
+        <members>attached_handout</members>
         <members>attachment</members>
         <members>attended_the_event_and_submitted_survey1</members>
         <members>attended_the_event_and_submitted_survey2</members>
+        <members>attendees</members>
         <members>attending_the_event1</members>
         <members>attending_the_event2</members>
+        <members>auto_generated</members>
+        <members>autosend_on_survey_submission</members>
+        <members>back</members>
         <members>basic_config</members>
         <members>best_event</members>
+        <members>best_survey</members>
+        <members>body</members>
         <members>body_of_deck_delivery_mail</members>
         <members>cancel</members>
         <members>chatter_config</members>
         <members>clear_delivered_flag</members>
         <members>clearing_delivered_flag</members>
+        <members>clone</members>
         <members>cloning_event</members>
+        <members>cloning_survey</members>
         <members>close</members>
         <members>closing_survey</members>
         <members>comment</members>
         <members>complete</members>
+        <members>config_has_been_updated</members>
         <members>create</members>
+        <members>create_guest</members>
         <members>create_lead</members>
         <members>customSurveyOption</members>
         <members>customSurveyQuestion</members>
         <members>delete</members>
         <members>deleting_event</members>
+        <members>deleting_guest</members>
+        <members>deleting_presenter</members>
         <members>deleting_question</members>
         <members>deleting_survey</members>
         <members>deliver_destinations</members>
+        <members>delivered_flag_has_been_cleared</members>
         <members>delivered_guest_will_not_be_delivered_again</members>
         <members>delivering_guest_pass</members>
+        <members>delivering_mail</members>
         <members>delivery_complete</members>
         <members>dummy</members>
         <members>edit</members>
@@ -223,21 +274,30 @@
         <members>event_date</members>
         <members>event_history</members>
         <members>failed_to_create_feedItem</members>
+        <members>finish_init_inprogress</members>
+        <members>free</members>
         <members>free_answers</members>
         <members>go_to_contact</members>
+        <members>guest</members>
+        <members>guest_has_been_deleted</members>
         <members>guest_id_is_not_set</members>
         <members>guest_list</members>
         <members>guest_pass_mail_subject</members>
+        <members>handout</members>
         <members>handout_download_url</members>
         <members>has_been_delivered</members>
         <members>has_checked_in_1</members>
         <members>has_checked_in_2</members>
         <members>high</members>
+        <members>init_completed</members>
         <members>invalid_email</members>
+        <members>invalid_value</members>
         <members>low</members>
         <members>mail_config</members>
         <members>mail_limit_exceeds</members>
         <members>mail_preview</members>
+        <members>new_presenter</members>
+        <members>new_survey</members>
         <members>new_survey_name</members>
         <members>no</members>
         <members>no_data</members>
@@ -246,6 +306,7 @@
         <members>other_survey</members>
         <members>password</members>
         <members>people</members>
+        <members>performance</members>
         <members>performance_summary</members>
         <members>phone</members>
         <members>picklist_anyone</members>
@@ -260,30 +321,49 @@
         <members>pls_input_email</members>
         <members>pls_tell_me_detail</members>
         <members>pls_wait_for_a_while</members>
+        <members>presenter</members>
+        <members>presenter_has_been_deleted</members>
+        <members>presenter_list</members>
         <members>processing</members>
         <members>property</members>
         <members>q_a</members>
+        <members>question_has_been_deleted</members>
         <members>question_is_missing</members>
         <members>rate</members>
         <members>rate_avg</members>
         <members>rate_avg_transition</members>
         <members>rating</members>
         <members>re_initialize</members>
+        <members>redirecting_to_top_page</members>
         <members>reload</members>
         <members>report</members>
         <members>requested_number_of_question_is_not_valid</members>
+        <members>required_parameter_is_missing</members>
+        <members>reset</members>
         <members>save</members>
+        <members>saved</members>
+        <members>select_record</members>
+        <members>send</members>
         <members>send_mail</members>
+        <members>sender</members>
+        <members>session_has_been_copied</members>
         <members>session_has_been_saved</members>
         <members>session_id_is_not_set</members>
         <members>session_is_not_configured_correctly</members>
         <members>sites_not_activated</members>
         <members>sites_permission_set_not_found</members>
         <members>sites_user_not_found</members>
+        <members>sort</members>
+        <members>sort_has_been_completed</members>
         <members>specified_question_not_found</members>
         <members>specified_session_does_not_exist</members>
         <members>specified_survey_does_not_exist</members>
         <members>start</members>
+        <members>start_init_inprogress</members>
+        <members>subject</members>
+        <members>subject_for_mail_guest_pass</members>
+        <members>subject_for_mail_handout</members>
+        <members>subject_for_mail_survey_link</members>
         <members>subject_of_deck_delivery_mail</members>
         <members>submit</members>
         <members>sugoiSurvey</members>
@@ -291,29 +371,36 @@
         <members>survey</members>
         <members>survey_answer</members>
         <members>survey_collection_rate</members>
+        <members>survey_has_been_cloned</members>
         <members>survey_has_been_created</members>
         <members>survey_has_been_deleted</members>
         <members>survey_has_been_saved</members>
         <members>survey_has_been_submitted</members>
+        <members>survey_history</members>
         <members>survey_id_is_not_set</members>
         <members>survey_is_over</members>
+        <members>survey_link</members>
         <members>survey_list</members>
         <members>survey_name_is_missing</members>
         <members>survey_type_checkbox</members>
         <members>survey_type_free</members>
         <members>survey_type_radio</members>
         <members>survey_url</members>
+        <members>template</members>
         <members>there_are_not_enough_number_of_question_to_sort</members>
         <members>title_of_deliverDeck</members>
         <members>total_events</members>
         <members>total_guests</members>
+        <members>total_surveys</members>
         <members>unknown_company</members>
         <members>unregistered_guest</members>
         <members>up_to_255_letter</members>
         <members>update</members>
         <members>update_has_been_saved</members>
+        <members>who_have_submitted_survey</members>
         <members>xPointScale</members>
         <members>yes</members>
+        <members>you_can_sort_by_drag</members>
         <members>your_company</members>
         <members>your_name</members>
         <name>CustomLabel</name>
@@ -360,20 +447,19 @@
     <types>
         <members>Presenter__c</members>
         <members>S1_session_list</members>
+        <members>S1_survey</members>
         <members>event_and_session</members>
         <members>session_list</members>
+        <members>survey</members>
         <name>CustomTab</name>
     </types>
     <types>
         <members>Guest__c.base_info</members>
+        <members>Presenter__c.Base_Info</members>
         <members>Session__c.Base_Info</members>
         <members>Session__c.Chatter_Setting</members>
         <members>Session__c.Mail_Setting</members>
         <name>FieldSet</name>
-    </types>
-    <types>
-        <members>SugoiSurveyTop</members>
-        <name>FlexiPage</name>
     </types>
     <types>
         <members>Comment__c-コメントレイアウト</members>
@@ -392,10 +478,8 @@
         <members>Custom_Survey_Option__c.All</members>
         <members>Custom_Survey_Question__c.All</members>
         <members>Guest__c.All</members>
+        <members>Guest__c.All1</members>
         <members>Presenter__c.All</members>
-        <members>Session__c.All</members>
-        <members>Session__c.Available</members>
-        <members>Session__c.Closed</members>
         <members>Survey__c.All</members>
         <name>ListView</name>
     </types>
@@ -430,6 +514,7 @@
         <members>session_list_css</members>
         <members>sites_non_mobile_css</members>
         <members>sites_rwd_css</members>
+        <members>sortable_js</members>
         <members>survey_type_checkbox_png</members>
         <members>survey_type_free_png</members>
         <members>survey_type_radio_png</members>

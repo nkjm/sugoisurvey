@@ -1,51 +1,87 @@
-<apex:page standardController="Guest__c" extensions="survey_for_guest,guest_list" readOnly="true" showHeader="false" standardStylesheets="false" applyhtmlTag="false" applyBodyTag="false" docType="html-5.0">
+<apex:page standardController="Guest__c" extensions="jr_session" readOnly="true" showHeader="false" standardStylesheets="false" applyhtmlTag="false" applyBodyTag="false" docType="html-5.0">
 
-<html class="ng-app" id="ng-app">
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.2/css/bootstrap.min.css"></link>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.2/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.0/angular.min.js"></script>
-    <title>{!$label.sugoisurvey}</title>
-	<style>
-	a, a:hover, a:active {
-	    color: #666666;
-	    text-decoration: none;
+<style>
+.row_guest_selected {
+	background-color: #eeeeee;
+}
+.row_guest:hover {
+	background-color: #F6EDF2;
+	border-bottom: solid 1px #f4a4d4;
+	cursor: pointer;
+}
+</style>
+
+<script>
+j$ = jQuery.noConflict();
+
+function guests($scope, $filter){
+	$scope.retrieve_guests = function(session_id, search_by, search_value){
+		$scope.rtk.action = 'retrieve_guests';
+		$scope.rtk.submitting = true;
+		sugoisurvey4.jr_session.get_guests_by_condition(
+			session_id, search_by, search_value,
+			function(result, event){
+				$scope.rtk.submitting = false;
+				if (event.status){
+					$scope.rtk.result = 'success';
+					$scope.guests = result;
+					j$("#guest_list").show();
+				} else {
+					$scope.rtk.result = 'error';
+					$scope.rtk.message = event.message;
+				}
+				$scope.$apply();
+			},{escape:true}
+		);
 	}
-	.row_guest_selected {
-		background-color: #eeeeee;
-	}
-	</style>
-	<script>
-	j$ = jQuery.noConflict();
-	function navigate_to_guest_detail(guest_id){
-		j$("#row_guest_" + guest_id).addClass("row_guest_selected");
+
+	$scope.navigate_to_guest_detail = function(guest_id){
+		j$("#guest_list .row_guest_" + guest_id).addClass("row_guest_selected");
 		
-		if (typeof sforce == "undefined"){
-			window.location = '/apex/sugoisurvey4__S1_guest_detail?id=' + guest_id;
+		if (typeof sforce == 'undefined'){
+			window.location = '/apex/sugoisurvey4__guest?id=' + guest_id + '&session_id=' + $scope.session_id + '&search_by=' + $scope.search_by + '&search_value=' + $scope.search_value;
 		} else {
-			sforce.one.navigateToURL('/apex/sugoisurvey4__S1_guest_detail?id=' + guest_id);
+			sforce.one.navigateToURL('/apex/sugoisurvey4__S1_guest?id=' + guest_id + '&session_id=' + $scope.session_id + '&search_by=' + $scope.search_by + '&search_value=' + $scope.search_value);
 		}
 	}
-	</script>
-</head>
-<body>
-<apex:repeat value="{!guests}" var="guest">
-	<div id="row_guest_{!guest.Id}" style="height:60px; padding: 10px; border-bottom: solid 1px #dddddd;" onclick="navigate_to_guest_detail('{!guest.Id}')">
-        <span class="glyphicon glyphicon-chevron-right pull-right" style="margin-top:10px;"></span>
-        <div>
-            <apex:outputText rendered="{!language_locale_key == 'ja'}" value="{!guest.Name__c}" />
-            <apex:outputText rendered="{!language_locale_key != 'ja'}" value="{!guest.First_Name__c} {!guest.Last_Name__c}" />
-            <apex:outputText rendered="{! !ISBLANK(guest.Email__c)}">
-            	&nbsp;&lt;{!guest.Email__c}&gt;
-            </apex:outputText>
-        </div>
-       	<div>
-        	{!guest.Company__c}
-        </div>
+
+	$scope.init = function(){
+		$scope.rtk = {};
+		$scope.rtk.submitting = false;
+		$scope.session_id = '{! JSENCODE($CurrentPage.parameters.session_id) }';
+		$scope.search_by = '{! JSENCODE($CurrentPage.parameters.search_by) }';
+		$scope.search_value = '{! JSENCODE($CurrentPage.parameters.search_value) }';
+		$scope.retrieve_guests($scope.session_id, $scope.search_by, $scope.search_value);
+	}
+
+	$scope.init();
+}
+</script>
+
+<div ng-controller="guests" >
+
+	<!-- Message Area -->
+	<div class="row survey_section" ng-show="rtk.action == 'retrieve_guests' && rtk.result == 'error'">
+	    <div class="col-sm-12">
+	    	<div class="alert alert-danger">
+		    	{{rtk.message}}
+	    	</div>
+	    </div>
 	</div>
-</apex:repeat>
-</body>
-</html>
+
+	<!-- Guest List -->
+	<div id="guest_list" style="display:none;">
+		<div ng-repeat="guest in guests" class="row_guest row_guest_{{guest.Id}}" style="overflow: hidden; height:60px; padding: 10px; border-bottom: solid 1px #dddddd;" ng-click="navigate_to_guest_detail(guest.Id)">
+	        <span class="glyphicon glyphicon-chevron-right pull-right" style="margin-top:10px;"></span>
+	        <div>
+	        	{{guest.sugoisurvey4__Name__c}}
+	        </div>
+	       	<div>
+	        	{{guest.sugoisurvey4__Company__c}}
+	        </div>
+		</div>
+	</div>
+
+</div>
+
 </apex:page>

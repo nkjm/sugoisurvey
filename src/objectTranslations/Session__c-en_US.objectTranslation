@@ -57,6 +57,126 @@
         <name>Label_For_Rate__c</name>
     </fields>
     <fields>
+        <label>Body for Mail</label>
+        <name>Mail_Body_L__c</name>
+    </fields>
+    <fields>
+        <label>Body for Mail</label>
+        <name>Mail_Body__c</name>
+    </fields>
+    <fields>
+        <label>Body for Guest Pass Delivery Mail</label>
+        <name>Mail_Guest_Pass_Body_L__c</name>
+    </fields>
+    <fields>
+        <label>Body for Guest Pass Delivery Mail</label>
+        <name>Mail_Guest_Pass_Body__c</name>
+    </fields>
+    <fields>
+        <label>Sender for Guest Pass Delivery Mail</label>
+        <name>Mail_Guest_Pass_Sender__c</name>
+    </fields>
+    <fields>
+        <label>Subject for Guest Pass Delivery Mail</label>
+        <name>Mail_Guest_Pass_Subject__c</name>
+    </fields>
+    <fields>
+        <label>To for Guest Pass Delivery Mail</label>
+        <name>Mail_Guest_Pass_To__c</name>
+        <picklistValues>
+            <masterLabel>anyone</masterLabel>
+            <translation><!-- anyone --></translation>
+        </picklistValues>
+    </fields>
+    <fields>
+        <label>Body for Handout Delivery Mail</label>
+        <name>Mail_Handout_Body_L__c</name>
+    </fields>
+    <fields>
+        <label>Body Email for Handout Delivery Mail</label>
+        <name>Mail_Handout_Body__c</name>
+    </fields>
+    <fields>
+        <label>Send on Survey Submission</label>
+        <name>Mail_Handout_Send_On_Submission__c</name>
+    </fields>
+    <fields>
+        <label>Sender for Handout Delivery Mail</label>
+        <name>Mail_Handout_Sender__c</name>
+    </fields>
+    <fields>
+        <label>Subject for Handout Delivery Mail</label>
+        <name>Mail_Handout_Subject__c</name>
+    </fields>
+    <fields>
+        <label>To for Handout Delivery Mail</label>
+        <name>Mail_Handout_To__c</name>
+        <picklistValues>
+            <masterLabel>anyone</masterLabel>
+            <translation><!-- anyone --></translation>
+        </picklistValues>
+        <picklistValues>
+            <masterLabel>attendees</masterLabel>
+            <translation><!-- attendees --></translation>
+        </picklistValues>
+        <picklistValues>
+            <masterLabel>who_have_submitted_survey</masterLabel>
+            <translation><!-- who_have_submitted_survey --></translation>
+        </picklistValues>
+    </fields>
+    <fields>
+        <label>Sender for Mail</label>
+        <name>Mail_Sender__c</name>
+    </fields>
+    <fields>
+        <label>Subject for Mail</label>
+        <name>Mail_Subject__c</name>
+    </fields>
+    <fields>
+        <label>Body for Survey Link Delivery Mail</label>
+        <name>Mail_Survey_Link_Body_L__c</name>
+    </fields>
+    <fields>
+        <label>Body for Survey Link Delivery Mail</label>
+        <name>Mail_Survey_Link_Body__c</name>
+    </fields>
+    <fields>
+        <label>Sender for Survey Link Delivery Mail</label>
+        <name>Mail_Survey_Link_Sender__c</name>
+    </fields>
+    <fields>
+        <label>Subject for Survey Link Delivery Mail</label>
+        <name>Mail_Survey_Link_Subject__c</name>
+    </fields>
+    <fields>
+        <label>To for Survey Link Delivery Mail</label>
+        <name>Mail_Survey_Link_To__c</name>
+        <picklistValues>
+            <masterLabel>anyone</masterLabel>
+            <translation><!-- anyone --></translation>
+        </picklistValues>
+        <picklistValues>
+            <masterLabel>attendees</masterLabel>
+            <translation><!-- attendees --></translation>
+        </picklistValues>
+    </fields>
+    <fields>
+        <label>To for Mail</label>
+        <name>Mail_To__c</name>
+        <picklistValues>
+            <masterLabel>anyone</masterLabel>
+            <translation><!-- anyone --></translation>
+        </picklistValues>
+        <picklistValues>
+            <masterLabel>attendees</masterLabel>
+            <translation><!-- attendees --></translation>
+        </picklistValues>
+        <picklistValues>
+            <masterLabel>who_have_submitted_survey</masterLabel>
+            <translation><!-- who_have_submitted_survey --></translation>
+        </picklistValues>
+    </fields>
+    <fields>
         <label>Body for Handout Delivery Mail</label>
         <name>Mass_Mail_Additional_Body__c</name>
     </fields>
@@ -71,6 +191,11 @@
     <fields>
         <label>Open</label>
         <name>Open__c</name>
+    </fields>
+    <fields>
+        <help>If checked, guest&apos;s comments are posted to Survey Record Feed. The owner of the feed will be an administrator who installed Sugoi Survey.</help>
+        <label>Post comment to survey record feed</label>
+        <name>Post_Comment_To_Session_Record_Feed__c</name>
     </fields>
     <fields>
         <help>If checked, a notification is posted to Account Record Feed when a guest is registered or submit a survey.</help>
@@ -174,16 +299,16 @@
             <section>Chatter設定</section>
         </sections>
         <sections>
-            <label>Survey Site</label>
-            <section>アンケートサイト</section>
-        </sections>
-        <sections>
             <label>Custom Link</label>
             <section>カスタムリンク</section>
         </sections>
         <sections>
             <label>Handout Distribution Setting</label>
             <section>メール配信設定</section>
+        </sections>
+        <sections>
+            <label><!-- 旧メール設定 --></label>
+            <section>旧メール設定</section>
         </sections>
     </layouts>
     <nameFieldLabel>Event Name</nameFieldLabel>

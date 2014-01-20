@@ -67,11 +67,6 @@
             <isRequired>false</isRequired>
         </availableFields>
         <availableFields>
-            <field>Presenter__c</field>
-            <isFieldManaged>false</isFieldManaged>
-            <isRequired>false</isRequired>
-        </availableFields>
-        <availableFields>
             <field>Survey_Collection_Rate__c</field>
             <isFieldManaged>false</isFieldManaged>
             <isRequired>false</isRequired>
@@ -89,6 +84,11 @@
         </displayedFields>
         <displayedFields>
             <field>Date__c</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </displayedFields>
+        <displayedFields>
+            <field>Presenter__c</field>
             <isFieldManaged>false</isFieldManaged>
             <isRequired>false</isRequired>
         </displayedFields>
@@ -112,11 +112,21 @@
             <isFieldManaged>false</isFieldManaged>
             <isRequired>false</isRequired>
         </displayedFields>
+        <displayedFields>
+            <field>Survey_Sum__c</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </displayedFields>
         <label>基本情報</label>
     </fieldSets>
     <fieldSets>
         <fullName>Chatter_Setting</fullName>
         <description>VF: S1_tab_session_property</description>
+        <displayedFields>
+            <field>Post_Comment_To_Session_Record_Feed__c</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </displayedFields>
         <displayedFields>
             <field>Post_To_Account_Record_Feed__c</field>
             <isFieldManaged>false</isFieldManaged>
@@ -321,10 +331,308 @@
         <unique>false</unique>
     </fields>
     <fields>
+        <fullName>Mail_Body_L__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>メール 本文</label>
+        <length>32768</length>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>LongTextArea</type>
+        <visibleLines>8</visibleLines>
+    </fields>
+    <fields>
+        <fullName>Mail_Body__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>deprecated メール 本文</label>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>TextArea</type>
+    </fields>
+    <fields>
+        <fullName>Mail_Guest_Pass_Body_L__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>受講票配信メール 本文</label>
+        <length>32768</length>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>LongTextArea</type>
+        <visibleLines>8</visibleLines>
+    </fields>
+    <fields>
+        <fullName>Mail_Guest_Pass_Body__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>deprecated 受講票配信メール 本文</label>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>TextArea</type>
+    </fields>
+    <fields>
+        <fullName>Mail_Guest_Pass_Sender__c</fullName>
+        <defaultValue>$User.Email</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>受講票配信メール 送信元</label>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Email</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Mail_Guest_Pass_Subject__c</fullName>
+        <defaultValue>$Label.subject_for_mail_guest_pass</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>受講票配信メール 件名</label>
+        <length>255</length>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Mail_Guest_Pass_To__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>受講票配信メール 配信先</label>
+        <picklist>
+            <picklistValues>
+                <fullName>anyone</fullName>
+                <default>true</default>
+            </picklistValues>
+            <sorted>false</sorted>
+        </picklist>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Picklist</type>
+    </fields>
+    <fields>
+        <fullName>Mail_Handout_Body_L__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>資料配信メール 本文</label>
+        <length>32768</length>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>LongTextArea</type>
+        <visibleLines>8</visibleLines>
+    </fields>
+    <fields>
+        <fullName>Mail_Handout_Body__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>deprecatred 資料配信メール 本文</label>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>TextArea</type>
+    </fields>
+    <fields>
+        <fullName>Mail_Handout_Send_On_Submission__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>資料配信メールをアンケート提出後に自動配信</label>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Mail_Handout_Sender__c</fullName>
+        <defaultValue>$User.Email</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>資料配信メール 送信元</label>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Email</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Mail_Handout_Subject__c</fullName>
+        <defaultValue>$Label.subject_for_mail_handout</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>資料配信メール 件名</label>
+        <length>255</length>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Mail_Handout_To__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>資料配信メール 配信先</label>
+        <picklist>
+            <picklistValues>
+                <fullName>anyone</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>attendees</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>who_have_submitted_survey</fullName>
+                <default>true</default>
+            </picklistValues>
+            <sorted>false</sorted>
+        </picklist>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Picklist</type>
+    </fields>
+    <fields>
+        <fullName>Mail_Sender__c</fullName>
+        <defaultValue>$User.Email</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>メール 送信元</label>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Email</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Mail_Subject__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>メール 件名</label>
+        <length>255</length>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Mail_Survey_Link_Body_L__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>アンケートリンク配信メール 本文</label>
+        <length>32768</length>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>LongTextArea</type>
+        <visibleLines>8</visibleLines>
+    </fields>
+    <fields>
+        <fullName>Mail_Survey_Link_Body__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>deprecated アンケートリンク配信メール 本文</label>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>TextArea</type>
+    </fields>
+    <fields>
+        <fullName>Mail_Survey_Link_Sender__c</fullName>
+        <defaultValue>$User.Email</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>アンケートリンク配信メール 送信元</label>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Email</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Mail_Survey_Link_Subject__c</fullName>
+        <defaultValue>$Label.subject_for_mail_survey_link</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>アンケートリンク配信メール 件名</label>
+        <length>255</length>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Mail_Survey_Link_To__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>アンケートリンク配信メール 配信先</label>
+        <picklist>
+            <picklistValues>
+                <fullName>anyone</fullName>
+                <default>true</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>attendees</fullName>
+                <default>false</default>
+            </picklistValues>
+            <sorted>false</sorted>
+        </picklist>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Picklist</type>
+    </fields>
+    <fields>
+        <fullName>Mail_To__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>メール 配信先</label>
+        <picklist>
+            <picklistValues>
+                <fullName>anyone</fullName>
+                <default>true</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>attendees</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>who_have_submitted_survey</fullName>
+                <default>false</default>
+            </picklistValues>
+            <sorted>false</sorted>
+        </picklist>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Picklist</type>
+    </fields>
+    <fields>
         <fullName>Mass_Mail_Additional_Body__c</fullName>
         <deprecated>false</deprecated>
         <externalId>false</externalId>
-        <label>メール本文(HTML)</label>
+        <label>Deprecated メール本文(HTML)</label>
         <length>32768</length>
         <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
@@ -336,7 +644,7 @@
         <fullName>Mass_Mail_Sender__c</fullName>
         <deprecated>false</deprecated>
         <externalId>false</externalId>
-        <label>メール送信元アドレス</label>
+        <label>Deprecated メール送信元アドレス</label>
         <required>false</required>
         <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
@@ -348,7 +656,7 @@
         <fullName>Mass_Mail_Title__c</fullName>
         <deprecated>false</deprecated>
         <externalId>false</externalId>
-        <label>メール題名</label>
+        <label>Deprecated メール題名</label>
         <length>255</length>
         <required>false</required>
         <trackFeedHistory>false</trackFeedHistory>
@@ -363,6 +671,18 @@
         <deprecated>false</deprecated>
         <externalId>false</externalId>
         <label>オープン</label>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Post_Comment_To_Session_Record_Feed__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <inlineHelpText>チェックするとゲストが入力したコメントがアンケートのレコードフィードに投稿されます。投稿者はすごいアンケートをを組織にインストールした管理者になります。</inlineHelpText>
+        <label>アンケートのレコードフィードにコメントを投稿</label>
         <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
         <trackTrending>false</trackTrending>
@@ -545,7 +865,7 @@
         <defaultValue>false</defaultValue>
         <deprecated>false</deprecated>
         <externalId>false</externalId>
-        <label>アンケート提出後に自動送信</label>
+        <label>deprecated アンケート提出後に自動送信</label>
         <trackFeedHistory>false</trackFeedHistory>
         <trackHistory>false</trackHistory>
         <trackTrending>false</trackTrending>
@@ -580,7 +900,7 @@
         <fullName>Who_Can_Get_Handout__c</fullName>
         <deprecated>false</deprecated>
         <externalId>false</externalId>
-        <label>メールを配信される人</label>
+        <label>deprecated メールを配信される人</label>
         <picklist>
             <picklistValues>
                 <fullName>全員</fullName>
@@ -627,37 +947,6 @@
         <type>Picklist</type>
     </fields>
     <label>すごいアンケート</label>
-    <listViews>
-        <fullName>All</fullName>
-        <filterScope>Everything</filterScope>
-        <label>すべて選択</label>
-    </listViews>
-    <listViews>
-        <fullName>Available</fullName>
-        <columns>NAME</columns>
-        <columns>Date__c</columns>
-        <filterScope>Everything</filterScope>
-        <filters>
-            <field>Open__c</field>
-            <operation>equals</operation>
-            <value>1</value>
-        </filters>
-        <label>公開中のアンケート</label>
-        <language>ja</language>
-    </listViews>
-    <listViews>
-        <fullName>Closed</fullName>
-        <columns>NAME</columns>
-        <columns>Date__c</columns>
-        <filterScope>Everything</filterScope>
-        <filters>
-            <field>Open__c</field>
-            <operation>equals</operation>
-            <value>0</value>
-        </filters>
-        <label>終了したアンケート</label>
-        <language>ja</language>
-    </listViews>
     <nameField>
         <label>アンケートタイトル</label>
         <trackFeedHistory>false</trackFeedHistory>

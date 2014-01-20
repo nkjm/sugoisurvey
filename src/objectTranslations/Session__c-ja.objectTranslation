@@ -53,20 +53,145 @@
         <name>Label_For_Rate__c</name>
     </fields>
     <fields>
-        <label><!-- メール本文(HTML) --></label>
+        <label><!-- メール 本文 --></label>
+        <name>Mail_Body_L__c</name>
+    </fields>
+    <fields>
+        <label><!-- deprecated メール 本文 --></label>
+        <name>Mail_Body__c</name>
+    </fields>
+    <fields>
+        <label><!-- 受講票配信メール 本文 --></label>
+        <name>Mail_Guest_Pass_Body_L__c</name>
+    </fields>
+    <fields>
+        <label><!-- deprecated 受講票配信メール 本文 --></label>
+        <name>Mail_Guest_Pass_Body__c</name>
+    </fields>
+    <fields>
+        <label><!-- 受講票配信メール 送信元 --></label>
+        <name>Mail_Guest_Pass_Sender__c</name>
+    </fields>
+    <fields>
+        <label><!-- 受講票配信メール 件名 --></label>
+        <name>Mail_Guest_Pass_Subject__c</name>
+    </fields>
+    <fields>
+        <label><!-- 受講票配信メール 配信先 --></label>
+        <name>Mail_Guest_Pass_To__c</name>
+        <picklistValues>
+            <masterLabel>anyone</masterLabel>
+            <translation><!-- anyone --></translation>
+        </picklistValues>
+    </fields>
+    <fields>
+        <label><!-- 資料配信メール 本文 --></label>
+        <name>Mail_Handout_Body_L__c</name>
+    </fields>
+    <fields>
+        <label><!-- deprecatred 資料配信メール 本文 --></label>
+        <name>Mail_Handout_Body__c</name>
+    </fields>
+    <fields>
+        <label><!-- 資料配信メールをアンケート提出後に自動配信 --></label>
+        <name>Mail_Handout_Send_On_Submission__c</name>
+    </fields>
+    <fields>
+        <label><!-- 資料配信メール 送信元 --></label>
+        <name>Mail_Handout_Sender__c</name>
+    </fields>
+    <fields>
+        <label><!-- 資料配信メール 件名 --></label>
+        <name>Mail_Handout_Subject__c</name>
+    </fields>
+    <fields>
+        <label><!-- 資料配信メール 配信先 --></label>
+        <name>Mail_Handout_To__c</name>
+        <picklistValues>
+            <masterLabel>anyone</masterLabel>
+            <translation><!-- anyone --></translation>
+        </picklistValues>
+        <picklistValues>
+            <masterLabel>attendees</masterLabel>
+            <translation><!-- attendees --></translation>
+        </picklistValues>
+        <picklistValues>
+            <masterLabel>who_have_submitted_survey</masterLabel>
+            <translation><!-- who_have_submitted_survey --></translation>
+        </picklistValues>
+    </fields>
+    <fields>
+        <label><!-- メール 送信元 --></label>
+        <name>Mail_Sender__c</name>
+    </fields>
+    <fields>
+        <label><!-- メール 件名 --></label>
+        <name>Mail_Subject__c</name>
+    </fields>
+    <fields>
+        <label><!-- アンケートリンク配信メール 本文 --></label>
+        <name>Mail_Survey_Link_Body_L__c</name>
+    </fields>
+    <fields>
+        <label><!-- deprecated アンケートリンク配信メール 本文 --></label>
+        <name>Mail_Survey_Link_Body__c</name>
+    </fields>
+    <fields>
+        <label><!-- アンケートリンク配信メール 送信元 --></label>
+        <name>Mail_Survey_Link_Sender__c</name>
+    </fields>
+    <fields>
+        <label><!-- アンケートリンク配信メール 件名 --></label>
+        <name>Mail_Survey_Link_Subject__c</name>
+    </fields>
+    <fields>
+        <label><!-- アンケートリンク配信メール 配信先 --></label>
+        <name>Mail_Survey_Link_To__c</name>
+        <picklistValues>
+            <masterLabel>anyone</masterLabel>
+            <translation><!-- anyone --></translation>
+        </picklistValues>
+        <picklistValues>
+            <masterLabel>attendees</masterLabel>
+            <translation><!-- attendees --></translation>
+        </picklistValues>
+    </fields>
+    <fields>
+        <label><!-- メール 配信先 --></label>
+        <name>Mail_To__c</name>
+        <picklistValues>
+            <masterLabel>anyone</masterLabel>
+            <translation><!-- anyone --></translation>
+        </picklistValues>
+        <picklistValues>
+            <masterLabel>attendees</masterLabel>
+            <translation><!-- attendees --></translation>
+        </picklistValues>
+        <picklistValues>
+            <masterLabel>who_have_submitted_survey</masterLabel>
+            <translation><!-- who_have_submitted_survey --></translation>
+        </picklistValues>
+    </fields>
+    <fields>
+        <label><!-- Deprecated メール本文(HTML) --></label>
         <name>Mass_Mail_Additional_Body__c</name>
     </fields>
     <fields>
-        <label><!-- メール送信元アドレス --></label>
+        <label><!-- Deprecated メール送信元アドレス --></label>
         <name>Mass_Mail_Sender__c</name>
     </fields>
     <fields>
-        <label><!-- メール題名 --></label>
+        <label><!-- Deprecated メール題名 --></label>
         <name>Mass_Mail_Title__c</name>
     </fields>
     <fields>
         <label><!-- オープン --></label>
         <name>Open__c</name>
+    </fields>
+    <fields>
+        <help><!-- チェックするとゲストが入力したコメントがアンケートのレコードフィードに投稿されます。投稿者はすごいアンケートをを組織にインストールした管理者になります。 --></help>
+        <label><!-- アンケートのレコードフィードにコメントを投稿 --></label>
+        <name>Post_Comment_To_Session_Record_Feed__c</name>
     </fields>
     <fields>
         <help><!-- チェックすると、ゲストが登録された時またはアンケートを回答した時に、そのゲストに該当する取引先レコードがあれば、そのレコードフィードに活動が投稿されます。 --></help>
@@ -120,7 +245,7 @@
         <name>Report_Public__c</name>
     </fields>
     <fields>
-        <label><!-- アンケート提出後に自動送信 --></label>
+        <label><!-- deprecated アンケート提出後に自動送信 --></label>
         <name>Send_Mail_On_Submittion__c</name>
     </fields>
     <fields>
@@ -132,7 +257,7 @@
         <name>Survey_Sum__c</name>
     </fields>
     <fields>
-        <label><!-- メールを配信される人 --></label>
+        <label><!-- deprecated メールを配信される人 --></label>
         <name>Who_Can_Get_Handout__c</name>
         <picklistValues>
             <masterLabel>アンケートの入力が必要</masterLabel>
@@ -170,16 +295,16 @@
             <section>Chatter設定</section>
         </sections>
         <sections>
-            <label><!-- アンケートサイト --></label>
-            <section>アンケートサイト</section>
-        </sections>
-        <sections>
             <label><!-- カスタムリンク --></label>
             <section>カスタムリンク</section>
         </sections>
         <sections>
             <label><!-- メール配信設定 --></label>
             <section>メール配信設定</section>
+        </sections>
+        <sections>
+            <label><!-- 旧メール設定 --></label>
+            <section>旧メール設定</section>
         </sections>
     </layouts>
     <nameFieldLabel>アンケート名</nameFieldLabel>

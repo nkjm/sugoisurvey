@@ -1,0 +1,35 @@
+<apex:component >
+<div class="modal fade modal_confirm" tabindex="-1" role="dialog" aria-labelledby="modal_confirm" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <span style="font-size: 14pt;" class="modal-title" id="myModalLabel">{{modal.title}}</span>
+            </div>
+            <div class="modal-body">
+                <div ng-show="rtk.result == null">
+                    {!$label.are_you_sure}
+                </div>
+                <div ng-show="rtk.result == 'success'" class="alert alert-success">
+                    {{rtk.message}}
+                </div>
+                <div ng-show="rtk.result == 'error'" class="alert alert-danger">
+                    {{rtk.message}}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div ng-show="rtk.submitting == false && rtk.result == null">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">{!$label.cancel}</button>
+                    <button type="button" class="btn btn-{{modal.button_class}}" ng-click="modal.action(modal.action_param)">{{modal.button_label}}</button>
+                </div>
+                <div ng-show="rtk.submitting == true" class="progress progress-striped active" style="height: 30px; margin-bottom:10px;">
+                    <div class="progress-bar progress-bar-{{modal.button_class}}"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%;"></div>
+                </div>
+                <div ng-show="rtk.submitting == false && rtk.result == 'success'">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">{!$label.close}</button>
+                </div>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+</apex:component>

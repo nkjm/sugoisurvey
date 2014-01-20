@@ -58,7 +58,7 @@ public with sharing class chatter_notification {
         if (r == false){
             return false;
         }
-        update guests;
+        scrud.supdate(guests);
         return true;
     }
     

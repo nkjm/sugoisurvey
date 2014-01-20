@@ -66,21 +66,6 @@ if (remotetk.Client === undefined) {
     remotetk.Client.prototype.setUserAgentString = function() {}
         
     /*
-     * Completely describes the individual metadata at all levels for the 
-     * specified object.
-     * @param objtype object type; e.g. "Account"
-     * @param callback function to which response will be passed
-     * @param [error=null] function to which jqXHR will be passed in case of error
-     */
-    remotetk.Client.prototype.describe = function(objtype, callback, error) {
-        Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.RemoteTKController.describe}', objtype, function(result){
-            handleResult(result, callback, error);
-        }, { 
-            escape: false
-        });
-    }
-        
-    /*
      * Creates a new record of the given type.
      * @param objtype object type; e.g. "Account"
      * @param fields an object containing initial field names and values for 
@@ -113,24 +98,15 @@ if (remotetk.Client === undefined) {
             escape: false
         });
     }
-    
+
     /* 
-     * Upsert - creates or updates record of the given type, based on the 
-     * given external Id.
-     * @param objtype object type; e.g. "Account"
-     * @param externalIdField external ID field name; e.g. "accountMaster__c"
-     * @param externalId the record's external ID value
-     * @param fields an object containing field names and values for 
-     *               the record, e.g. {Name: "salesforce.com", TickerSymbol: 
-     *               "CRM"}
-     * @param callback function to which response will be passed
-     * @param [error=null] function to which jqXHR will be passed in case of error
+     * nkjm extended
      */
-    remotetk.Client.prototype.upsert = function(objtype, externalIdField, externalId, fields, callback, error) {
-        Visualforce.remoting.Manager.invokeAction('$RemoteAction.RemoteTKController.upser', objtype, externalIdField, externalId, JSON.stringify(fields), function(result){
-            handleResult(result, callback, error, true);
+    remotetk.Client.prototype.list = function(objtype, callback, error) {
+        Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.RemoteTKController.lis}', objtype, function(result){
+            handleResult(result, callback, error);
         }, { 
-                escape: false
+            escape: false
         });
     }
         
@@ -163,36 +139,6 @@ if (remotetk.Client === undefined) {
     remotetk.Client.prototype.del = function(objtype, id, callback, error) {
         Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.RemoteTKController.del}', objtype, id, function(result){
             handleResult(result, callback, error, true);
-        }, { 
-            escape: false
-        });
-    }
-
-    /*
-     * Executes the specified SOQL query.
-     * @param soql a string containing the query to execute - e.g. "SELECT Id, 
-     *             Name from Account ORDER BY Name LIMIT 20"
-     * @param callback function to which response will be passed
-     * @param [error=null] function to which jqXHR will be passed in case of error
-     */
-    remotetk.Client.prototype.query = function(soql, callback, error) {
-        Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.RemoteTKController.query}', soql, function(result){
-            handleResult(result, callback, error);
-        }, { 
-            escape: false
-        });
-    }        
-
-    /*
-     * Executes the specified SOSL search.
-     * @param sosl a string containing the search to execute - e.g. "FIND 
-     *             {needle}"
-     * @param callback function to which response will be passed
-     * @param [error=null] function to which jqXHR will be passed in case of error
-     */
-    remotetk.Client.prototype.search = function(sosl, callback, error) {
-        Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.RemoteTKController.search}', sosl, function(result){
-            handleResult(result, callback, error);
         }, { 
             escape: false
         });

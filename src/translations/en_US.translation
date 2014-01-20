@@ -21,12 +21,24 @@
         <name>answer_required</name>
     </customLabels>
     <customLabels>
+        <label>Anyone</label>
+        <name>anyone</name>
+    </customLabels>
+    <customLabels>
         <label>Application has been updated</label>
         <name>app_updated</name>
     </customLabels>
     <customLabels>
         <label>Are you sure?</label>
         <name>are_you_sure</name>
+    </customLabels>
+    <customLabels>
+        <label>Assigning permission set to sites user...</label>
+        <name>assign_perm_set_inprogress</name>
+    </customLabels>
+    <customLabels>
+        <label>Attachment</label>
+        <name>attached_handout</name>
     </customLabels>
     <customLabels>
         <label>Attachment</label>
@@ -41,6 +53,10 @@
         <name>attended_the_event_and_submitted_survey2</name>
     </customLabels>
     <customLabels>
+        <label>Attendees</label>
+        <name>attendees</name>
+    </customLabels>
+    <customLabels>
         <label>is attending</label>
         <name>attending_the_event1</name>
     </customLabels>
@@ -49,12 +65,32 @@
         <name>attending_the_event2</name>
     </customLabels>
     <customLabels>
+        <label>Wiill be automatically generated (not editable)</label>
+        <name>auto_generated</name>
+    </customLabels>
+    <customLabels>
+        <label>Send on survey submission</label>
+        <name>autosend_on_survey_submission</name>
+    </customLabels>
+    <customLabels>
+        <label>Back</label>
+        <name>back</name>
+    </customLabels>
+    <customLabels>
         <label>Base Info</label>
         <name>basic_config</name>
     </customLabels>
     <customLabels>
         <label>Best Event</label>
         <name>best_event</name>
+    </customLabels>
+    <customLabels>
+        <label>Best Performance</label>
+        <name>best_survey</name>
+    </customLabels>
+    <customLabels>
+        <label>Message Body</label>
+        <name>body</name>
     </customLabels>
     <customLabels>
         <label>A Handout of the seminar you attended is now available. Please find attached.</label>
@@ -73,12 +109,20 @@
         <name>clear_delivered_flag</name>
     </customLabels>
     <customLabels>
-        <label>Going to reset delivery status.</label>
+        <label>Going to reset delivery history for this template.</label>
         <name>clearing_delivered_flag</name>
+    </customLabels>
+    <customLabels>
+        <label>Clone</label>
+        <name>clone</name>
     </customLabels>
     <customLabels>
         <label>Going to clone this event.</label>
         <name>cloning_event</name>
+    </customLabels>
+    <customLabels>
+        <label>Going to clone Survey.</label>
+        <name>cloning_survey</name>
     </customLabels>
     <customLabels>
         <label>close</label>
@@ -97,8 +141,16 @@
         <name>complete</name>
     </customLabels>
     <customLabels>
+        <label>Configuration has been updated.</label>
+        <name>config_has_been_updated</name>
+    </customLabels>
+    <customLabels>
         <label>Create</label>
         <name>create</name>
+    </customLabels>
+    <customLabels>
+        <label>Create Guest</label>
+        <name>create_guest</name>
     </customLabels>
     <customLabels>
         <label>Create Lead</label>
@@ -121,6 +173,14 @@
         <name>deleting_event</name>
     </customLabels>
     <customLabels>
+        <label>Going to delete guest.</label>
+        <name>deleting_guest</name>
+    </customLabels>
+    <customLabels>
+        <label>Going to delete presenter.</label>
+        <name>deleting_presenter</name>
+    </customLabels>
+    <customLabels>
         <label>Going to delete Question.</label>
         <name>deleting_question</name>
     </customLabels>
@@ -133,12 +193,20 @@
         <name>deliver_destinations</name>
     </customLabels>
     <customLabels>
+        <label>Delivery History has been cleared.</label>
+        <name>delivered_flag_has_been_cleared</name>
+    </customLabels>
+    <customLabels>
         <label>Mail will not be delivered to guests who have already been sent handout</label>
         <name>delivered_guest_will_not_be_delivered_again</name>
     </customLabels>
     <customLabels>
         <label>Going to send Guest Pass.</label>
         <name>delivering_guest_pass</name>
+    </customLabels>
+    <customLabels>
+        <label>Going to send mail.</label>
+        <name>delivering_mail</name>
     </customLabels>
     <customLabels>
         <label>Delivery has been completed.</label>
@@ -189,12 +257,28 @@
         <name>failed_to_create_feedItem</name>
     </customLabels>
     <customLabels>
+        <label>Registering schedule job...</label>
+        <name>finish_init_inprogress</name>
+    </customLabels>
+    <customLabels>
+        <label>Free</label>
+        <name>free</name>
+    </customLabels>
+    <customLabels>
         <label>Free Answers</label>
         <name>free_answers</name>
     </customLabels>
     <customLabels>
         <label>Go to Contact</label>
         <name>go_to_contact</name>
+    </customLabels>
+    <customLabels>
+        <label>Guests</label>
+        <name>guest</name>
+    </customLabels>
+    <customLabels>
+        <label>Guest has been deleted.</label>
+        <name>guest_has_been_deleted</name>
     </customLabels>
     <customLabels>
         <label>Guest Id is not set.</label>
@@ -207,6 +291,10 @@
     <customLabels>
         <label>Guest Pass</label>
         <name>guest_pass_mail_subject</name>
+    </customLabels>
+    <customLabels>
+        <label>Handout</label>
+        <name>handout</name>
     </customLabels>
     <customLabels>
         <label>Handout Download URL</label>
@@ -229,8 +317,16 @@
         <name>high</name>
     </customLabels>
     <customLabels>
+        <label>Initialization completed.</label>
+        <name>init_completed</name>
+    </customLabels>
+    <customLabels>
         <label>Entered Email is not valid format.</label>
         <name>invalid_email</name>
+    </customLabels>
+    <customLabels>
+        <label>Invalid value</label>
+        <name>invalid_value</name>
     </customLabels>
     <customLabels>
         <label>Low</label>
@@ -247,6 +343,14 @@
     <customLabels>
         <label>Preview</label>
         <name>mail_preview</name>
+    </customLabels>
+    <customLabels>
+        <label>New Presenter</label>
+        <name>new_presenter</name>
+    </customLabels>
+    <customLabels>
+        <label>New Survey</label>
+        <name>new_survey</name>
     </customLabels>
     <customLabels>
         <label>New Survey Title</label>
@@ -279,6 +383,10 @@
     <customLabels>
         <label>people</label>
         <name>people</name>
+    </customLabels>
+    <customLabels>
+        <label>Performance</label>
+        <name>performance</name>
     </customLabels>
     <customLabels>
         <label>Performance Summary</label>
@@ -337,6 +445,18 @@
         <name>pls_wait_for_a_while</name>
     </customLabels>
     <customLabels>
+        <label>Presenter</label>
+        <name>presenter</name>
+    </customLabels>
+    <customLabels>
+        <label>Presenter has been deleted.</label>
+        <name>presenter_has_been_deleted</name>
+    </customLabels>
+    <customLabels>
+        <label>Presenter List</label>
+        <name>presenter_list</name>
+    </customLabels>
+    <customLabels>
         <label>Processing</label>
         <name>processing</name>
     </customLabels>
@@ -347,6 +467,10 @@
     <customLabels>
         <label>Questions and Answers</label>
         <name>q_a</name>
+    </customLabels>
+    <customLabels>
+        <label>Question has been deleted.</label>
+        <name>question_has_been_deleted</name>
     </customLabels>
     <customLabels>
         <label>Please enter Question.</label>
@@ -373,6 +497,10 @@
         <name>re_initialize</name>
     </customLabels>
     <customLabels>
+        <label>Redirecting to top page...</label>
+        <name>redirecting_to_top_page</name>
+    </customLabels>
+    <customLabels>
         <label>Reload</label>
         <name>reload</name>
     </customLabels>
@@ -385,12 +513,40 @@
         <name>requested_number_of_question_is_not_valid</name>
     </customLabels>
     <customLabels>
+        <label>Required parameter is missing.</label>
+        <name>required_parameter_is_missing</name>
+    </customLabels>
+    <customLabels>
+        <label>Reset</label>
+        <name>reset</name>
+    </customLabels>
+    <customLabels>
         <label>Save</label>
         <name>save</name>
     </customLabels>
     <customLabels>
+        <label>Saved.</label>
+        <name>saved</name>
+    </customLabels>
+    <customLabels>
+        <label>Please select record.</label>
+        <name>select_record</name>
+    </customLabels>
+    <customLabels>
+        <label>Send</label>
+        <name>send</name>
+    </customLabels>
+    <customLabels>
         <label>Send Mail</label>
         <name>send_mail</name>
+    </customLabels>
+    <customLabels>
+        <label>Sender Email</label>
+        <name>sender</name>
+    </customLabels>
+    <customLabels>
+        <label>Survey has been copied.</label>
+        <name>session_has_been_copied</name>
     </customLabels>
     <customLabels>
         <label>Session has been saved.</label>
@@ -417,6 +573,14 @@
         <name>sites_user_not_found</name>
     </customLabels>
     <customLabels>
+        <label>Sort</label>
+        <name>sort</name>
+    </customLabels>
+    <customLabels>
+        <label>Sort order has been saved.</label>
+        <name>sort_has_been_completed</name>
+    </customLabels>
+    <customLabels>
         <label>Specified question was not found.</label>
         <name>specified_question_not_found</name>
     </customLabels>
@@ -431,6 +595,26 @@
     <customLabels>
         <label>Start</label>
         <name>start</name>
+    </customLabels>
+    <customLabels>
+        <label>Initializing custom setting...</label>
+        <name>start_init_inprogress</name>
+    </customLabels>
+    <customLabels>
+        <label>Subject</label>
+        <name>subject</name>
+    </customLabels>
+    <customLabels>
+        <label>Guest Pass</label>
+        <name>subject_for_mail_guest_pass</name>
+    </customLabels>
+    <customLabels>
+        <label>Handout Attached</label>
+        <name>subject_for_mail_handout</name>
+    </customLabels>
+    <customLabels>
+        <label>Survey URL</label>
+        <name>subject_for_mail_survey_link</name>
     </customLabels>
     <customLabels>
         <label>Handout Attached</label>
@@ -461,6 +645,10 @@
         <name>survey_collection_rate</name>
     </customLabels>
     <customLabels>
+        <label>Survey has been cloned.</label>
+        <name>survey_has_been_cloned</name>
+    </customLabels>
+    <customLabels>
         <label>Your survey has been created.</label>
         <name>survey_has_been_created</name>
     </customLabels>
@@ -477,12 +665,20 @@
         <name>survey_has_been_submitted</name>
     </customLabels>
     <customLabels>
+        <label>Survey History</label>
+        <name>survey_history</name>
+    </customLabels>
+    <customLabels>
         <label>Survey Id has not been set.</label>
         <name>survey_id_is_not_set</name>
     </customLabels>
     <customLabels>
         <label>This survey is over.</label>
         <name>survey_is_over</name>
+    </customLabels>
+    <customLabels>
+        <label>Survey Link</label>
+        <name>survey_link</name>
     </customLabels>
     <customLabels>
         <label>Survey List</label>
@@ -509,6 +705,10 @@
         <name>survey_url</name>
     </customLabels>
     <customLabels>
+        <label>Template</label>
+        <name>template</name>
+    </customLabels>
+    <customLabels>
         <label>There are not enough number of question to sort.</label>
         <name>there_are_not_enough_number_of_question_to_sort</name>
     </customLabels>
@@ -523,6 +723,10 @@
     <customLabels>
         <label>Total Guests</label>
         <name>total_guests</name>
+    </customLabels>
+    <customLabels>
+        <label>Surveys</label>
+        <name>total_surveys</name>
     </customLabels>
     <customLabels>
         <label>Unknown Company</label>
@@ -545,12 +749,20 @@
         <name>update_has_been_saved</name>
     </customLabels>
     <customLabels>
+        <label>People who have submitted survey</label>
+        <name>who_have_submitted_survey</name>
+    </customLabels>
+    <customLabels>
         <label>Rating (5 Point)</label>
         <name>xPointScale</name>
     </customLabels>
     <customLabels>
         <label>Yes</label>
         <name>yes</name>
+    </customLabels>
+    <customLabels>
+        <label>You can sort surveys by drag &amp; drop.</label>
+        <name>you_can_sort_by_drag</name>
     </customLabels>
     <customLabels>
         <label>Your Company</label>
@@ -561,16 +773,24 @@
         <name>your_name</name>
     </customLabels>
     <customTabs>
-        <label><!-- すごいアンケート --></label>
+        <label>deprecarted Sugoi Survey</label>
         <name>S1_session_list</name>
     </customTabs>
     <customTabs>
-        <label>Surveys</label>
+        <label>Sugoi Survey</label>
+        <name>S1_survey</name>
+    </customTabs>
+    <customTabs>
+        <label>deprecated Surveys</label>
         <name>event_and_session</name>
     </customTabs>
     <customTabs>
         <label>Surveys</label>
         <name>session_list</name>
+    </customTabs>
+    <customTabs>
+        <label>Surveys</label>
+        <name>survey</name>
     </customTabs>
     <quickActions>
         <label><!-- すごいアンケート --></label>

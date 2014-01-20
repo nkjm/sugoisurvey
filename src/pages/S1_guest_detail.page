@@ -1,104 +1,178 @@
-<apex:page readOnly="true" standardController="Guest__c" extensions="survey_for_guest" standardStyleSheets="false" showheader="false" applyBodyTag="false" applyHtmlTag="false" doctype="html-5.0" cache="false">
+<apex:page readOnly="true" standardController="Guest__c" extensions="guest" standardStyleSheets="false" showheader="false" applyBodyTag="false" applyHtmlTag="false" doctype="html-5.0" cache="false">
 
-<html class="ng-app" id="ng-app">
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.2/css/bootstrap.min.css"></link>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.2/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.0/angular.min.js"></script>
-    <title>{!$label.sugoisurvey}</title>
+<style>
+#guest_detail .section {
+   	margin-bottom: 60px;
+}
+#guest_detail .q_and_a {
+	margin-bottom: 30px;
+}
+</style>
 
-	<style>
-	#guest_detail h3 {
-		color: #999999;
-		margin-bottom: 20px;
-	}
-	#guest_detail h4 {
-		margin-bottom: 20px;
-		padding-bottom: 10px;
-		color: #666666;
-		border-bottom: solid 1px #666666;
-	}
-	#guest_detail h5 {
-		color: #666666;
-	}
-	#guest_detail .submit-complete, .submit-inprogress {
-		display: none;
-	}
-	#guest_detail .section {
-    	margin-bottom: 60px;
-	}
-	#guest_detail .q_and_a {
-		margin-bottom: 30px;
-	}
-	</style>
+<script>
+j$ = jQuery.noConflict();
+
+function guest_detail($scope){
+    $scope.retrieve_guest = function(){
+    	$scope.rtk.action = 'retrieve_guest';
+    	
+        $scope.rtk.result = null;
+        $scope.rtk.message = null;
+        $scope.rtk.submitting = true;
+        $scope.force.retrieve(
+            'sugoisurvey4__Guest__c',
+            $scope.guest.Id,
+            null,
+            function(result){
+                $scope.rtk.submitting = false;
+                $scope.rtk.result = 'success';
+                $scope.guest = result;
+                $scope.$apply();
+                j$("#guest_detail").show();
+            },
+            function(result){
+                $scope.rtk.submitting = false;
+                $scope.rtk.result = 'error';
+                $scope.rtk.message = result[0].message;
+                $scope.$apply();
+            }
+        );
+    };
+    
+	$scope.update_guest = function(){
+		$scope.rtk.action = 'update_guest';
+		
+		var guest = j$.extend(true, {}, $scope.guest);
+		delete guest.attributes;
+		delete guest.Name;
+		delete guest.sugoisurvey4__Name__c;
+		delete guest.sugoisurvey4__Session__c;
+		
+		$scope.rtk.result = null;
+		$scope.rtk.message = null;
+		$scope.rtk.submitting = true;
+		$scope.force.update(
+			'sugoisurvey4__Guest__c',
+			$scope.guest.Id,
+			guest,
+			function(result){
+				$scope.rtk.submitting = false;
+				$scope.rtk.result = 'success';
+				$scope.rtk.message = '{!$label.config_has_been_updated}';
+				$scope.$apply();
+			},
+			function(result){
+				$scope.rtk.submitting = false;
+				$scope.rtk.result = 'error';
+				$scope.rtk.message = result[0].message;
+				$scope.$apply();
+			}
+		);
+	};
 	
-	<script>
-	j$ = jQuery.noConflict();
+	$scope.delete_guest = function(){
+		$scope.rtk.action = 'delete_guest';
 	
-	function start_submit(){
-		j$("#guest_detail .submit-complete").hide();
-		j$("#guest_detail .submit-button").hide();
-		j$("#guest_detail .submit-inprogress").show();
-	}
+		var update_view = function(){
+			if (typeof sforce == 'undefined'){
+				window.location = '/apex/sugoisurvey4__survey?id=' + $scope.guest.sugoisurvey4__Session__c;
+			} else {
+				sforce.one.navigateToURL('/apex/sugoisurvey4__S1_survey?id=' + $scope.guest.sugoisurvey4__Session__c);
+			}
+		};
+		
+		$scope.rtk.message = null;
+		$scope.rtk.result = null;
+		$scope.rtk.submitting = true;
+		$scope.force.del(
+			'sugoisurvey4__Guest__c',
+			$scope.guest.Id,
+			function(result){
+				$scope.rtk.submitting = false;
+				$scope.rtk.result = 'success';
+				$scope.rtk.message = '{!$label.guest_has_been_deleted}';
+				update_view();
+			},
+			function(result){
+				$scope.rtk.submitting = false;
+				$scope.rtk.result = 'error';
+				$scope.rtk.message = result[0].message;
+				$scope.$apply();
+			}
+		);
+	};
+
+	$scope.show_modal = function(type, title, button_label, button_class, action, action_param){
+		$scope.rtk.submitting = false;
+		$scope.rtk.result = null;
+		$scope.rtk.message = null;
+		$scope.modal = {};
+		$scope.modal.title = title;
+		$scope.modal.button_label = button_label;
+        $scope.modal.button_class = button_class;
+		$scope.modal.action = action;
+		$scope.modal.action_param = action_param;
+		j$("#guest_detail .modal_" + type).modal();
+		if (type == 'progress'){
+			action(action_param);
+		}
+	};
 	
-	function stop_submit(){
-		j$("#guest_detail .submit-inprogress").hide();
-		j$("#guest_detail .submit-complete").show();
-		j$("#guest_detail .submit-button").show();
-	}
-	</script>
-</head>
+	$scope.init = function(){
+		$scope.guest = {};
+		$scope.rtk = {};
+		$scope.rtk.submitting = false;
+		$scope.guest.Id = '{!guest__c.Id}';
+		$scope.retrieve_guest();
+	};
+	
+	$scope.force = new remotetk.Client();
+	$scope.init();
+}
+</script>
 
-<body>
+<form name="form_update_guest">
 
-<div class="container" id="guest_detail" style="margin-top: 20px; margin-bottom: 60px;">
+<div id="guest_detail" ng-controller="guest_detail" style="display:none;">
 	<div class="row">
 		<div class="col-xs-12">
-			<h1>{!Guest.Name__c}</h1>
+			<h1>{{guest.sugoisurvey4__Name__c}}</h1>
 			
 			<div class="section">
-				<apex:form >
-					<div style="margin-bottom:40px">
-						<apex:messages styleClass="alert alert-danger" />
-						<apex:actionStatus id="session_report_status" onstart="start_submit()" onstop="stop_submit()" />
-						
-						<div class="submit-complete alert alert-success">
-							{!$Label.update_has_been_saved}
+				<!-- Save Button -->
+				<div class="row">
+					<div class="col-md-12">
+						<div ng-show="rtk.action == 'update_guest' && rtk.submitting == false && rtk.result == 'error'" class="alert alert-danger">
+							<a href="#" class="close" data-dismiss="alert">&times;</a>
+							{{rtk.message}}
 						</div>
-						
-						<div class="submit-inprogress progress progress-striped active" style="height: 35px;">
+						<div ng-show="rtk.action == 'update_guest' && rtk.submitting == false && rtk.result == 'success'" class="alert alert-success">
+							<a href="#" class="close" data-dismiss="alert">&times;</a>
+							{{rtk.message}}
+						</div>
+						<div ng-show="rtk.action == 'update_guest' && rtk.submitting == true" class="progress progress-striped active" style="height: 35px;">
 						    <div class="progress-bar progress-bar-success"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%;"></div>
 						</div>
-						
-						<div>
-							&nbsp;<apex:commandButton status="session_report_status" styleClass="submit-button btn btn-success pull-right" rerender="tab_session_report" action="{!quicksave}" value="{!$Label.update}"></apex:commandButton>
-			        	</div>
-			        </div>
-			        
-		        	<h3>{!$Label.basic_config}</h3>
-					<div class="form-horizontal" role="form">
-						<apex:repeat value="{!$ObjectType.Guest__c.FieldSets.base_info}" var="f">
-							<div class="form-group">
-								<label class="col-sm-2 control-label">{!f.Label}</label>
-								<div class="col-sm-10">
-									<apex:inputField styleClass="form-control" value="{!Guest__c[f]}" rendered="{!f.Type != 'date' && f.Type != 'boolean'}"></apex:inputField>
-									<apex:inputField styleClass="form-control" type="date" value="{!Guest__c[f]}" rendered="{!f.Type == 'date'}"></apex:inputField>
-									<apex:inputField value="{!Guest__c[f]}" rendered="{!f.Type == 'boolean'}"></apex:inputField>
-								</div>
-							</div>
-						</apex:repeat>
+						<div ng-show="rtk.action != 'update_guest' || rtk.submitting == false" style="text-align:right;">
+							<button ng-click="update_guest()" class="btn btn-success" value="{!$Label.save}"><span class="glyphicon glyphicon-ok-sign"></span>&nbsp;{!$label.save}</button>
+						</div>
 					</div>
-	        	</apex:form>
+				</div><!-- Save Button -->
+   
+	        	<h2>{!$Label.basic_config}</h2>
+				<div class="form-horizontal" role="form">
+					<apex:repeat value="{!$ObjectType.Guest__c.FieldSets.base_info}" var="f">
+						<c:ng_form_element field="{!f}" value="{!Guest__c[f]}" object="sugoisurvey4__Guest__c" ngInstance="guest" ngModel="guest.{!f}" />
+					</apex:repeat>
+				</div>
 	        </div><!-- section -->
 			        
 	        <div class="section">
-	        	<h3>{!$label.survey_answer}</h3>
+	        	<h2>{!$label.survey_answer}</h2>
 	        	<div class="row">
 	        	
 	        		<div class="col-sm-4"><!-- Rate -->
-			        	<h4>{!$label.rate}</h4>
+			        	<h3>{!$label.rate}</h3>
 						<apex:repeat value="{!Guest__c.survey__r}" var="survey">
 				            <div style="font-weight: bold; font-size: 96pt; text-align:center;">
 				                <apex:outputText value="{! round(survey.Rate__c,0)}" />
@@ -107,10 +181,10 @@
 	        		</div><!-- Rate -->
 	        		
 	        		<div class="col-sm-4"><!-- Questions and Answers -->
-				        <h4>{!$Label.q_a}</h4>
+				        <h3>{!$Label.q_a}</h3>
 				        <apex:repeat value="{!custom_survey_questions}" var="csq">
 				            <div class="q_and_a">
-				                <h5>{!csq.Question__c}</h5>
+				                <h4>{!csq.Question__c}</h4>
 				                <apex:repeat value="{!Guest__c.custom_survey_answer__r}" var="csa">
 				                    <apex:outputtext rendered="{!(csq.id == csa.custom_survey_option__r.Custom_Survey_Question__c)}" >
 				                        <div>
@@ -131,7 +205,7 @@
 	        		</div><!-- Questions and Answers -->
 
 	        		<div class="col-sm-4"><!-- Comments -->
-						<h4>{!$Label.comment}</h4>
+						<h3>{!$Label.comment}</h3>
 				        <apex:repeat value="{!Guest__c.comment__r}" var="comment">
 				            <div>
 				                {!comment.Comment__c}
@@ -141,12 +215,23 @@
 	        		
 	        	</div>
 	        </div><!-- section -->
+	        
+	        <div class="section">
+				<!-- Delete Button -->
+				<div style="text-align:right;">
+					<button ng-click="show_modal('confirm', '{!$label.deleting_guest}', '{!$label.delete}', 'danger', delete_guest, null)" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove-sign"></span>&nbsp;{!$label.delete}</button>
+				</div>
+	        </div><!-- section -->
 
 		</div>
 	</div>
+
+	<!-- Modal Dialog -->
+	<c:S1_modal_confirm />
+	<c:S1_modal_progress />
+
 </div>
 
-</body>
-</html>
+</form>
 
 </apex:page>

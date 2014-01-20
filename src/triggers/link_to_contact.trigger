@@ -17,6 +17,12 @@ trigger link_to_contact on Guest__c (before insert) {
 	}
 	
 	// Retrieve contact records corresponding to new guests.
+    if (!scrud.isAccessible('Contact', new list<string>{'Id','Name','LastName','FirstName','Email','Phone','Title','AccountId','CreatedDate'})){
+        return;
+    }
+    if (!scrud.isAccessible('Account', new list<string>{'Name'})){
+        return;
+    }
 	contacts = [
         select 
             id, 

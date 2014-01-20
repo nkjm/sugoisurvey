@@ -1,0 +1,15 @@
+<apex:component controller="inputPicklist">
+<apex:attribute name="objectName" required="true" type="string" assignTo="{!p_object_name}" description="object name"/>
+<apex:attribute name="fieldName" required="true" type="string" assignTo="{!p_field_name}" description="field name"/>
+<apex:attribute name="ngModel" required="true" type="string" description="ng-model" />
+
+<select class="form-control" ng-model="{!ngModel}">
+    <option value=""></option>
+    <apex:repeat value="{!picklist_map}" var="m">
+        <apex:outputText >
+            <option value="{!m.value}">{!m.label}</option>
+        </apex:outputText>
+    </apex:repeat>
+</select>
+
+</apex:component>

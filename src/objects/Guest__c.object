@@ -42,9 +42,7 @@
     </actionOverrides>
     <actionOverrides>
         <actionName>View</actionName>
-        <content>guest_profile</content>
-        <skipRecordTypeSelect>false</skipRecordTypeSelect>
-        <type>Visualforce</type>
+        <type>Default</type>
     </actionOverrides>
     <compactLayoutAssignment>SYSTEM</compactLayoutAssignment>
     <deploymentStatus>Deployed</deploymentStatus>
@@ -173,7 +171,7 @@
         <defaultValue>false</defaultValue>
         <deprecated>false</deprecated>
         <externalId>false</externalId>
-        <label>メール配信済み</label>
+        <label>資料配信済み</label>
         <trackFeedHistory>false</trackFeedHistory>
         <trackTrending>false</trackTrending>
         <type>Checkbox</type>
@@ -189,6 +187,16 @@
         <trackTrending>false</trackTrending>
         <type>Text</type>
         <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Mail_Delivered__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>メール配信済み</label>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
     </fields>
     <fields>
         <fullName>Multiple_Contacts__c</fullName>
@@ -276,6 +284,16 @@ Last_Name__c + &apos; &apos; +  First_Name__c
         <type>Picklist</type>
     </fields>
     <fields>
+        <fullName>Survey_Link_Delivered__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>アンケートリンク配信済み</label>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
         <fullName>Title__c</fullName>
         <deprecated>false</deprecated>
         <externalId>false</externalId>
@@ -307,6 +325,11 @@ Last_Name__c + &apos; &apos; +  First_Name__c
         <filterScope>Everything</filterScope>
         <label>すべて選択</label>
         <language>ja</language>
+    </listViews>
+    <listViews>
+        <fullName>All1</fullName>
+        <filterScope>Everything</filterScope>
+        <label>すべて選択</label>
     </listViews>
     <nameField>
         <displayFormat>GST-{00000000}</displayFormat>

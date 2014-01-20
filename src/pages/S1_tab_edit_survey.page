@@ -2,21 +2,21 @@
 
 <style>
 #tab_edit_survey .survey_section {
-	margin-bottom: 20px;
+    margin-bottom: 20px;
 }
 #tab_edit_survey .btn-selected {
-	background-color: #F6EDF2;
-	border-color: #f4a4d4;
+    background-color: #F6EDF2;
+    border-color: #f4a4d4;
 }
 #tab_edit_survey .survey_box_outer {
-	background-color: #f4f4f4;
-	border-radius: 3px; 
-	margin-bottom: 40px; 
-	border: solid 1px #dddddd;
+    background-color: #f4f4f4;
+    border-radius: 3px; 
+    margin-bottom: 40px; 
+    border: solid 1px #dddddd;
 }
 #tab_edit_survey .survey_box_inner {
-	width: 90%;
-	margin: 40px auto;
+    width: 90%;
+    margin: 40px auto;
 }
 </style>
 
@@ -24,440 +24,525 @@
 j$ = jQuery.noConflict();
 
 function survey($scope){
-	$scope.retrieve_csqs = function(){
-		var update_view = function(){
-			$scope.$apply();
-			j$("#tab_edit_survey").show();
-		};
-		
-		var soql = "select Id, Name, sugoisurvey4__Question__c, sugoisurvey4__Survey_Type__c, sugoisurvey4__Sort_Order__c, sugoisurvey4__Enable_Free_Form__c, sugoisurvey4__Required__c, sugoisurvey4__Session__c, (select Id, Name, sugoisurvey4__Option__c, sugoisurvey4__Enable_Free_Form__c, sugoisurvey4__Dummy__c, sugoisurvey4__Custom_Survey_Question__c, sugoisurvey4__Session__c from sugoisurvey4__Custom_Survey_Option__r order by Name) from sugoisurvey4__Custom_Survey_Question__c where sugoisurvey4__Session__c = '" + $scope.csq.Session__c + "' order by sugoisurvey4__Sort_Order__c, Name";
-		$scope.force.query(
-			soql,
-			function(result){
-				$scope.csqs = result.records;
-				//console.log($scope.csqs);
-				update_view();
-			},
-			function(result){
-				//console.log(result);
-				$scope.rtk.result = 'error';
-				$scope.rtk.message = result;
-				update_view();
-			}
-		);
-	};
-	
-	$scope.create_survey = function(){
-		var update_view = function(){
-			$scope.$apply();
-		};
-		
-		if ($scope.csq == null || $scope.csq.Question__c == null || $scope.csq.Question__c == ''){
-			$scope.rtk.result = 'error';
-			$scope.rtk.message = '{!$label.question_is_missing}';
-			return;
-		}
-		
-		// remove $$hashKey
-		angular.forEach($scope.csos, function(v, k){
-			delete v.$$hashKey;
-		});
-		
-		$scope.rtk.submitting = true;
-		sugoisurvey4.jr_session.create_survey(
-			$scope.csq,
-			$scope.csos,
-			function(result, event){
-                if (event.status){
-                    if (result.status == false){
-						$scope.rtk.result = 'error';
-						$scope.rtk.message = result.message;
-                    } else {
-                        $scope.init();
-                        update_view();
-                    }
-                } else {
-                    $scope.rtk.result = 'error';
-					$scope.rtk.message = event;
-                }
-            },{escape:true}
-		);
-	};
-	
-	$scope.update_survey = function(ecsq){
-		var update_view = function(){
-			$scope.$apply();
-		};
-		
-		$scope.rtk.csq_id = ecsq.Id;
-		
-		if (ecsq.sugoisurvey4__Question__c == null || ecsq.sugoisurvey4__Question__c == ''){
-			$scope.rtk.result = 'error';
-			$scope.rtk.message = '{!$label.question_is_missing}';
-			return;
-		}
-		
-		// remove $$hashKey and unrequired property
-		var ecsq_for_update = j$.extend(true, {}, ecsq);
-		if (ecsq.sugoisurvey4__Custom_Survey_Option__r == null){
-			ecsq.sugoisurvey4__Custom_Survey_Option__r = {};
-			ecsq.sugoisurvey4__Custom_Survey_Option__r.records = [];
-		}
-		var ecsos_for_update = j$.extend(true, [], ecsq.sugoisurvey4__Custom_Survey_Option__r.records);
-		delete ecsq_for_update.$$hashKey;
-		delete ecsq_for_update.attributes;
-		delete ecsq_for_update.sugoisurvey4__Custom_Survey_Option__r;
-		angular.forEach(ecsos_for_update, function(v, k){
-			delete v.$$hashKey;
-			delete v.attributes;
-		});
-		
-		$scope.rtk.submitting = true;
-		//console.log(ecsos_for_update);
-		sugoisurvey4.jr_session.edit_survey(
-			ecsq_for_update,
-			ecsos_for_update,
-			function(result, event){
-                if (event.status){
-                    if (result.status == false){
-						$scope.rtk.result = 'error';
-						$scope.rtk.message = result.message;
-                    } else {
-                        $scope.init();
-                        update_view();
-                    }
-                } else {
-                    $scope.rtk.result = 'error';
-					$scope.rtk.message = event;
-                }
-            },{escape:true}
-		);
-	};
-	
-	$scope.delete_survey = function(csq_id){
-		var update_view = function(){
-			j$("#confirm_delete_survey").modal('hide');
-			$scope.$apply();
-		};
-		
-		if (csq_id == null || csq_id == ''){
-			$scope.rtk.result = 'error';
-			$scope.rtk.message = '{!$label.survey_id_is_not_set}';
-			return;
-		}
-		
-		$scope.rtk.csq_id = csq_id;
-		$scope.rtk.deleting = true;
-		
-		$scope.force.del(
-			'sugoisurvey4__Custom_Survey_Question__c',
-			csq_id,
-			function(result){
-				$scope.init();
-				update_view();
-			},
-			function(result){
-				//console.log(result);
-				$scope.rtk.result = 'error';
-				$scope.rtk.message = result;
-				update_view();
-			}
-		);
-	};
-	
-	$scope.show_modal_before_delete_survey = function(csq_id){
-		$scope.rtk.csq_id = csq_id;
-		j$("#confirm_delete_survey").modal();
-	};
-	
-	$scope.add_option = function(csq_id){
-		if (csq_id == null){
-			$scope.csos.push({
-				'Session__c':$scope.csq.Session__c,
-				'Option__c':''
-			});
-		} else {
-			angular.forEach($scope.csqs, function(v, k){
-				if (v.Id == csq_id){
-					if (v.sugoisurvey4__Custom_Survey_Option__r == null){
-						v.sugoisurvey4__Custom_Survey_Option__r = {};
-						v.sugoisurvey4__Custom_Survey_Option__r.records = [];
-					}
-					v.sugoisurvey4__Custom_Survey_Option__r.records.push({
-						'sugoisurvey4__Session__c':$scope.csq.Session__c,
-						'sugoisurvey4__Option__c':''
-					});
-				}
-			});
-		}
-	};
-	
-	$scope.del_option = function(csq_id, hashKey){
-		if (csq_id == null){
-			angular.forEach($scope.csos, function(v, k){
-				if (v.$$hashKey == hashKey) {
-					$scope.csos.splice(k, 1);
-				}
-			});
-		} else {
-			angular.forEach($scope.csqs, function(v, k){
-				if (v.Id == csq_id){
-					angular.forEach(v.sugoisurvey4__Custom_Survey_Option__r.records, function(vv, kk){
-						if (vv.$$hashKey == hashKey) {
-							v.sugoisurvey4__Custom_Survey_Option__r.records.splice(kk, 1);
-						}
-					});
-				}
-			});
-		}
-	};
 
-	$scope.init = function(){
-		// Initialize csq
-		$scope.csq = {};
-		$scope.csq.Session__c = '{!session__c.Id}';
-		$scope.csq.Required__c = false;
-		$scope.csq.Enable_Free_Form__c = false;
-		$scope.csq.Survey_Type__c = 'checkbox';
-		
-		// Initialize csos
-		var default_num_of_options = 2;
-		$scope.csos = [];
-		for (var i = 0; i < default_num_of_options; i++){
-			$scope.add_option(null);
-		}
-		
-		$scope.rtk = {};
-		$scope.rtk.submitting = null;
-		$scope.rtk.deleting = null;
-		$scope.rtk.result = null;
-		$scope.rtk.message = null;
-		$scope.rtk.csq_id = null;
-		
-		$scope.retrieve_csqs();
-	};
-	
-	// Initialize All
-	$scope.force = new remotetk.Client();
-	$scope.init();
+    $scope.existing_surveys_for_sort = {
+        update: function(e, ui){
+            $scope.csqs_for_sort = $scope.csqs;
+        }
+    }
+
+    $scope.sort_csqs = function(){
+        $scope.rtk.action = 'sort_csqs';
+
+        var csq_ids = [];
+        angular.forEach($scope.csqs, function(csqv, csqk){
+            csq_ids.push(csqv.Id);
+        });
+
+        $scope.rtk.result = null;
+        $scope.rtk.message = null;
+        $scope.rtk.submitting = true;
+        sugoisurvey4.jr_session.reorder_question(
+            $scope.session.Id,
+            csq_ids,
+            function(result, event){
+                $scope.rtk.submitting = false;
+                if (event.status){
+                    $scope.rtk.result = 'success';
+                    $scope.rtk.message = '{!$label.sort_has_been_completed}';
+                    delete $scope.csqs_for_sort;
+                    $scope.$apply();
+                } else {
+                    $scope.rtk.result = 'error';
+                    $scope.rtk.message = event.message;
+                    delete $scope.csqs_for_sort;
+                    $scope.$apply();
+                }
+            }
+        );
+    };
+
+    $scope.generate_csqs = function(){
+        $scope.csqs = j$.extend(true, [], $scope.session.sugoisurvey4__Custom_Survey_Question__r);
+        $scope.csq_ids_for_sort = j$.extend(true, [], $scope.session.sugoisurvey4__Custom_Survey_Question__r);
+        angular.forEach($scope.csqs, function(csqv, csqk){
+            csqv.sugoisurvey4__Custom_Survey_Option__r = [];
+            angular.forEach($scope.session.sugoisurvey4__Custom_Survey_Option__r, function(csov, csok){
+                if (csov.sugoisurvey4__Custom_Survey_Question__c == csqv.Id){
+                    csqv.sugoisurvey4__Custom_Survey_Option__r.push(csov);
+                }
+            });
+        });
+    };
+    
+    $scope.create_survey = function(){
+        $scope.rtk.action = 'create_survey';
+        
+        if ($scope.csq == null || $scope.csq.Question__c == null || $scope.csq.Question__c == ''){
+            $scope.rtk.result = 'error';
+            $scope.rtk.message = '{!$label.question_is_missing}';
+            return;
+        }
+        
+        // remove $$hashKey
+        angular.forEach($scope.csos, function(v, k){
+            delete v.$$hashKey;
+        });
+        
+        $scope.rtk.result = null;
+        $scope.rtk.message = null;
+        $scope.rtk.csq_id = null;
+        $scope.rtk.submitting = true;
+        sugoisurvey4.jr_session.create_survey(
+            $scope.csq,
+            $scope.csos,
+            function(result, event){
+                $scope.rtk.submitting = false;
+                if (event.status){
+                    $scope.rtk.result = 'success';
+                    $scope.rtk.message = '{!$label.survey_has_been_created}';
+                    $scope.retrieve_session();
+                    $scope.init_csq();
+                } else {
+                    $scope.rtk.result = 'error';
+                    $scope.rtk.message = event.message;
+                    $scope.$apply();
+                }
+            },{escape:true}
+        );
+    };
+    
+    $scope.update_survey = function(ecsq){
+        $scope.rtk.action = 'update_survey';
+        
+        $scope.rtk.csq_id = ecsq.Id;
+        
+        if (ecsq.sugoisurvey4__Question__c == null || ecsq.sugoisurvey4__Question__c == ''){
+            $scope.rtk.result = 'error';
+            $scope.rtk.message = '{!$label.question_is_missing}';
+            return;
+        }
+        
+        // remove $$hashKey and unrequired property
+        var ecsq_for_update = j$.extend(true, {}, ecsq);
+        if (ecsq.sugoisurvey4__Custom_Survey_Option__r == null){
+            ecsq.sugoisurvey4__Custom_Survey_Option__r = [];
+        }
+        var ecsos_for_update = j$.extend(true, [], ecsq.sugoisurvey4__Custom_Survey_Option__r);
+        delete ecsq_for_update.$$hashKey;
+        delete ecsq_for_update.attributes;
+        delete ecsq_for_update.sugoisurvey4__Custom_Survey_Option__r;
+        angular.forEach(ecsos_for_update, function(v, k){
+            delete v.$$hashKey;
+            delete v.attributes;
+        });
+        
+        $scope.rtk.result = null;
+        $scope.rtk.message = null;
+        $scope.rtk.submitting = true;
+        sugoisurvey4.jr_session.edit_survey(
+            ecsq_for_update,
+            ecsos_for_update,
+            function(result, event){
+                $scope.rtk.submitting = false;
+                if (event.status){
+                    $scope.rtk.result = 'success';
+                    $scope.rtk.message = '{!$label.survey_has_been_saved}';
+                    $scope.retrieve_session();
+                } else {
+                    $scope.rtk.result = 'error';
+                    $scope.rtk.message = event.message;
+                    $scope.$apply();
+                }
+            },{escape:true}
+        );
+    };
+    
+    $scope.delete_survey = function(csq_id){
+        $scope.rtk.action = 'delete_survey';
+        
+        if (csq_id == null || csq_id == ''){
+            $scope.rtk.result = 'error';
+            $scope.rtk.message = '{!$label.survey_id_is_not_set}';
+            return;
+        }
+        
+        $scope.rtk.csq_id = csq_id;
+        $scope.rtk.result = null;
+        $scope.rtk.message = null;
+        $scope.rtk.submitting = true;
+        $scope.force.del(
+            'sugoisurvey4__Custom_Survey_Question__c',
+            csq_id,
+            function(result){
+                $scope.rtk.submitting = false;
+                $scope.rtk.result = 'success';
+                $scope.rtk.message = '{!$label.question_has_been_deleted}';
+                $scope.rtk.csq_id = null;
+                $scope.retrieve_session();
+            },
+            function(result){
+                //console.log(result);
+                $scope.rtk.submitting = false;
+                $scope.rtk.result = 'error';
+                $scope.rtk.message = result[0].message;
+                $scope.$apply();
+            }
+        );
+    };
+    
+    $scope.add_option = function(csq_id){
+        if (csq_id == null){
+            $scope.csos.push({
+                'Session__c':$scope.csq.Session__c,
+                'Option__c':''
+            });
+        } else {
+            angular.forEach($scope.csqs, function(v, k){
+                if (v.Id == csq_id){
+                    if (v.sugoisurvey4__Custom_Survey_Option__r == null){
+                        v.sugoisurvey4__Custom_Survey_Option__r = [];
+                    }
+                    v.sugoisurvey4__Custom_Survey_Option__r.push({
+                        'sugoisurvey4__Session__c':$scope.csq.Session__c,
+                        'sugoisurvey4__Option__c':''
+                    });
+                }
+            });
+        }
+    };
+    
+    $scope.del_option = function(csq_id, hashKey){
+        if (csq_id == null){
+            angular.forEach($scope.csos, function(v, k){
+                if (v.$$hashKey == hashKey) {
+                    $scope.csos.splice(k, 1);
+                }
+            });
+        } else {
+            angular.forEach($scope.csqs, function(v, k){
+                if (v.Id == csq_id){
+                    angular.forEach(v.sugoisurvey4__Custom_Survey_Option__r, function(vv, kk){
+                        if (vv.$$hashKey == hashKey) {
+                            v.sugoisurvey4__Custom_Survey_Option__r.splice(kk, 1);
+                        }
+                    });
+                }
+            });
+        }
+    };
+    
+    $scope.show_modal = function(type, title, button_label, button_class, action, action_param){
+        $scope.rtk.submitting = false;
+        $scope.rtk.result = null;
+        $scope.rtk.message = null;
+        $scope.modal = {};
+        $scope.modal.title = title;
+        $scope.modal.button_label = button_label;
+        $scope.modal.button_class = button_class;
+        $scope.modal.action = action;
+        $scope.modal.action_param = action_param;
+        j$("#tab_edit_survey .modal_" + type).modal();
+        if (type == 'progress'){
+            action(action_param);
+        }
+    };
+
+    $scope.init_csq = function(){
+        // Initialize csq
+        $scope.csq = {};
+        $scope.csq.Session__c = '{!session__c.Id}';
+        $scope.csq.Required__c = false;
+        $scope.csq.Enable_Free_Form__c = false;
+        $scope.csq.Survey_Type__c = 'checkbox';
+
+        var default_num_of_options = 2;
+        $scope.csos = [];
+        for (var i = 0; i < default_num_of_options; i++){
+            $scope.add_option(null);
+        }
+    }
+
+    $scope.init = function(){
+        // Initialize csq
+        $scope.init_csq();
+        
+        // Initialize rtk
+        $scope.rtk = {};
+        $scope.rtk.submitting = false;
+        $scope.rtk.action = null;
+        $scope.rtk.result = null;
+        $scope.rtk.message = null;
+        $scope.rtk.csq_id = null;
+
+        // Initialize mode
+        $scope.mode = 'edit';
+
+        if (typeof sforce == 'undefined'){
+            $scope.s1 = false;
+        } else {
+            $scope.s1 = true;
+        }
+        
+        $scope.$watch('session', function(new_value, old_value){
+            if (new_value !== old_value){
+                $scope.generate_csqs();
+            }
+        });
+
+        $scope.$watch('csqs_for_sort', function(new_value, old_value){
+            if (new_value == null){
+                return;
+            }
+            if (new_value !== old_value){
+                $scope.sort_csqs();
+            }
+        });
+    };
+    
+    // Initialize All
+    $scope.init();
 
 }
 </script>
 
-<!-- Modal Dialog for delete survey -->
-<div class="modal fade" id="confirm_delete_survey" tabindex="-1" role="dialog" aria-labelledby="confirm_delete_survey" aria-hidden="true">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-				<h4 class="modal-title" id="myModalLabel">{!$label.deleting_question}</h4>
-			</div>
-			<div class="modal-body">
-				{!$label.are_you_sure}
-			</div>
-			<div class="modal-footer">
-				<div ng-show="rtk.deleting != true">
-					<button type="button" class="btn btn-default" data-dismiss="modal">{!$label.cancel}</button>
-					<button type="button" class="btn btn-danger" ng-click="delete_survey(rtk.csq_id)">{!$label.delete}</button>
-				</div>
-				<div ng-show="rtk.deleting == true" class="progress progress-striped active" style="height: 30px; margin-bottom:10px;">
-					<div class="progress-bar progress-bar-danger"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%;"></div>
-				</div>
-			</div>
-		</div><!-- /.modal-content -->
-	</div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-
 <div class="survey_box_outer" style="border-color: #76CB6E; background-color: #f0f0f0">
-	<div class="survey_box_inner">
-		<!-- Message Area -->
-		<div class="row survey_section" ng-show="rtk.csq_id == null && rtk.result == 'error'">
-		    <div class="col-sm-12">
-		    	<div class="alert alert-danger">
-			    	<a href="#" class="close" data-dismiss="alert">&times;</a>
-			    	{{rtk.message}}
-		    	</div>
-		    </div>
-		</div>
-		
-		<!-- Survey Type Selection Panel -->
-		<div class="row survey_section">
-		    <div class="col-sm-4" style="margin-bottom:10px;">
-		        <button type="button" class="btn btn-block btn-lg btn-default" ng-class="(csq.Survey_Type__c == 'checkbox') ? 'btn-selected active' : 'btn-default'" ng-click="csq.Survey_Type__c = 'checkbox'">
-		        	<span class="glyphicon glyphicon-list"></span><br/>
-		        	{!$label.survey_type_checkbox}
-		        </button>
-		    </div>
-		    <div class="col-sm-4" style="margin-bottom:10px;">
-		        <button type="button" class="btn btn-block btn-lg btn-default" ng-class="(csq.Survey_Type__c == 'radio') ? 'btn-selected active' : 'btn-default'" ng-click="csq.Survey_Type__c = 'radio'">
-		        	<span class="glyphicon glyphicon-pushpin"></span><br/>
-		        	{!$label.survey_type_radio}
-	        	</button>
-		    </div>
-		    <div class="col-sm-4" style="margin-bottom:10px;">
-		        <button type="button" class="btn btn-block btn-lg btn-default" ng-class="(csq.Survey_Type__c == 'free') ? 'btn-selected active' : 'btn-default'" ng-click="csq.Survey_Type__c = 'free'">
-		        	<span class="glyphicon glyphicon-pencil"></span><br/>
-		        	{!$label.survey_type_free}
-		        </button>
-		    </div>
-		</div>
-		
-		<!--  Question Form -->
-		<div class="row survey_section">
-			<div class="col-sm-12 form-group">
-		    	<input class="form-control input-lg" type="text" id="new_csq" placeholder="{!$label.customSurveyQuestion}" ng-model="csq.Question__c"></input>
-			</div>
-		</div>
-		
-		<!-- Survey Property Swtich -->
-		<div class="row survey_section">
-			<div class="col-sm-12">
-				<button type="button" class="btn btn-default" ng-class="(csq.Required__c == true) ? 'btn-danger active' : 'btn-default'" ng-click="csq.Required__c = !csq.Required__c">{!$label.answer_required}</button>
-				<button type="button" class="btn btn-default" ng-class="(csq.Enable_Free_Form__c == true) ? 'btn-danger active' : 'btn-default'" ng-show="csq.Survey_Type__c != 'free'" ng-click="csq.Enable_Free_Form__c = !csq.Enable_Free_Form__c">{!$label.enable_free_form}</button>
-			</div>
-		</div>
-		
-		<!--  Option Form -->
-		<div class="row survey_section" ng-show="csq.Survey_Type__c != 'free'">
-			<div class="col-xs-12 form-group">
-				<div class="row" ng-repeat="cso in csos" style="margin-bottom: 5px;">
-					<div class="col-md-11 col-sm-10 col-xs-8">
-						<input ng-model="cso.Option__c" class="form-control input-lg" type="text" placeholder="{!$label.option}"></input>
-					</div>
-					<div class="col-md-1 col-sm-2 col-xs-4">
-						<button type="button" class="btn btn-default btn-lg btn-danger" ng-click="del_option(null, cso.$$hashKey)"><span class="glyphicon glyphicon-remove"></span></button>
-					</div>
-				</div>
-				
-				<input ng-show="csq.Enable_Free_Form__c == true" class="form-control input-lg" type="text" placeholder="{!$label.other}" style="margin-bottom:5px;" disabled="true"></input>
-		    	<textarea ng-show="csq.Enable_Free_Form__c == true" class="form-control input-lg" rows="3" disabled="true"></textarea>
-		    </div>
-		    <div class="col-xs-12">
-		        <button type="button" class="btn btn-default btn-lg pull-right" ng-click="add_option(null)">
-					<span class="glyphicon glyphicon-plus-sign"></span>&nbsp;{!$label.add_option}
-		        </button>
-		    </div>
-		</div>
-		
-		<!--  Free Form -->
-		<div class="row survey_section" ng-show="csq.Survey_Type__c == 'free'">
-			<div class="col-sm-12 form-group">
-		    	<textarea class="form-control input-lg" rows="3" disabled="true"></textarea>
-			</div>
-		</div>
-		
-		<!-- Save Button -->
-		<div class="row survey_section">
-			<div class="col-sm-12">
-				<button ng-show="rtk.csq_id != null || rtk.submitting != true" type="button" class="btn btn-success btn-lg btn-block" ng-click="create_survey()">
-			     	<span class="glyphicon glyphicon-ok-sign"></span>
-			     	{!$label.create}
-			    </button>
-		       	<div ng-show="rtk.csq_id == null && rtk.submitting == true" class="progress progress-striped active" style="height: 45px; margin-bottom:10px;">
-					<div class="progress-bar progress-bar-success"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%;"></div>
-				</div>
-		   	</div>
-		</div>
-	</div>
+    <div class="survey_box_inner">
+        <!-- Message Area -->
+        <div class="row survey_section" ng-show="rtk.action == 'create_survey' && rtk.result == 'error'">
+            <div class="col-sm-12">
+                <div class="alert alert-danger">
+                    {{rtk.message}}
+                </div>
+            </div>
+        </div>
+        <div class="row survey_section" ng-show="rtk.action == 'create_survey' && rtk.result == 'success'">
+            <div class="col-sm-12">
+                <div class="alert alert-success">
+                    {{rtk.message}}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Survey Type Selection Panel -->
+        <div class="row survey_section">
+            <div class="col-sm-4" style="margin-bottom:10px;">
+                <button type="button" class="btn btn-block btn-default" ng-class="(csq.Survey_Type__c == 'checkbox') ? 'btn-selected active' : 'btn-default'" ng-click="csq.Survey_Type__c = 'checkbox'">
+                    <span class="glyphicon glyphicon-list"></span><br/>
+                    {!$label.survey_type_checkbox}
+                </button>
+            </div>
+            <div class="col-sm-4" style="margin-bottom:10px;">
+                <button type="button" class="btn btn-block btn-default" ng-class="(csq.Survey_Type__c == 'radio') ? 'btn-selected active' : 'btn-default'" ng-click="csq.Survey_Type__c = 'radio'">
+                    <span class="glyphicon glyphicon-pushpin"></span><br/>
+                    {!$label.survey_type_radio}
+                </button>
+            </div>
+            <div class="col-sm-4" style="margin-bottom:10px;">
+                <button type="button" class="btn btn-block btn-default" ng-class="(csq.Survey_Type__c == 'free') ? 'btn-selected active' : 'btn-default'" ng-click="csq.Survey_Type__c = 'free'">
+                    <span class="glyphicon glyphicon-pencil"></span><br/>
+                    {!$label.survey_type_free}
+                </button>
+            </div>
+        </div>
+        
+        <!--  Question Form -->
+        <div class="row survey_section">
+            <div class="col-sm-12 form-group">
+                <input class="form-control" type="text" id="new_csq" placeholder="{!$label.customSurveyQuestion}" ng-model="csq.Question__c"></input>
+            </div>
+        </div>
+        
+        <!-- Survey Property Swtich -->
+        <div class="row survey_section">
+            <div class="col-sm-12">
+                <button type="button" class="btn btn-default" ng-class="(csq.Required__c == true) ? 'btn-danger active' : 'btn-default'" ng-click="csq.Required__c = !csq.Required__c">{!$label.answer_required}</button>
+                <button type="button" class="btn btn-default" ng-class="(csq.Enable_Free_Form__c == true) ? 'btn-danger active' : 'btn-default'" ng-show="csq.Survey_Type__c != 'free'" ng-click="csq.Enable_Free_Form__c = !csq.Enable_Free_Form__c">{!$label.enable_free_form}</button>
+            </div>
+        </div>
+        
+        <!--  Option Form -->
+        <div class="row survey_section" ng-show="csq.Survey_Type__c != 'free'">
+            <div class="col-xs-12 form-group">
+                <div class="row" ng-repeat="cso in csos" style="margin-bottom: 5px;">
+                    <div class="col-sm-10 col-xs-8">
+                        <input ng-model="cso.Option__c" class="form-control" type="text" placeholder="{!$label.option}"></input>
+                    </div>
+                    <div class="col-sm-2 col-xs-4" style="text-align: right;">
+                        <button type="button" class="btn btn-default btn-danger" ng-click="del_option(null, cso.$$hashKey)"><span class="glyphicon glyphicon-remove"></span></button>
+                    </div>
+                </div>
+                
+                <input ng-show="csq.Enable_Free_Form__c == true" class="form-control" type="text" placeholder="{!$label.other}" style="margin-bottom:5px;" disabled="true"></input>
+                <textarea ng-show="csq.Enable_Free_Form__c == true" class="form-control" rows="3" disabled="true"></textarea>
+            </div>
+            <div class="col-xs-12">
+                <button type="button" class="btn btn-default pull-right" ng-click="add_option(null)">
+                    <span class="glyphicon glyphicon-plus-sign"></span>&nbsp;{!$label.add_option}
+                </button>
+            </div>
+        </div>
+        
+        <!--  Free Form -->
+        <div class="row survey_section" ng-show="csq.Survey_Type__c == 'free'">
+            <div class="col-sm-12 form-group">
+                <textarea class="form-control" rows="3" disabled="true"></textarea>
+            </div>
+        </div>
+        
+        <!-- Save Button -->
+        <div class="row survey_section">
+            <div class="col-sm-12">
+                <button ng-show="rtk.csq_id != null || rtk.submitting != true" type="button" class="btn btn-success btn-block" ng-click="create_survey()">
+                    <span class="glyphicon glyphicon-ok-sign"></span>
+                    {!$label.create}
+                </button>
+                <div ng-show="rtk.csq_id == null && rtk.submitting == true" class="progress progress-striped active" style="height: 35px; margin-bottom:10px;">
+                    <div class="progress-bar progress-bar-success"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
+<div ng-show="s1 == false" style="margin-bottom: 20px; text-align: right;">
+    <button type="button" class="btn btn-default" ng-click="mode = 'sort'" ng-show="mode == 'edit'">{!$label.sort}</button>
+    <button type="button" class="btn btn-default" ng-click="mode = 'edit'" ng-show="mode == 'sort'">{!$label.back}</button>
+</div>
+
+<div ng-show="mode == 'edit'">
 <div ng-repeat="ecsq in csqs" class="survey_box_outer">
-	<!-- Delete Button -->
-   	<div style="margin:10px;">
-	   	<button type="button" class="btn btn-xs btn-danger pull-right" ng-click="show_modal_before_delete_survey(ecsq.Id)">
-	   		<span class="glyphicon glyphicon-remove"></span>
-	   	</button>
-   	</div>
-		    	
-	<div class="survey_box_inner">
-		<!-- Message Area -->
-		<div class="row survey_section" ng-show="rtk.csq_id == ecsq.Id && rtk.result == 'error'">
-		    <div class="col-sm-12">
-		    	<div class="alert alert-danger">
-			    	<a href="#" class="close" data-dismiss="alert">&times;</a>
-			    	{{rtk.message}}
-		    	</div>
-		    </div>
-		</div>
-		
-		<!-- Survey Type Selection Panel -->
-		<div class="row survey_section">
-		    <div class="col-sm-4" style="margin-bottom:10px;">
-		        <button type="button" class="btn btn-block btn-lg btn-default" ng-class="(ecsq.sugoisurvey4__Survey_Type__c == 'checkbox') ? 'btn-selected active' : 'btn-default'" ng-click="ecsq.sugoisurvey4__Survey_Type__c = 'checkbox'">
-		        	<span class="glyphicon glyphicon-list"></span><br/>
-		        	{!$label.survey_type_checkbox}
-		        </button>
-		    </div>
-		    <div class="col-sm-4" style="margin-bottom:10px;">
-		        <button type="button" class="btn btn-block btn-lg btn-default" ng-class="(ecsq.sugoisurvey4__Survey_Type__c == 'radio') ? 'btn-selected active' : 'btn-default'" ng-click="ecsq.sugoisurvey4__Survey_Type__c = 'radio'">
-		        	<span class="glyphicon glyphicon-pushpin"></span><br/>
-		        	{!$label.survey_type_radio}
-		        </button>
-		    </div>
-		    <div class="col-sm-4" style="margin-bottom:10px;">
-		        <button type="button" class="btn btn-block btn-lg btn-default" ng-class="(ecsq.sugoisurvey4__Survey_Type__c == 'free') ? 'btn-selected active' : 'btn-default'" ng-click="ecsq.sugoisurvey4__Survey_Type__c = 'free'">
-		        	<span class="glyphicon glyphicon-pencil"></span><br/>
-		        	{!$label.survey_type_free}
-		        </button>
-		    </div>
-		</div>
+    <!-- Delete Button -->
+    <div style="margin:10px;">
+        <button type="button" class="btn btn-xs btn-danger pull-right" ng-click="show_modal('confirm', '{!$label.deleting_question}', '{!$label.delete}', 'danger', delete_survey, ecsq.Id)">
+            <span class="glyphicon glyphicon-remove"></span>
+        </button>
+    </div>
+                
+    <div class="survey_box_inner">
+        <!-- Message Area -->
+        <div class="row survey_section" ng-show="rtk.csq_id == ecsq.Id && rtk.result == 'error'">
+            <div class="col-sm-12">
+                <div class="alert alert-danger">
+                    {{rtk.message}}
+                </div>
+            </div>
+        </div>
+        <div class="row survey_section" ng-show="rtk.csq_id == ecsq.Id && rtk.result == 'success'">
+            <div class="col-sm-12">
+                <div class="alert alert-success">
+                    {{rtk.message}}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Survey Type Selection Panel -->
+        <div class="row survey_section">
+            <div class="col-sm-4" style="margin-bottom:10px;">
+                <button type="button" class="btn btn-block btn-default" ng-class="(ecsq.sugoisurvey4__Survey_Type__c == 'checkbox') ? 'btn-selected active' : 'btn-default'" ng-click="ecsq.sugoisurvey4__Survey_Type__c = 'checkbox'">
+                    <span class="glyphicon glyphicon-list"></span><br/>
+                    {!$label.survey_type_checkbox}
+                </button>
+            </div>
+            <div class="col-sm-4" style="margin-bottom:10px;">
+                <button type="button" class="btn btn-block btn-default" ng-class="(ecsq.sugoisurvey4__Survey_Type__c == 'radio') ? 'btn-selected active' : 'btn-default'" ng-click="ecsq.sugoisurvey4__Survey_Type__c = 'radio'">
+                    <span class="glyphicon glyphicon-pushpin"></span><br/>
+                    {!$label.survey_type_radio}
+                </button>
+            </div>
+            <div class="col-sm-4" style="margin-bottom:10px;">
+                <button type="button" class="btn btn-block btn-default" ng-class="(ecsq.sugoisurvey4__Survey_Type__c == 'free') ? 'btn-selected active' : 'btn-default'" ng-click="ecsq.sugoisurvey4__Survey_Type__c = 'free'">
+                    <span class="glyphicon glyphicon-pencil"></span><br/>
+                    {!$label.survey_type_free}
+                </button>
+            </div>
+        </div>
 
-		<!--  Question Form -->
-		<div class="row survey_section">
-			<div class="col-sm-12 form-group">
-		    	<input class="form-control input-lg" type="text" placeholder="{!$label.customSurveyQuestion}" ng-model="ecsq.sugoisurvey4__Question__c"></input>
-			</div>
-		</div>
-		
-		<!-- Survey Property Swtich -->
-		<div class="row survey_section">
-			<div class="col-sm-12">
-				<button type="button" class="btn btn-default" ng-class="(ecsq.sugoisurvey4__Required__c == true) ? 'btn-danger active' : 'btn-default'" ng-click="ecsq.sugoisurvey4__Required__c = !ecsq.sugoisurvey4__Required__c">{!$label.answer_required}</button>
-				<button type="button" class="btn btn-default" ng-class="(ecsq.sugoisurvey4__Enable_Free_Form__c == true) ? 'btn-danger active' : 'btn-default'" ng-show="ecsq.sugoisurvey4__Survey_Type__c != 'free'" ng-click="ecsq.sugoisurvey4__Enable_Free_Form__c = !ecsq.sugoisurvey4__Enable_Free_Form__c">{!$label.enable_free_form}</button>
-			</div>
-		</div>
-		
-		<!--  Option Form -->
-		<div class="row survey_section" ng-show="ecsq.sugoisurvey4__Survey_Type__c != 'free'">
-			<div class="col-xs-12 form-group">
-				<div class="row" ng-repeat="ecso in ecsq.sugoisurvey4__Custom_Survey_Option__r.records" style="margin-bottom: 5px;">
-					<div class="col-md-11 col-sm-10 col-xs-9" ng-show="ecso.sugoisurvey4__Enable_Free_Form__c != true && ecso.sugoisurvey4__Dummy__c != true">
-						<input ng-model="ecso.sugoisurvey4__Option__c" class="form-control input-lg" type="text" placeholder="{!$label.option}"></input>
-					</div>
-					<div class="col-md-1 col-sm-2 col-xs-3" ng-show="ecso.sugoisurvey4__Enable_Free_Form__c != true && ecso.sugoisurvey4__Dummy__c != true">
-						<button type="button" class="btn btn-default btn-lg btn-danger" ng-click="del_option(ecsq.Id, ecso.$$hashKey)"><span class="glyphicon glyphicon-remove"></span></button>
-					</div>
-				</div>
-				
-				<input ng-show="ecsq.sugoisurvey4__Enable_Free_Form__c == true" class="form-control input-lg" type="text" placeholder="{!$label.other}" style="margin-bottom:5px;" disabled="true"></input>
-		    	<textarea ng-show="ecsq.sugoisurvey4__Enable_Free_Form__c == true" class="form-control input-lg" rows="3" disabled="true"></textarea>
-		    </div>
-		    <div class="col-xs-12">
-		        <button type="button" class="btn btn-default btn-lg pull-right" ng-click="add_option(ecsq.Id)">
-					<span class="glyphicon glyphicon-plus-sign"></span>&nbsp;{!$label.add_option}
-		        </button>
-		    </div>
-		</div>
-		
-		<!--  Free Form -->
-		<div class="row survey_section" ng-show="ecsq.sugoisurvey4__Survey_Type__c == 'free'">
-			<div class="col-sm-12 form-group">
-		    	<textarea class="form-control input-lg" rows="3" disabled="true"></textarea>
-			</div>
-		</div>
-		
-		<!-- Save Button -->
-		<div class="row survey_section">
-			<div class="col-sm-12">
-				<button ng-show="rtk.csq_id != ecsq.Id || rtk.submitting != true" type="button" class="btn btn-success btn-lg btn-block" ng-click="update_survey(ecsq)">
-			     	<span class="glyphicon glyphicon-ok-sign"></span>
-			     	{!$label.update}
-			    </button>
-		       	<div ng-show="rtk.csq_id == ecsq.Id && rtk.submitting == true" class="progress progress-striped active" style="height: 45px; margin-bottom:10px;">
-					<div class="progress-bar progress-bar-success"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%;"></div>
-				</div>
-		   	</div>
-		</div>
-	</div>
+        <!--  Question Form -->
+        <div class="row survey_section">
+            <div class="col-sm-12 form-group">
+                <input class="form-control" type="text" placeholder="{!$label.customSurveyQuestion}" ng-model="ecsq.sugoisurvey4__Question__c"></input>
+            </div>
+        </div>
+        
+        <!-- Survey Property Swtich -->
+        <div class="row survey_section">
+            <div class="col-sm-12">
+                <button type="button" class="btn btn-default" ng-class="(ecsq.sugoisurvey4__Required__c == true) ? 'btn-danger active' : 'btn-default'" ng-click="ecsq.sugoisurvey4__Required__c = !ecsq.sugoisurvey4__Required__c">{!$label.answer_required}</button>
+                <button type="button" class="btn btn-default" ng-class="(ecsq.sugoisurvey4__Enable_Free_Form__c == true) ? 'btn-danger active' : 'btn-default'" ng-show="ecsq.sugoisurvey4__Survey_Type__c != 'free'" ng-click="ecsq.sugoisurvey4__Enable_Free_Form__c = !ecsq.sugoisurvey4__Enable_Free_Form__c">{!$label.enable_free_form}</button>
+            </div>
+        </div>
+        
+        <!--  Option Form -->
+        <div class="row survey_section" ng-show="ecsq.sugoisurvey4__Survey_Type__c != 'free'">
+            <div class="col-xs-12 form-group">
+                <div class="row" ng-repeat="ecso in ecsq.sugoisurvey4__Custom_Survey_Option__r" style="margin-bottom: 5px;">
+                    <div class="col-md-11 col-sm-10 col-xs-9" ng-show="ecso.sugoisurvey4__Enable_Free_Form__c != true && ecso.sugoisurvey4__Dummy__c != true">
+                        <input ng-model="ecso.sugoisurvey4__Option__c" class="form-control" type="text" placeholder="{!$label.option}"></input>
+                    </div>
+                    <div class="col-md-1 col-sm-2 col-xs-3" ng-show="ecso.sugoisurvey4__Enable_Free_Form__c != true && ecso.sugoisurvey4__Dummy__c != true">
+                        <button type="button" class="btn btn-default btn-danger" ng-click="del_option(ecsq.Id, ecso.$$hashKey)"><span class="glyphicon glyphicon-remove"></span></button>
+                    </div>
+                </div>
+                
+                <input ng-show="ecsq.sugoisurvey4__Enable_Free_Form__c == true" class="form-control" type="text" placeholder="{!$label.other}" style="margin-bottom:5px;" disabled="true"></input>
+                <textarea ng-show="ecsq.sugoisurvey4__Enable_Free_Form__c == true" class="form-control" rows="3" disabled="true"></textarea>
+            </div>
+            <div class="col-xs-12">
+                <button type="button" class="btn btn-default pull-right" ng-click="add_option(ecsq.Id)">
+                    <span class="glyphicon glyphicon-plus-sign"></span>&nbsp;{!$label.add_option}
+                </button>
+            </div>
+        </div>
+        
+        <!--  Free Form -->
+        <div class="row survey_section" ng-show="ecsq.sugoisurvey4__Survey_Type__c == 'free'">
+            <div class="col-sm-12 form-group">
+                <textarea class="form-control" rows="3" disabled="true"></textarea>
+            </div>
+        </div>
+        
+        <!-- Save Button -->
+        <div class="row survey_section">
+            <div class="col-sm-12">
+                <button ng-show="rtk.csq_id != ecsq.Id || rtk.submitting != true" type="button" class="btn btn-success btn-block" ng-click="update_survey(ecsq)">
+                    <span class="glyphicon glyphicon-ok-sign"></span>
+                    {!$label.update}
+                </button>
+                <div ng-show="rtk.csq_id == ecsq.Id && rtk.submitting == true" class="progress progress-striped active" style="height: 35px; margin-bottom:10px;">
+                    <div class="progress-bar progress-bar-success"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+</div>
+
+<!-- Existing Survey List for Sort -->
+<div ng-show="mode == 'sort'">
+    <div ng-show="rtk.action == 'sort_csqs' && rtk.submitting == true" class="progress progress-striped active" style="height: 45px; margin-bottom:10px;">
+        <div class="progress-bar progress-bar-primary"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%;"></div>
+    </div>
+    <div ng-show="rtk.action != 'sort_csqs' && rtk.submitting == false" class="alert alert-info">
+        {!$label.you_can_sort_by_drag}
+    </div>
+    <div ng-show="rtk.action == 'sort_csqs' && rtk.submitting == false && rtk.result == 'success'" class="alert alert-success">
+        {{rtk.message}}
+    </div>
+    <div ng-show="rtk.action == 'sort_csqs' && rtk.submitting == false && rtk.result == 'error'" class="alert alert-danger">
+        {{rtk.message}}
+    </div>
+    <div ui-sortable="existing_surveys_for_sort" ng-model="csqs">
+        <div ng-repeat="ecsq in csqs" class="survey_box_outer" style="margin-bottom: 20px;">
+            <div class="survey_box_inner" style="margin: 20px auto;">
+                <input class="form-control" type="text" placeholder="{!$label.customSurveyQuestion}" ng-model="ecsq.sugoisurvey4__Question__c"></input>
+            </div>
+        </div>
+    </div>
+</div><!-- Existing Survey List for Sort -->
+
+<!-- Modal Dialog -->
+<c:S1_modal_confirm />
+<c:S1_modal_progress />
+
 </apex:page>

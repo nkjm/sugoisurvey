@@ -46,6 +46,10 @@
         <name>Last_Name__c</name>
     </fields>
     <fields>
+        <label>Mail Delivered</label>
+        <name>Mail_Delivered__c</name>
+    </fields>
+    <fields>
         <label>Found Multiple Contacts</label>
         <name>Multiple_Contacts__c</name>
     </fields>
@@ -83,6 +87,10 @@
         </picklistValues>
     </fields>
     <fields>
+        <label>Survey Link Delivered</label>
+        <name>Survey_Link_Delivered__c</name>
+    </fields>
+    <fields>
         <label>Title</label>
         <name>Title__c</name>
     </fields>
@@ -95,6 +103,10 @@
         <sections>
             <label>Custom Link</label>
             <section>カスタムリンク</section>
+        </sections>
+        <sections>
+            <label><!-- メール配信状況 --></label>
+            <section>メール配信状況</section>
         </sections>
     </layouts>
     <nameFieldLabel>Guest Number</nameFieldLabel>

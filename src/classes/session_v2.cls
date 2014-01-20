@@ -19,10 +19,29 @@ public with sharing class session_v2 {
         return this.session;
     }
     
+    public static config__c config = config__c.getOrgDefaults();
+
+    // Get method for retrieving custom setting
+    public static config__c getConfig(){
+        return config;
+    }
+    
+    private static testmethod void validate_getConfig(){
+        config.initialized__c = true;
+        upsert config;
+        system.assertEquals(true, getConfig().initialized__c);
+    }
+    
+    
+    // Deprecated
+    /*
     public string getSession_json(){
         return JSON.serialize(this.session).replaceAll('\\<.*?\\>', '');
     }
+    */
 
+	// Deprecated
+	/*
     public list<session__c> getSessions(){
         return [
             select 
@@ -37,20 +56,10 @@ public with sharing class session_v2 {
             from session__c order by date__c desc, createdDate desc
         ];
     }
+    */
     
-    public static config__c config = config__c.getOrgDefaults();
-
-    // Get method for retrieving custom setting
-    public static config__c getConfig(){
-        return config;
-    }
-    
-    private static testmethod void validate_getConfig(){
-        config.initialized__c = true;
-        upsert config;
-        system.assertEquals(true, getConfig().initialized__c);
-    }
-    
+    // Deprecated
+    /*
     public list<guest__c> getDeliveryDestinations(){
         list<guest__c> deliveryDestinations = new list<guest__c>();
         if (this.session.who_can_get_handout__c == '全員' ||
@@ -77,7 +86,10 @@ public with sharing class session_v2 {
         }
         return deliveryDestinations;
     }
+    */
     
+    // Deprecated
+    /*
     public string getMailBody(){
         string body = '';
         if (this.session.mass_mail_additional_body__c != null){
@@ -93,4 +105,5 @@ public with sharing class session_v2 {
         }
         return body;
     }
+    */
 }

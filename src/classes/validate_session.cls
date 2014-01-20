@@ -123,6 +123,8 @@ public class validate_session {
         system.assertEquals('test session1', sugoi_session1.getSession().name);
     }
     
+    // Deprecated
+    /*
     static testmethod void validate_getSessions(){
     	Session__c session1 = createDummySession('test session1', system.label.picklist_require_email, system.label.picklist_require_survey_submission);
     	ApexPages.StandardController sc1 = new ApexPages.StandardController(session1);
@@ -130,7 +132,9 @@ public class validate_session {
         system.assertEquals(1, sugoi_session1.getSessions().size());
         system.assertEquals('test session1', sugoi_session1.getSessions()[0].name);
     }
+    */
     
+    /*
     static testmethod void validate_getDeliveryDestinations(){
      	session__c session;
     	ApexPages.StandardController sc;
@@ -169,4 +173,5 @@ public class validate_session {
         string mail_body = i_session.getMailBody();
         system.assertEquals('<p>ksldhfoihoedfjosdklf</p><p>' + system.label.handout_download_url + ' : <a href="https://woieur.woeifjoeiwjfow.com">https://woieur.woeifjoeiwjfow.com</a><br/>' + system.label.password + ' : kriigjeifnief</p>', mail_body);
     }
+    */
 }

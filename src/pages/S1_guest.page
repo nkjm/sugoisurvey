@@ -1,0 +1,60 @@
+<apex:page readOnly="true" showHeader="false" standardStylesheets="false" applyhtmlTag="false" applyBodyTag="false" docType="html-5.0">
+
+<html class="ng-app" id="ng-app">
+<head>
+	<meta charset="utf-8"></meta>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+    <title>{!$label.sugoisurvey}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.2/css/bootstrap.min.css"></link>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.2/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.1/angular.min.js"></script>
+    <c:RemoteTK />
+<style>
+@media screen and (min-width: 320px) {
+    h1 {
+        color: #666666;
+        font-size: 14pt;
+    }
+    .tab_label {
+        font-size: 0.8em;
+        padding: 7px;
+    }
+}
+@media screen and (min-width: 768px) {
+    h1 {
+        color: #666666;
+        font-size: 16pt;
+    }
+    .tab_label {
+        font-size: 1.0em;
+        padding: 12px;
+    }
+}
+h2 {
+    color: #666666;
+    font-size: 14pt;
+    margin-bottom: 20px;
+}
+h3 {
+    color: #333333;
+    font-size: 12pt;
+    border-bottom: solid 1px #666666;
+    padding-bottom: 10px;
+}
+h4, h5 {
+    color: #333333;
+    font-size: 10pt;
+}
+</style>
+</head>
+<body>
+	<apex:include pageName="S1_guest_list" rendered="{! ISNULL($CurrentPage.parameters.Id) }" />
+	<apex:outputText rendered="{! !ISNULL($CurrentPage.parameters.Id) }">
+    	<div class="container">
+			<apex:include pageName="S1_guest_detail" />
+		</div>
+    </apex:outputText>
+</body>
+</html>
+</apex:page>

@@ -2,6 +2,8 @@
 private class validate_guest_cascade_delete {
     static testmethod void validate_guest_cascade_delete(){
         session__c session = validate_session.createDummySession('poiqjefpoerfj', system.label.picklist_require_email, system.label.picklist_require_survey_submission);
+        session.Post_Comment_To_Session_Record_Feed__c = true;
+        update session;
         guest__c g = [select id from guest__c where session__c = :session.id and first_name__c = 'uruffjjfr'];
         jr_session.copy_comment_to_feedItem(session.id);
         list<feedItem> feedItems = [select id, linkUrl from feedItem where parentId = :session.id];

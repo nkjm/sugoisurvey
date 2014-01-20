@@ -1,0 +1,143 @@
+<apex:page standardController="Presenter__c" extensions="presenter" readOnly="true" showHeader="false" standardStylesheets="false" applyhtmlTag="false" applyBodyTag="false" docType="html-5.0">
+
+<style>
+#presenter_list .row_presenter_selected {
+	background-color: #eeeeee;
+}
+#presenter_list .row_presenter:hover {
+	background-color: #F6EDF2;
+	border-bottom: solid 1px #f4a4d4;
+	cursor: pointer;
+}
+</style>
+
+<script>
+j$ = jQuery.noConflict();
+function presenters($scope){
+	$scope.toggle_form_new = function(){
+		j$("#form_new").slideToggle();
+		$scope.show_form_new = !$scope.show_form_new;
+	};
+	
+	$scope.retrieve_presenters = function(){
+		$scope.rtk.action = 'retrieve_presenters';
+		
+		delete $scope.rtk.result;
+		delete $scope.rtk.message;
+		$scope.rtk.submitting = true;
+		sugoisurvey4.presenter.get_presenters(
+			function(result, event){
+				if (event.status){
+					$scope.rtk.submitting = false;
+					$scope.rtk.result = 'success';
+					$scope.presenters = result;
+					$scope.$apply();
+					j$("#presenter_list").show();
+				} else {
+					$scope.rtk.submitting = false;
+					$scope.rtk.result = 'error';
+					$scope.rtk.message = event.message;
+					$scope.$apply();
+				}
+			},{escape:true}
+		);
+	};
+	
+	$scope.create_presenter = function(){
+		$scope.rtk.action = 'create_presenter';
+		
+		if ($scope.presenter == null || $scope.presenter.Name == null || $scope.presenter.Name == ''){
+			$scope.rtk.result = 'error';
+			$scope.rtk.message = '{!$label.survey_name_is_missing}';
+			return;
+		}
+		
+		$scope.rtk.submitting = true;
+		delete $scope.rtk_result;
+		delete $scope.rtk_message;
+		$scope.force.create(
+			'sugoisurvey4__Presenter__c',
+			$scope.presenter,
+			function(result){
+				$scope.rtk.submitting = false;
+				$scope.rtk.result = 'success';
+				$scope.toggle_form_new();
+                $scope.init();
+			},
+			function(result){
+				$scope.rtk.submitting = false;
+				$scope.rtk.result = 'error';
+				$scope.rtk.message = result[0].message;
+				$scope.$apply();
+			}
+		);
+	};
+	
+	$scope.navigate_to_presenter_detail = function(presenter_id){
+		j$("#presenter_list .row_presenter" + presenter_id).addClass("row_presenter_selected");
+		
+		if (typeof sforce == "undefined"){
+			window.location = '/apex/sugoisurvey4__presenter?id=' + presenter_id;
+		} else {
+			sforce.one.navigateToURL('/apex/sugoisurvey4__S1_survey?id=' + presenter_id + '&tab=presenter');
+		}
+	};
+	
+	$scope.init = function(){
+		$scope.presenter = null;
+		
+		$scope.show_form_new = false;
+		
+		$scope.rtk = {};
+		$scope.rtk.submitting = false;
+		$scope.rtk.result = null;
+		$scope.rtk.message = null;
+		
+		$scope.retrieve_presenters();
+	};
+	
+	// Initialize All
+	$scope.force = new remotetk.Client();
+	$scope.init();
+}
+</script>
+
+<div id="presenter_list" ng-controller="presenters" style="display:none;">
+	<div style="width: 95%; margin: 10px auto 20px auto;">
+		<div style="margin-bottom: 10px;">
+			<button type="button" class="btn btn-success btn-block" ng-class="(show_form_new == true) ? 'btn-default' : 'btn-success'" ng-click="toggle_form_new()">
+				<span class="glyphicon glyphicon-plus-sign"></span>&nbsp; {!$label.new_presenter}
+			</button>
+		</div>
+		<div id="form_new" style="display:none;">
+			<div ng-show="rtk.action == 'create_session' && rtk.result == 'error'" class="alert alert-danger">
+				<a href="#" class="close" data-dismiss="alert">&times;</a>
+				{{rtk.message}}
+			</div>
+			<div class="row">
+				<div class="col-md-8 col-sm-10 col-xs-8">
+					<input ng-model="presenter.Name" type="text" class="form-control" placeholder="{!$ObjectType.Presenter__c.fields.Name.Label}" style="margin-bottom: 10px;"></input>
+				</div>
+				<div class="col-md-4 col-sm-2 col-xs-4">
+					<div ng-show="rtk.action == 'create_presenter' && rtk.submitting == true" class="progress progress-striped active" style="height: 35px; margin-bottom:10px;">
+						<div class="progress-bar progress-bar-success"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%;"></div>
+					</div>
+					<button ng-show="rtk.action != 'create_presenter' || rtk.submitting == false" type="button" class="btn btn-success btn-block" ng-click="create_presenter()" style="margin-bottom: 10px;">
+						<span class="glyphicon glyphicon-ok-sign"></span>&nbsp;{!$label.create}
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div ng-repeat="presenter in presenters">
+		<div class="row_presenter row_presenter_{{presenter.Id}}" style="overflow: hidden; height:60px; padding: 10px; border-bottom: solid 1px #dddddd;" ng-click="navigate_to_presenter_detail(presenter.Id)">
+	        <span class="glyphicon glyphicon-chevron-right pull-right" style="margin-top:10px;"></span>
+	        <div style="overflow: hidden; height:20px;"><span style="font-size:1.1em;">{{presenter.Name}}</span></div>
+	        <div ng-show="presenter.sugoisurvey4__Company__c != null">
+	        	{{presenter.sugoisurvey4__Company__c}}
+	        </div>
+        </div>
+    </div>
+</div>
+
+</apex:page>

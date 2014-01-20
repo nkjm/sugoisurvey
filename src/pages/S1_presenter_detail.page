@@ -1,0 +1,385 @@
+<apex:page readOnly="true" standardController="Presenter__c" extensions="presenter" standardStylesheets="false" docType="html-5.0">
+<style>
+#presenter_detail .section {
+	margin-bottom: 40px;
+}
+
+@media screen and (min-width: 320px) {
+	#presenter_detail .tab_label {
+        padding: 7px;
+    }
+    #tab_presenter_performance .rate_score {
+        padding: 20px 0 30px 0;
+    }
+}
+@media screen and (min-width: 768px) {
+	#presenter_detail .tab_label {
+        padding: 12px;
+    }
+    #tab_presenter_performance .rate_score {
+        padding: 60px 0 0 0;
+    }
+}
+</style>
+
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type="text/javascript">
+google.load('visualization', '1.0', {'packages':['corechart']});
+j$ = jQuery.noConflict();
+
+function navigate_to_session_detail(session_id){
+	if (typeof sforce == "undefined"){
+		window.location = '/apex/sugoisurvey4__survey?id=' + session_id;
+	} else {
+		sforce.one.navigateToURL('/apex/sugoisurvey4__S1_survey?id=' + session_id);
+	}
+}
+
+function presenter_detail($scope){
+    $scope.retrieve_presenter = function(presenter_id){
+    	$scope.rtk.action = 'retrieve_presenter';
+    	
+        $scope.rtk.result = null;
+        $scope.rtk.message = null;
+        $scope.rtk.submitting = true;
+        sugoisurvey4.presenter.get_presenter(
+        	presenter_id,
+        	function(result, event){
+        		if (event.status){
+	                $scope.rtk.submitting = false;
+	                $scope.rtk.result = 'success';
+	                $scope.presenter = result;
+	                $scope.$apply();
+	                j$("#presenter_detail").show();
+        		} else {
+	                $scope.rtk.submitting = false;
+	                $scope.rtk.result = 'error';
+	                $scope.rtk.message = event.message;
+	                $scope.$apply();
+        		}
+        	},{escape:true}
+        );
+    };
+    
+	$scope.update_presenter = function(){
+		$scope.rtk.action = 'update_presenter';
+		
+		var presenter = j$.extend(true, {}, $scope.presenter);
+		delete presenter.attributes;
+		delete presenter.sugoisurvey4__Session__r;
+		
+		$scope.rtk.result = null;
+		$scope.rtk.message = null;
+		$scope.rtk.submitting = true;
+		$scope.force.update(
+			'sugoisurvey4__Presenter__c',
+			$scope.presenter.Id,
+			presenter,
+			function(result){
+				$scope.rtk.submitting = false;
+				$scope.rtk.result = 'success';
+				$scope.rtk.message = '{!$label.config_has_been_updated}';
+				$scope.$apply();
+			},
+			function(result){
+				$scope.rtk.submitting = false;
+				$scope.rtk.result = 'error';
+				$scope.rtk.message = result[0].message;
+				$scope.$apply();
+			}
+		);
+	};
+	
+    $scope.update_chart = function(){
+        // Draw Area Chart for Performance Summary
+        $scope.draw_area_chart();
+        
+        // Draw Pie Chart for Survey History
+        $scope.draw_pie_chart();
+    };
+    
+    $scope.draw_area_chart = function(){
+	    var data = new google.visualization.DataTable();
+	    data.addColumn('string', '{!$Label.event}');
+	    data.addColumn('number', '{!$Label.rate}');
+	    rate_data = [];
+	    j$.each($scope.presenter.sugoisurvey4__Session__r, function(i, session){
+	        if (session != null){
+	            rate_data.push([session.Name, session.sugoisurvey4__Rate_Avg__c]);
+	        }
+	    });
+	    data.addRows(rate_data);
+	    
+	    var options = {
+	        title: '{!$Label.rate_avg_transition}',
+	        hAxis: {title: '{!$Label.event}'},
+	        vAxis: {viewWindow:{min:0,max:6},viewWindowMode:'explicit',maxValue:5}
+	    };
+	
+	    var chart = new google.visualization.AreaChart(document.getElementById('rate_chart_container'));
+	    chart.draw(data, options);
+    };
+    
+    $scope.draw_pie_chart = function(){
+        j$.each($scope.presenter.sugoisurvey4__Session__r, function(i, session){
+        	var data = new google.visualization.DataTable();
+            var rate_data = [];
+            rate_data.push(['5pt', session.sugoisurvey4__Rate_5__c]);
+            rate_data.push(['4pt', session.sugoisurvey4__Rate_4__c]);
+            rate_data.push(['3pt', session.sugoisurvey4__Rate_3__c]);
+            rate_data.push(['2pt', session.sugoisurvey4__Rate_2__c]);
+            rate_data.push(['1pt', session.sugoisurvey4__Rate_1__c]);
+        
+		    data.addColumn('string', '{!$Label.rate}');
+		    data.addColumn('number', '{!$Label.sum}');
+		    data.addRows(rate_data);
+		    var options = {
+		        'width':250,
+		        'height':210,
+		        'chartArea':{width:'90%',height:'80%'},
+		        'legend':{position:'top'},
+		        'is3D':true
+		    };
+		    var chart = new google.visualization.PieChart(document.getElementById('session_rate_chart_container_' + session.Id));
+		    chart.draw(data, options);
+		
+		    google.visualization.events.addListener(chart, 'select', function(){
+		        var selectedData = chart.getSelection(), row, item;
+		        row = selectedData[0].row;
+		        if (row == 0){
+		            rate = 5;
+		        } else if (row == 1){
+		            rate = 4;
+		        } else if (row == 2){
+		            rate = 3;
+		        } else if (row == 3){
+		            rate = 2;
+		        } else if (row == 4){
+		            rate = 1;
+		        }
+		        if (typeof sforce == 'undefined'){
+		        	window.location = "/apex/sugoisurvey4__guest?session_id=" + session.Id + "&search_by=rate&search_value=" + rate;
+		        } else {
+		        	sforce.one.navigateToURL("/apex/sugoisurvey4__S1_guest?session_id=" + session.Id + "&search_by=rate&search_value=" + rate);
+		        }
+		        
+		    });
+	    });
+    };
+	
+	$scope.delete_presenter = function(){
+		$scope.rtk.action = 'delete_presenter';
+	
+		var update_view = function(){
+			if (typeof sforce == 'undefined'){
+				window.location = '/apex/sugoisurvey4__presenter';
+			} else {
+				sforce.one.navigateToURL('/apex/sugoisurvey4__S1_presenter');
+			}
+		};
+		
+		$scope.rtk.message = null;
+		$scope.rtk.result = null;
+		$scope.rtk.submitting = true;
+		$scope.force.del(
+			'sugoisurvey4__Presenter__c',
+			$scope.presenter.Id,
+			function(result){
+				$scope.rtk.submitting = false;
+				$scope.rtk.result = 'success';
+				$scope.rtk.message = '{!$label.presenter_has_been_deleted}';
+				update_view();
+			},
+			function(result){
+				$scope.rtk.submitting = false;
+				$scope.rtk.result = 'error';
+				$scope.rtk.message = result[0].message;
+				$scope.$apply();
+			}
+		);
+	};
+
+	$scope.show_modal = function(type, title, button_label, button_class, action, action_param){
+		$scope.rtk.submitting = false;
+		$scope.rtk.result = null;
+		$scope.rtk.message = null;
+		$scope.modal = {};
+		$scope.modal.title = title;
+		$scope.modal.button_label = button_label;
+        $scope.modal.button_class = button_class;
+		$scope.modal.action = action;
+		$scope.modal.action_param = action_param;
+		j$("#presenter_detail .modal_" + type).modal();
+		if (type == 'progress'){
+			action(action_param);
+		}
+	};
+	
+	$scope.init = function(){
+
+		$scope.rtk = {};
+		$scope.rtk.submitting = false;
+
+		$scope.presenter = {};
+		$scope.retrieve_presenter('{!presenter__c.Id}');
+		$scope.$watch('presenter', function(new_value, old_value){
+			if (new_value !== old_value){
+				$scope.update_chart();
+			}
+		});
+	};
+	
+	$scope.force = new remotetk.Client();
+	$scope.init();
+}
+</script>
+
+<div ng-controller="presenter_detail" id="presenter_detail" style="display:none;">
+	<div class="row" style="margin-bottom: 20px;">
+	    <div class="col-sm-12">
+	    	<h1>{{presenter.Name}}</h1>
+	    </div>
+	</div>
+	
+	<!--  Tab Bar -->
+	<div class="row" style="margin-bottom: 20px;" id="tab_bar">
+	    <div class="col-sm-12">
+	        <ul class="nav nav-tabs">
+	            <li class="active"><a href="#tab_presenter_performance" data-toggle="tab" class="tab_label">{!$label.performance}</a></li>
+	            <li><a href="#tab_presenter_property" data-toggle="tab" class="tab_label">{!$label.property}</a></li>
+	        </ul>
+	    </div>
+	</div>
+	
+	<div class="tab-content">
+	
+		<!-- Performance Tab -->
+		<div id="tab_presenter_performance" class="tab-pane active">
+			<h2>{!$Label.performance_summary}</h2>
+
+			<!-- Summary Chart -->
+	        <div class="row section">
+	        	<div class="col-sm-4 rate_score" style="text-align: center;">
+			        <apex:outputText rendered="{! !ISNULL(performance_stat.rate_avg) }"><span style="font-size: 12pt;">{!$Label.rate_avg} <span style="font-size:48pt;">{!performance_stat.rate_avg} </span>pt</span></apex:outputText>
+			    </div>
+		        <div class="col-sm-8">
+				    <div id="rate_chart_container">
+				        <!--
+				        <apex:chart height="200" width="450" data="{!rate_chart_data}">
+				            <apex:legend position="top" />
+				            <apex:axis position="left" type="Numeric" title="" grid="true" fields="sugoisurvey4__Rate_Avg__c" maximum="5" minimum="0">
+				                <apex:chartLabel />
+				            </apex:axis>
+				            <apex:axis position="bottom" type="Category" fields="Name">
+				                <apex:chartLabel />
+				            </apex:axis>
+				            <apex:lineSeries axis="left" fill="true" xField="Name" yField="sugoisurvey4__Rate_Avg__c" title="{!$Label.rating}">
+				                <apex:chartTips height="28" width="160" />
+				            </apex:lineSeries>
+				        </apex:chart>
+				        -->
+				    </div>
+			    </div>
+			</div><!-- Summary Chart -->
+
+			<!-- Summary Table -->
+			<div class="row section">
+				<div class="col-sm-12">
+			        <table class="table table-hover">
+			            <tr>
+			                <td>{!$Label.total_guests}</td>
+			                <td><apex:outputText rendered="{! !ISNULL(performance_stat.total_guests) }">{!performance_stat.total_guests} {!$Label.people}</apex:outputText></td>
+			            </tr>
+			            <tr>
+			                <td>{!$Label.total_surveys}</td>
+			                <td><apex:outputText rendered="{! !ISNULL(performance_stat.total_events) }">{!performance_stat.total_events} {!$Label.survey}</apex:outputText></td>
+			            </tr>
+			            <tr onclick="navigate_to_session_detail('{!performance_stat.best_session.id}')">
+			                <td>{!$Label.best_survey}</td>
+			                <td><apex:outputText rendered="{! !ISNULL(performance_stat.best_session.id) }">{!performance_stat.best_session.name}&nbsp;({!performance_stat.best_session.Rate_Avg__c} pt)</apex:outputText></td>
+			            </tr>
+			        </table>
+		        </div>
+	        </div><!-- Summary Chart -->
+	        
+	        <!-- Survey History -->
+			<h2>{!$Label.survey_history}</h2>
+			<apex:repeat value="{!sessions}" var="session">
+			    <div class="row section" id="session_container_{!session.Id}">
+			        <div class="col-sm-6" id="session_rate_avg_container_{!session.Id}">
+			            <table class="table table-hover">
+			                <tr onclick="navigate_to_session_detail('{!session.Id}')">
+			                    <td>{!$Label.survey}</td>
+			                    <td>{!session.name}</td>
+			                </tr>
+			                <tr>
+			                    <td>{!$Label.event_date}</td>
+			                    <td><apex:outputText rendered="{! !ISNULL(session.date__c)}">{!YEAR(session.Date__c)} / {!MONTH(session.Date__c)} / {!DAY(session.Date__c)}</apex:outputText></td>
+			                </tr>
+			                <tr>
+			                    <td>{!$Label.rate_avg}</td>
+			                    <td>{!session.rate_avg__c} pt</td>
+			                </tr>
+			                <tr>
+			                    <td>{!$Label.total_guests}</td>
+			                    <td>{!session.guest_sum__c} {!$label.people}</td>
+			                </tr>
+			            </table>
+			        </div>
+			        <div class="col-sm-6">
+			            <div id="session_rate_chart_container_{!session.Id}" style="margin:0 auto; width:250px;">
+			                &nbsp;
+			            </div>
+			        </div>
+			    </div>
+			</apex:repeat><!-- Survey History -->
+		</div><!-- Performance Tab -->
+	
+		<!-- Property Tab -->
+		<div id="tab_presenter_property" class="tab-pane">
+			<form name="form_update_presenter" ng-submit="update_presenter()">
+			
+			<!-- Save Button -->
+			<div class="row">
+				<div class="col-md-12">
+					<div ng-show="rtk.action == 'update_presenter' && rtk.submitting == false && rtk.result == 'error'" class="alert alert-danger">
+						<a href="#" class="close" data-dismiss="alert">&times;</a>
+						{{rtk.message}}
+					</div>
+					<div ng-show="rtk.action == 'update_presenter' && rtk.submitting == false && rtk.result == 'success'" class="alert alert-success">
+						<a href="#" class="close" data-dismiss="alert">&times;</a>
+						{{rtk.message}}
+					</div>
+					<div ng-show="rtk.action == 'update_presenter' && rtk.submitting == true" class="progress progress-striped active" style="height: 35px;">
+					    <div class="progress-bar progress-bar-success"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%;"></div>
+					</div>
+					<div ng-show="rtk.action != 'update_survey' || rtk.submitting == false" style="text-align:right;">
+						<button ng-click="update_presenter()" class="btn btn-success" value="{!$Label.save}"><span class="glyphicon glyphicon-ok-sign"></span>&nbsp;{!$label.save}</button>
+					</div>
+				</div>
+			</div><!-- Save Button -->
+			
+	        <!-- Form -->
+	        <h2>{!$label.basic_config}</h2>
+	        <div class="form-horizontal" role="form">
+				<apex:repeat value="{!$ObjectType.Presenter__c.FieldSets.Base_Info}" var="f">
+					<c:ng_form_element field="{!f}" value="{!Presenter__c[f]}" object="sugoisurvey4__Presenter__c" ngInstance="presenter" ngModel="presenter.{!f}" />
+				</apex:repeat>
+			</div><!-- Form -->
+				
+			<!-- Delete Button -->
+			<div style="text-align:right;">
+				<button ng-click="show_modal('confirm', '{!$label.deleting_presenter}', '{!$label.delete}', 'danger', delete_presenter, null)" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove-sign"></span>&nbsp;{!$label.delete}</button>
+			</div>
+			
+			</form>
+		</div><!-- Property Tab -->
+		
+	</div><!-- Tab Content -->
+
+<!-- Modal Dialog -->
+<c:S1_modal_confirm />
+<c:S1_modal_progress />
+
+</div><!-- Presenter Detail -->
+</apex:page>

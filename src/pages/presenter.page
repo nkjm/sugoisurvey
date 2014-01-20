@@ -1,178 +1,82 @@
-<apex:page readOnly="true" standardController="Presenter__c" extensions="presenter" standardStylesheets="false" docType="html-5.0">
-<apex:styleSheet value="https://fonts.googleapis.com/css?family=Cuprum&subset=latin" />
-<apex:stylesheet value="{!$Resource.presenter_performance_css}"/>
-<apex:includeScript value="{!URLFOR($Resource.jqueryui_1_9_2_custom_zip, 'jquery-ui-1.9.2.custom/js/jquery-1.8.3.js')}" />
-<apex:includeScript value="https://www.google.com/jsapi" />
+<apex:page standardController="Presenter__c" readOnly="true" showHeader="false" standardStylesheets="false" applyhtmlTag="false" applyBodyTag="false" docType="html-5.0">
 
-<script type="text/javascript">
-google.load('visualization', '1.0', {'packages':['corechart']});
-j$ = jQuery.noConflict();
-
-j$("document").ready(function(){
-    if ({!sessions_json} != null && {!sessions_desc_json} != null){
-        //console.log('{!sessions_json}');
-        //console.log('{!sessions_desc_json}');
-        
-        // For Performance Summary
-        draw_area_chart({!sessions_desc_json});
-        
-        // For Event History
-        j$.each({!sessions_json}, function(i, session){
-            var rate_data = [];
-            rate_data.push(['5pt', session.sugoisurvey4__Rate_5__c]);
-            rate_data.push(['4pt', session.sugoisurvey4__Rate_4__c]);
-            rate_data.push(['3pt', session.sugoisurvey4__Rate_3__c]);
-            rate_data.push(['2pt', session.sugoisurvey4__Rate_2__c]);
-            rate_data.push(['1pt', session.sugoisurvey4__Rate_1__c]);
-            draw_pie_chart(rate_data, session.Id);
-        });
+<html class="ng-app" id="ng-app">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+    <meta charset="utf-8"></meta>
+    <title>{!$label.sugoisurvey}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.2/css/bootstrap.min.css"></link>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.2/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.1/angular.min.js"></script>
+    <c:RemoteTK />
+<style>
+@media screen and (min-width: 320px) {
+    h1 {
+        color: #666666;
+        font-size: 14pt;
+        border-bottom: solid 1px #999999;
+        padding-bottom: 10px;
     }
-});
-
-function draw_area_chart(sessions){
-    //console.log(sessions);
-    var data = new google.visualization.DataTable();
-    data.addColumn('string', '{!$Label.event}');
-    data.addColumn('number', '{!$Label.rate}');
-    rate_data = [];
-    j$.each(sessions, function(i, session){
-        if (session != null){
-            rate_data.push([session.Name, session.sugoisurvey4__Rate_Avg__c]);
-        }
-    });
-    data.addRows(rate_data);
-    
-    var options = {
-        title: '{!$Label.rate_avg_transition}',
-        hAxis: {title: '{!$Label.event}'},
-        vAxis: {viewWindow:{min:0,max:6},viewWindowMode:'explicit',maxValue:5}
-    };
-
-    var chart = new google.visualization.AreaChart(document.getElementById('rate_chart_container'));
-    chart.draw(data, options);
+    .tab_label {
+        font-size: 0.8em;
+        padding: 7px;
+    }
 }
-
-function draw_pie_chart(rate_data, session_id){
-    //console.log(rate_data);
-    
-    var data = new google.visualization.DataTable();
-    data.addColumn('string', '{!$Label.rate}');
-    data.addColumn('number', '{!$Label.sum}');
-    data.addRows(rate_data);
-    var options = {
-        'width':250,
-        'height':210,
-        'chartArea':{width:'90%',height:'80%'},
-        'legend':{position:'top'},
-        'is3D':true
-    };
-    var chart = new google.visualization.PieChart(document.getElementById('session_rate_chart_container_' + session_id));
-    chart.draw(data, options);
-
-    google.visualization.events.addListener(chart, 'select', function(){
-        var selectedData = chart.getSelection(), row, item;
-        row = selectedData[0].row;
-        if (row == 0){
-            rate = 5;
-        } else if (row == 1){
-            rate = 4;
-        } else if (row == 2){
-            rate = 3;
-        } else if (row == 3){
-            rate = 2;
-        } else if (row == 4){
-            rate = 1;
-        }
-        //item = data.getValue(row,0);
-        window.location = "/apex/guest_list?session_id=" + session_id + "&search_by=rate&rate=" + rate;
-    });
+@media screen and (min-width: 768px) {
+    h1 {
+        color: #666666;
+        font-size: 16pt;
+        border-bottom: solid 1px #999999;
+        padding-bottom: 10px;
+    }
+    .tab_label {
+        font-size: 1.0em;
+        padding: 12px;
+    }
 }
-</script>
+h2 {
+    color: #666666;
+    font-size: 14pt;
+    border-bottom: solid 1px #999999;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+h3 {
+    color: #333333;
+    font-size: 12pt;
+}
+h4, h5 {
+    color: #333333;
+    font-size: 10pt;
+}
+</style>
+</head>
+<body>
 
-<div class="section_container" id="presenter_property_container">
-    <div class="cell_of_2col">
-        <apex:detail relatedList="false" />
+<div class="navbar navbar-default navbar-static-top" role="navigation">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+        <ul class="nav navbar-nav">
+            <li><a href="/apex/sugoisurvey4__survey">{!$label.survey}</a></li>
+            <li class="active"><a href="/apex/sugoisurvey4__presenter">{!$label.presenter}</a></li>
+        </ul>
     </div>
-    <div class="cell_of_2col" style="text-align: center;font-family: 'Cuprum';">
-        <apex:outputText rendered="{! !ISNULL(performance_stat.rate_avg) }"><span style="font-size: 16pt;">{!$Label.rate_avg} <span style="font-size:72pt;">{!performance_stat.rate_avg} </span>pt</span></apex:outputText>
-    </div>
-</div>
-
-<div class="section_header">
-    {!$Label.performance_summary}
-</div>
-<div class="section_container" id="performance_summary_container">
-    <div id="statistics_container">
-        <table style="width:100%;">
-            <tr>
-                <td style="vertical-align:middle;" class="td_of_2col td_left_of_2col">{!$Label.rate_avg}</td>
-                <td style="vertical-align:middle;" class="td_of_2col td_right_of_2col"><apex:outputText rendered="{! !ISNULL(performance_stat.rate_avg) }">{!performance_stat.rate_avg} pt</apex:outputText></td>
-            </tr>
-            <tr>
-                <td style="vertical-align:middle;" class="td_of_2col td_left_of_2col">{!$Label.total_guests}</td>
-                <td style="vertical-align:middle;" class="td_of_2col td_right_of_2col"><apex:outputText rendered="{! !ISNULL(performance_stat.total_guests) }">{!performance_stat.total_guests} {!$Label.people}</apex:outputText></td>
-            </tr>
-            <tr>
-                <td style="vertical-align:middle;" class="td_of_2col td_left_of_2col">{!$Label.total_events}</td>
-                <td style="vertical-align:middle;" class="td_of_2col td_right_of_2col"><apex:outputText rendered="{! !ISNULL(performance_stat.total_events) }">{!performance_stat.total_events} {!$Label.event}</apex:outputText></td>
-            </tr>
-            <tr>
-                <td style="vertical-align:middle;" class="td_of_2col td_left_of_2col">{!$Label.best_event}</td>
-                <td style="vertical-align:middle;" class="td_of_2col td_right_of_2col"><apex:outputText rendered="{! !ISNULL(performance_stat.best_session.id) }"><span style="font-size:10pt;"><a href="/{!performance_stat.best_session.id}">{!performance_stat.best_session.name}</a>({!performance_stat.best_session.Rate_Avg__c} pt)</span></apex:outputText></td>
-            </tr>
-        </table>
-    </div>
-    <div id="rate_chart_container">
-        <!--
-        <apex:chart height="200" width="450" data="{!rate_chart_data}">
-            <apex:legend position="top" />
-            <apex:axis position="left" type="Numeric" title="" grid="true" fields="sugoisurvey4__Rate_Avg__c" maximum="5" minimum="0">
-                <apex:chartLabel />
-            </apex:axis>
-            <apex:axis position="bottom" type="Category" fields="Name">
-                <apex:chartLabel />
-            </apex:axis>
-            <apex:lineSeries axis="left" fill="true" xField="Name" yField="sugoisurvey4__Rate_Avg__c" title="{!$Label.rating}">
-                <apex:chartTips height="28" width="160" />
-            </apex:lineSeries>
-        </apex:chart>
-        -->
-    </div>
+    <p class="navbar-text navbar-right"><a href="/ui/setup/Setup"><span class="glyphicon glyphicon-cloud"></span></a></p>
 </div>
 
-<div class="section_header">
-    {!$Label.event_history}
-</div>
-<div class="section_container" id="event_history_container">
-    <apex:repeat value="{!sessions}" var="session">
-        <div class="session_container" id="session_container_{!session.Id}">
-            <div class="cell_of_2col" id="session_rate_avg_container_{!session.Id}">
-                <table style="width:100%;">
-                    <tr>
-                        <td style="vertical-align:middle;" class="td_of_2col td_left_of_2col">{!$Label.event}</td>
-                        <td style="vertical-align:middle;" class="td_of_2col td_right_of_2col"><span style="font-size:10pt;"><a href="/{!session.id}">{!session.name}</a></span></td>
-                    </tr>
-                    <tr>
-                        <td style="vertical-align:middle;" class="td_of_2col td_left_of_2col">{!$Label.event_date}</td>
-                        <td style="vertical-align:middle;" class="td_of_2col td_right_of_2col"><apex:outputText rendered="{! !ISNULL(session.date__c)}">{!YEAR(session.Date__c)} / {!MONTH(session.Date__c)} / {!DAY(session.Date__c)}</apex:outputText></td>
-                    </tr>
-                    <tr>
-                        <td style="vertical-align:middle;" class="td_of_2col td_left_of_2col">{!$Label.rate_avg}</td>
-                        <td style="vertical-align:middle;" class="td_of_2col td_right_of_2col">{!session.rate_avg__c} pt</td>
-                    </tr>
-                    <tr>
-                        <td style="vertical-align:middle;" class="td_of_2col td_left_of_2col">{!$Label.total_guests}</td>
-                        <td style="vertical-align:middle;" class="td_of_2col td_right_of_2col">{!session.guest_sum__c} {!$label.people}</td>
-                    </tr>
-                </table>
-            </div>
-            <div class="cell_of_2col">
-                <div id="session_rate_chart_container_{!session.Id}" style="margin:0 auto; width:250px;">
-                    &nbsp;
-                </div>
-            </div>
+<div class="container" style="margin-bottom: 40px;">
+    <div class="row">
+        <div class="col-sm-4">
+            <h2>{!$Label.presenter_list}</h2>
+            <apex:include pageName="S1_presenter_list" />
         </div>
-    </apex:repeat>
+        <div class="col-sm-8">
+            <apex:include pageName="S1_presenter_detail" rendered="{! !ISNULL(presenter__c.Id) }" />
+        </div>
+    </div>
 </div>
-
+    
+</body>
+</html>
 </apex:page>

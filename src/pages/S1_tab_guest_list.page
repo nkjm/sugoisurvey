@@ -1,0 +1,446 @@
+<apex:page readOnly="true" standardController="Session__c" extensions="jr_session" standardStyleSheets="false" showheader="false" applyBodyTag="false" applyHtmlTag="false" doctype="html-5.0" cache="false">
+<style>
+.row_guest_selected {
+	background-color: #eeeeee;
+}
+</style>
+<script>
+j$ = jQuery.noConflict();
+function guest_list($scope){
+    $scope.retrieve_guests_to_be_delivered = function(){
+    	$scope.rtk.action = "retrieve_guests_to_be_delivered";
+    	
+    	$scope.update_mail();
+    	
+    	if (typeof $scope.mail.template == 'undefined' || typeof $scope.mail.to == 'undefined'){
+    		return;
+   		}
+   		
+   		$scope.rtk.submitting = true;
+    	sugoisurvey4.jr_session.retrieve_guests_to_be_delivered(
+    		$scope.session.Id,
+    		$scope.mail.template,
+    		$scope.mail.to,
+    		function(result, event){
+    			$scope.rtk.submitting = false;
+                if (event.status){
+                    $scope.rtk.submitting = false;
+                    $scope.rtk.result = 'success';
+                    $scope.guests_to_be_delivered = result;
+                    $scope.$apply();
+                } else {
+                    $scope.rtk.result = 'error';
+					$scope.rtk.message = event.message;
+					$scope.$apply();
+                }
+            },{escape:true}
+    	);
+    };
+    
+    $scope.update_mail = function(){
+		if ($scope.mail.template == 'free'){
+    		$scope.mail.to = $scope.session.sugoisurvey4__Mail_To__c;
+    		$scope.mail.subject = $scope.session.sugoisurvey4__Mail_Subject__c;
+    		$scope.mail.body = $scope.session.sugoisurvey4__Mail_Body_L__c;
+    		$scope.mail.sender = $scope.session.sugoisurvey4__Mail_Sender__c;
+    	} else if ($scope.mail.template == 'guest_pass'){
+    		$scope.mail.to = $scope.session.sugoisurvey4__Mail_Guest_Pass_To__c;
+    		$scope.mail.subject = $scope.session.sugoisurvey4__Mail_Guest_Pass_Subject__c;
+    		$scope.mail.body = $scope.session.sugoisurvey4__Mail_Guest_Pass_Body_L__c;
+    		$scope.mail.sender = $scope.session.sugoisurvey4__Mail_Guest_Pass_Sender__c;
+    	} else if ($scope.mail.template == 'survey_link'){
+    		$scope.mail.to = $scope.session.sugoisurvey4__Mail_Survey_Link_To__c;
+    		$scope.mail.subject = $scope.session.sugoisurvey4__Mail_Survey_Link_Subject__c;
+    		$scope.mail.body = $scope.session.sugoisurvey4__Mail_Survey_Link_Body_L__c;
+    		$scope.mail.sender = $scope.session.sugoisurvey4__Mail_Survey_Link_Sender__c;
+    	} else if ($scope.mail.template == 'handout'){
+    		$scope.mail.to = $scope.session.sugoisurvey4__Mail_Handout_To__c;
+    		$scope.mail.subject = $scope.session.sugoisurvey4__Mail_Handout_Subject__c;
+    		$scope.mail.body = $scope.session.sugoisurvey4__Mail_Handout_Body_L__c;
+    		$scope.mail.sender = $scope.session.sugoisurvey4__Mail_Handout_Sender__c;
+    	}
+    	
+    	$scope.mail.subject = $scope.mail.subject == null ? '' : $scope.mail.subject;
+    	$scope.mail.body = $scope.mail.body == null ? '' : $scope.mail.body;
+    	$scope.mail.sender = $scope.mail.sender == null ? '' : $scope.mail.sender;
+    };
+
+    $scope.send_mail = function(){
+    	$scope.rtk.action = "send_mail";
+    	
+    	$scope.update_mail();
+    	$scope.rtk.result = null;
+   		$scope.rtk.message = null;
+    	$scope.rtk.submitting = true;
+    	sugoisurvey4.jr_session.send_mail(
+    		$scope.session.Id,
+    		$scope.mail.template,
+    		$scope.mail.to,
+    		$scope.mail.subject,
+    		$scope.mail.body,
+    		$scope.mail.sender,
+    		null,
+    		function(result, event){
+    			$scope.rtk.submitting = false;
+                if (event.status){
+                    $scope.rtk.result = 'success';
+                    $scope.rtk.message = result.message + '{!$label.has_been_delivered}';
+                    $scope.$apply();
+                } else {
+                    $scope.rtk.result = 'error';
+					$scope.rtk.message = event.message;
+					$scope.$apply();
+                }
+            },{escape:true}
+    	);
+    };
+    
+    $scope.retrieve_attachments = function(){
+    	$scope.rtk.action = "retrieve_attachments";
+    	
+        var soql = "select Id, Name from Attachments where ParentId = '" + $scope.session.Id + "'";
+        $scope.rtk.submitting = true;
+        $scope.rtk.result = null;
+        $scope.rtk.message = null;
+        $scope.force.query(
+        	soql,
+        	function(result){
+        		$scope.rtk.submitting = false;
+                $scope.rtk.result = "success";
+                $scope.attachments = result.records;
+            	$scope.$apply();
+        	},
+        	function(result){
+        		$scope.rtk.submitting = false;
+                $scope.rtk.result = 'error';
+                $scope.rtk.message = result[0].message;
+                $scope.$apply();
+        	}
+       	);
+    };
+    
+    $scope.save_attachment = function(event){
+    	$scope.rtk.action = "save_attachment";
+ 
+ 		var attachment = {};
+ 		
+ 		// NEED to retrieve file name and data
+
+    	$scope.force.create(
+    		'Attachment',
+    		attachment,
+    		function(result){
+    			$scope.rtk.submitting = false;
+    			$scope.rtk.result = 'success';
+    			$scope.rtk.message = '{!$label.saved}';
+    			$scope.retrieve_attachments();
+   			},
+   			function(result){
+   				$scope.rtk.submitting = false;
+    			$scope.rtk.result = 'error';
+    			$scope.rtk.message = result[0].message;
+    			$scope.$apply();
+ 			}
+		);
+    };
+
+    $scope.clear_delivered_flag = function(){
+    	$scope.rtk.action = "clear_delivered_flag";
+    	$scope.rtk.result = null;
+   		$scope.rtk.message = null;
+    	$scope.rtk.submitting = true;
+    	sugoisurvey4.jr_session.clear_delivered_flag(
+    		$scope.session.Id,
+    		$scope.mail.template,
+    		function(result, event){
+    			$scope.rtk.submitting = false;
+                if (event.status){
+                    $scope.rtk.result = 'success';
+                    $scope.rtk.message = '{!$label.delivered_flag_has_been_cleared}';
+                    $scope.retrieve_guests_to_be_delivered();
+                } else {
+                    $scope.rtk.result = 'error';
+					$scope.rtk.message = event.message;
+					$scope.$apply();
+                }
+            },{escape:true}
+    	);
+    };
+    
+	$scope.show_modal = function(type, title, button_label, button_class, action, action_param){
+		$scope.rtk.submitting = false;
+		$scope.rtk.result = null;
+		$scope.rtk.message = null;
+		$scope.modal = {};
+		$scope.modal.title = title;
+		$scope.modal.button_label = button_label;
+        $scope.modal.button_class = button_class;
+		$scope.modal.action = action;
+		$scope.modal.action_param = action_param;
+		j$("#tab_guest_list .modal_" + type).modal();
+		if (type == 'progress'){
+			action(action_param);
+		}
+	};
+	
+	$scope.create_guest = function(){
+		$scope.rtk.action = "create_guest";
+		
+		$scope.rtk.submitting = true;
+		$scope.rtk.result = null;
+		$scope.rtk.message = null;
+		$scope.force.create(
+			'sugoisurvey4__Guest__c',
+			$scope.guest,
+			function(result){
+				$scope.rtk.submitting = false;
+				$scope.rtk.result = 'success';
+				$scope.guest = {};
+				$scope.guest.sugoisurvey4__Session__c = $scope.session.Id;
+               	$scope.toggle_new_guest_form();
+                $scope.retrieve_session($scope.rtk);
+			},
+			function(result){
+				$scope.rtk.submitting = false;
+				$scope.rtk.result = 'error';
+				$scope.rtk.message = result[0].message;
+				$scope.$apply();
+			}
+		);
+	};
+	
+	$scope.toggle_new_guest_form = function(){
+		j$("#form_new_guest").slideToggle();
+		$scope.form_new_guest = !$scope.form_new_guest;
+	};
+	
+	$scope.navigate_to_guest_detail = function(guest_id){
+		j$("#tab_guest_list .row_guest_" + guest_id).addClass("row_guest_selected");
+		
+		if (typeof sforce == "undefined"){
+			window.location = '/apex/sugoisurvey4__guest?id=' + guest_id + '&session_id=' + $scope.session.Id + '&search_by=guest_id&search_value=' + guest_id;
+		} else {
+			sforce.one.navigateToURL('/apex/sugoisurvey4__S1_guest?id=' + guest_id + '&session_id=' + $scope.session.Id + '&search_by=guest_id&search_value=' + guest_id);
+		}
+	};
+
+	$scope.init = function(){
+		$scope.rtk = {};
+		$scope.submitting = false;
+
+		$scope.mode = "guest_list";
+		
+		$scope.attachments = [];
+		
+		$scope.mail = {};
+		$scope.mail.template = 'free';
+        $scope.guest = {};
+        $scope.$watch('session', function(new_value, old_value){
+            if (new_value !== old_value){
+                $scope.retrieve_guests_to_be_delivered();
+                $scope.guest.sugoisurvey4__Session__c = $scope.session.Id;
+            }
+        });
+		$scope.form_new_guest = false;
+	};
+
+	$scope.init();
+}
+</script>
+
+<div ng-show="mode == 'guest_list'">
+	<!-- Mail and New Guest Button -->
+	<div style="text-align: right;">
+		<button ng-click="toggle_new_guest_form()" type="button" ng-class="(form_new_guest == true) ? 'btn-default' : 'btn-success'" class="btn btn-success"><span class="glyphicon glyphicon-plus-sign"></span>&nbsp;{!$label.create_guest}</button>
+		<button ng-click="mode = 'mail'" type="button" class="btn btn-success"><span class="glyphicon glyphicon-envelope"></span>&nbsp;{!$label.send_mail}</button>
+	</div>
+	
+	<!-- New Guest Form -->
+	<div id="form_new_guest" style="display:none; padding: 40px 0;">
+		<div class="form-horizontal" role="form">
+			<apex:repeat value="{!$ObjectType.Guest__c.FieldSets.base_info}" var="f">
+				<div class="form-group">
+					<label class="col-sm-2 control-label">{!f.Label}</label>
+					<div class="col-sm-10">
+						<input ng-model="guest.{!f}" type="text" class="form-control"></input>
+					</div>
+				</div>
+			</apex:repeat>
+			<div class="form-group">
+				<div class="col-sm-offset-2 col-sm-10">
+					<div ng-show="rtk.action == 'create_guest' && rtk.result == 'error'" class="alert alert-danger">
+						<a href="#" class="close" data-dismiss="alert">&times;</a>
+						{{rtk.message}}
+					</div>
+					<div ng-show="rtk.action == 'create_guest' && rtk.submitting == true" class="progress progress-striped active" style="height: 35px; margin-bottom:10px;">
+						<div class="progress-bar progress-bar-success"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%;"></div>
+					</div>
+					<div ng-show="rtk.action != 'create_guest' || rtk.submitting == false" >
+						<button ng-click="create_guest()" type="button" class="btn btn-success"><span class="glyphicon glyphicon-ok-sign"></span>&nbsp;{!$label.create}</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<!-- Guests -->
+	<table class="table table-hover">
+		<thead>
+			<tr>
+				<th>{!$ObjectType.Guest__c.Fields.Company__c.Label}</th>
+				<th>{!$ObjectType.Guest__c.Fields.Name__c.Label}</th>
+				<th>{!$ObjectType.Guest__c.Fields.Email__c.Label}</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr ng-repeat="guest in session.sugoisurvey4__Guest__r" class="row_guest_{{guest.Id}}" ng-click="navigate_to_guest_detail(guest.Id)">
+				<td>{{guest.sugoisurvey4__Company__c}}</td>
+				<td>{{guest.sugoisurvey4__Name__c}}</td>
+				<td>{{guest.sugoisurvey4__Email__c}}</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+<div ng-show="mode == 'mail'" style="margin-bottom: 40px;">
+	<!-- Mail Button -->
+	<div style="text-align: right;">
+		<button ng-click="mode = 'guest_list'" type="button" class="btn btn-default">{!$label.cancel}</button>
+	</div>
+	<form class="form-horizontal" role="form" name="mail_form">
+	
+		<!-- Template Button -->
+		<div class="form-group">
+			<label class="col-sm-3 control-label">{!$label.template}</label>
+			<div class="col-sm-9">
+				<button type="button" class="btn btn-default" ng-class="(mail.template == 'free') ? 'btn-danger active' : 'btn-default'" ng-click="mail.template = 'free'; retrieve_guests_to_be_delivered()">{!$label.free}</button>
+				<!-- <button type="button" class="btn btn-default" ng-class="(mail.template == 'guest_pass') ? 'btn-danger active' : 'btn-default'" ng-click="mail.template = 'guest_pass'; retrieve_guests_to_be_delivered()">{!$label.guest_pass}</button> -->
+				<button type="button" class="btn btn-default" ng-class="(mail.template == 'survey_link') ? 'btn-danger active' : 'btn-default'" ng-click="mail.template = 'survey_link'; retrieve_guests_to_be_delivered()">{!$label.survey_link}</button>
+				<button type="button" class="btn btn-default" ng-class="(mail.template == 'handout') ? 'btn-danger active' : 'btn-default'" ng-click="mail.template = 'handout'; retrieve_guests_to_be_delivered()">{!$label.handout}</button>
+			</div>
+		</div>
+		
+		<!-- Autosend Checkbox -->
+		<div ng-show="mail.template == 'handout'" class="form-group">
+			<div class="col-sm-offset-3 col-sm-9">
+				<div class="checkbox">
+					<label>
+						<input ng-model="session.sugoisurvey4__Mail_Handout_Send_On_Submission__c" type="checkbox"></input>{!$label.autosend_on_survey_submission}
+					</label>
+				</div>
+			</div>
+		</div>
+		
+		<!-- To -->
+		<div class="form-group">
+			<label class="col-sm-3 control-label">{!$label.deliver_destinations}</label>
+			<div class="col-sm-9">
+				<select ng-show="mail.template == 'free'" ng-model="session.sugoisurvey4__Mail_To__c" ng-change="retrieve_guests_to_be_delivered()" class="form-control">
+					<option value="anyone">{!$label.anyone}</option>
+					<option value="attendees">{!$label.attendees}</option>
+					<option value="who_have_submitted_survey">{!$label.who_have_submitted_survey}</option>
+				</select>
+				<select ng-show="mail.template == 'guest_pass'" ng-model="session.sugoisurvey4__Mail_Guest_Pass_To__c" ng-change="retrieve_guests_to_be_delivered()" class="form-control">
+					<option value="anyone">{!$label.anyone}</option>
+				</select>
+				<select ng-show="mail.template == 'survey_link'" ng-model="session.sugoisurvey4__Mail_Survey_Link_To__c" ng-change="retrieve_guests_to_be_delivered()" class="form-control">
+					<option value="anyone">{!$label.anyone}</option>
+					<option value="attendees">{!$label.attendees}</option>
+				</select>
+				<select ng-show="mail.template == 'handout'" ng-model="session.sugoisurvey4__Mail_Handout_To__c" ng-change="retrieve_guests_to_be_delivered()" class="form-control">
+					<option value="anyone">{!$label.anyone}</option>
+					<option value="attendees">{!$label.attendees}</option>
+					<option value="who_have_submitted_survey">{!$label.who_have_submitted_survey}</option>
+				</select>
+			</div>
+		</div>
+		
+		<!-- Subject -->
+		<div class="form-group">
+			<label class="col-sm-3 control-label">{!$label.subject}</label>
+			<div class="col-sm-9">
+				<input ng-show="mail.template == 'free'" ng-model="session.sugoisurvey4__Mail_Subject__c" type="text" class="form-control"></input>
+				<input ng-show="mail.template == 'guest_pass'" ng-model="session.sugoisurvey4__Mail_Guest_Pass_Subject__c" type="text" class="form-control"></input>
+				<input ng-show="mail.template == 'survey_link'" ng-model="session.sugoisurvey4__Mail_Survey_Link_Subject__c" type="text" class="form-control"></input>
+				<input ng-show="mail.template == 'handout'" ng-model="session.sugoisurvey4__Mail_Handout_Subject__c" type="text" class="form-control"></input>
+			</div>
+		</div>
+		
+		<!-- Body -->
+		<div class="form-group">
+			<label class="col-sm-3 control-label">{!$label.body}</label>
+			<div class="col-sm-9">
+				<textarea ng-show="mail.template == 'free'" ng-model="session.sugoisurvey4__Mail_Body_L__c" class="form-control" rows="8"></textarea>
+				<textarea ng-show="mail.template == 'guest_pass'" ng-model="session.sugoisurvey4__Mail_Guest_Pass_Body_L__c" class="form-control" rows="8" disabled="disabled"></textarea>
+				<textarea ng-show="mail.template == 'survey_link'" ng-model="session.sugoisurvey4__Mail_Survey_Link_Body_L__c" class="form-control" rows="8" disabled="disabled"></textarea>
+				<textarea ng-show="mail.template == 'handout'" ng-model="session.sugoisurvey4__Mail_Handout_Body_L__c" class="form-control" rows="8"></textarea>
+			</div>
+		</div>
+		
+		<!-- Sender -->
+		<div class="form-group">
+			<label class="col-sm-3 control-label">{!$label.sender}</label>
+			<div class="col-sm-9">
+				<input ng-show="mail.template == 'free'" ng-model="session.sugoisurvey4__Mail_Sender__c" type="email" class="form-control"></input>
+				<input ng-show="mail.template == 'guest_pass'" ng-model="session.sugoisurvey4__Mail_Guest_Pass_Sender__c" type="email" class="form-control"></input>
+				<input ng-show="mail.template == 'survey_link'" ng-model="session.sugoisurvey4__Mail_Survey_Link_Sender__c" type="email" class="form-control"></input>
+				<input ng-show="mail.template == 'handout'" ng-model="session.sugoisurvey4__Mail_Handout_Sender__c" type="email" class="form-control"></input>
+			</div>
+		</div>
+		
+		<!-- Attachment -->
+		<!-- 
+		<div ng-show="mail.template == 'handout'" class="form-group">
+			<label class="col-sm-3 control-label">{!$label.attached_handout}</label>
+			<div class="col-sm-9">
+				<div style="padding-top:7px;" ng-repeat="attachment in attachments">
+					{{attachment.Name}}
+				</div>
+				<div style="padding-top:7px;" >
+					<input type="file"></input>
+				</div>
+			</div>
+		</div>
+		 -->
+		
+		<!-- Save and Send Button -->
+		<div class="form-group">
+			<div class="col-sm-offset-3 col-sm-9" style="text-align:right;">
+				<button ng-disabled="!mail_form.$valid" ng-click="show_modal('progress', null, null, 'success', update_session, rtk)" type="button" class="btn btn-success"><span class="glyphicon glyphicon-ok-sign"></span>&nbsp;{!$label.save}</button>
+				<button ng-disabled="!mail_form.$valid" ng-click="show_modal('confirm', '{!$label.delivering_mail}', '{!$label.send}', 'primary', send_mail, null)" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-envelope"></span>&nbsp;{!$label.send}</button>
+			</div>
+		</div>
+		
+	</form>
+	
+	<h2>{!$label.deliver_destinations}</h2>
+	
+	<!-- Guests -->
+	<table class="table table-hover">
+		<thead>
+			<tr>
+				<th>{!$ObjectType.Guest__c.Fields.Company__c.Label}</th>
+				<th>{!$ObjectType.Guest__c.Fields.Name__c.Label}</th>
+				<th>{!$ObjectType.Guest__c.Fields.Email__c.Label}</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr ng-repeat="guest in guests_to_be_delivered" class="row_guest_{{guest.Id}}" ng-click="navigate_to_guest_detail(guest.Id)">
+				<td>{{guest.sugoisurvey4__Company__c}}</td>
+				<td>{{guest.sugoisurvey4__Name__c}}</td>
+				<td>{{guest.sugoisurvey4__Email__c}}</td>
+			</tr>
+		</tbody>
+	</table>
+	
+	<!-- Button for clear delivered flag -->
+	<div style="text-align:right;">
+		<button ng-click="show_modal('confirm', '{!$label.clearing_delivered_flag}', '{!$label.reset}', 'success', clear_delivered_flag, null)" type="button" class="btn btn-success">{!$label.clear_delivered_flag}</button>
+	</div>
+	
+</div>
+
+<c:S1_modal_confirm />
+<c:S1_modal_progress />
+
+</apex:page>

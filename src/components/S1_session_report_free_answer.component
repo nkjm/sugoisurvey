@@ -4,7 +4,7 @@
 
 <ul>
     <apex:repeat value="{!free_answers}" var="fa">
-        <li><a href="#" onclick="navigate_to_guest_detail('{!fa.Guest__c}')">{!fa.Free_Form__c}</a></li>
+        <li><a href="#" ng-click="navigate_to_guest_detail('{!fa.Guest__c}')">{!fa.Free_Form__c}</a></li>
     </apex:repeat>
 </ul>
 </apex:component>

@@ -1,0 +1,55 @@
+<apex:page standardController="Presenter__c" readOnly="true" showHeader="false" standardStylesheets="false" applyhtmlTag="false" applyBodyTag="false" docType="html-5.0">
+deprecated
+<!--
+
+<html class="ng-app" id="ng-app">
+<head>
+    <meta charset="utf-8"></meta>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+    <title>{!$label.sugoisurvey}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.2/css/bootstrap.min.css"></link>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.2/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.1/angular.min.js"></script>
+    <c:RemoteTK />
+<style>
+h2 {
+    color: #999999;
+}
+h3 {
+    color: #999999;
+}
+h4 {
+    color: #666666;
+    padding-bottom: 10px;
+    border-bottom: solid 1px #666666;
+}
+@media screen and (min-width: 320px) {
+    h2 {
+        font-size: 16pt;
+    }
+    h3 {
+        font-size: 14pt;
+    }
+}
+@media screen and (min-width: 768px) {
+    h2 {
+        font-size: 20pt;
+    }
+    h3 {
+        font-size: 18pt;
+    }
+}
+</style>
+</head>
+<body>
+    <apex:include pageName="S1_presenter_list" rendered="{! ISNULL(presenter__c.Id) }" />
+    <apex:outputText rendered="{! !ISNULL(presenter__c.Id) }">
+        <div class="container">
+            <apex:include pageName="S1_presenter_detail" />
+        </div>
+    </apex:outputText>
+</body>
+</html>
+-->
+</apex:page>

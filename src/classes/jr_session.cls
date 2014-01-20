@@ -2,30 +2,26 @@ public with sharing class jr_session {
 
     public jr_session(ApexPages.StandardController controller) {
     }
-    
-    public class r {
-        public boolean status {get;set;}
-        public string message {get;set;}
-    }
+
+    private class sexception extends exception {}
     
     @remoteAction 
-    public static r start_init(string current_url){
-        r r = new r();
+    public static void start_init(string current_url){
         config__c config = config__c.getOrgDefaults();
         
         // Quit if app has been initialized.
         if (config.initialized__c == true && config.need_re_initialization__c == false){
-            r.status = false;
-            r.message = system.label.already_initialized;
-            return r;
+            sexception se = new sexception();
+            se.setMessage(system.label.already_initialized);
+            throw se;
         }
         
         // Quit if sites has not been activated yet.
         list<site> sites = [select status, subdomain from site where urlPathPrefix = 'sugoisurvey'];
         if (sites.size() == 0 || sites[0].subdomain == null || sites[0].status != 'Active'){
-            r.status = false;
-            r.message = system.label.sites_not_activated;
-            return r;
+            sexception se = new sexception();
+            se.setMessage(system.label.sites_not_activated);
+            throw se;
         }
         
         // Identify the Edition of this Org
@@ -67,29 +63,26 @@ public with sharing class jr_session {
             config.sites_username__c = 'sugoisurvey@' + config.survey_sites_domain__c;
         } else {
             // Non-Production Org
-            config.instance__c = hostname.replace('sugoisurvey4','').replace('visual.force.com','').replace('salesforce.com','').replace('.','').replace(sites[0].subdomain + '--', '');
+            config.instance__c = hostname.split('\\.', 0)[1];
+            //config.instance__c = hostname.replace('sugoisurvey4','').replace('visual.force.com','').replace('salesforce.com','').replace('.','').replace(sites[0].subdomain + '--', '');
             config.survey_sites_domain__c = sites[0].subdomain + '.' + config.instance__c + '.force.com';
             config.survey_sites_url__c = 'https://' + config.survey_sites_domain__c + '/sugoisurvey/';
             config.sites_username__c = 'sugoisurvey@' + config.survey_sites_domain__c;
         }
         
         upsert config;
-
-        r.status = true;
-        return r;
     }
     
     
     @remoteAction 
-    public static r assign_permission_set(){
-        r r = new r();
+    public static void assign_permission_set(){
         config__c config = config__c.getOrgDefaults();
         
         // Quit if site has not been activated
         if (config.survey_sites_domain__c == null){
-            r.status = false;
-            r.message = system.label.sites_not_activated;
-            return r;
+            sexception se = new sexception();
+            se.setMessage(system.label.sites_not_activated);
+            throw se;
         }
         
         // retreive id of user for sites
@@ -97,9 +90,20 @@ public with sharing class jr_session {
         try {
             sites_user_id = [select id from user where username = :config.sites_username__c].id;
         } catch(Exception e) {
-            r.status = false;
-            r.message = system.label.sites_user_not_found;
-            return r;
+        	try {
+        		list<user> site_users = [select id from user where username like 'sugoisurvey@%'];
+        		if (site_users.size() == 1){
+        			sites_user_id = site_users[0].id;
+        		} else {
+                    sexception se = new sexception();
+                    se.setMessage(system.label.sites_user_not_found);
+                    throw se;
+        		}
+        	} catch (Exception ee){
+                sexception se = new sexception();
+                se.setMessage(system.label.sites_user_not_found);
+                throw se;
+        	}
         }
         
         // retrieve id of permission set for sites
@@ -107,44 +111,28 @@ public with sharing class jr_session {
         try {
             sites_permission_set_id = [select id from permissionSet where name = 'Sugoi_Survey_Sites_for_Any_License'].id;
         } catch(Exception e){
-            r.status = false;
-            r.message = system.label.sites_permission_set_not_found;
-            return r;
+            sexception se = new sexception();
+            se.setMessage(system.label.sites_permission_set_not_found);
+            throw se;
         }
         
         if ([select id from permissionSetAssignment where assigneeId = :sites_user_id and permissionSetId = :sites_permission_set_id].size() == 0){
             permissionSetAssignment psa = new permissionSetAssignment(assigneeId = sites_user_id, permissionSetId = sites_permission_set_id);
             insert psa;
         }
-        
-        r.status = true;
-        return r;
     }
     
     
     @remoteAction 
-    public static r finish_init(){
-        r r = new r();
+    public static void finish_init(){
         config__c config = config__c.getOrgDefaults();
 
         // Quit if app has been initialized.
         if (config.initialized__c == true && config.need_re_initialization__c == false){
-            r.status = false;
-            r.message = system.label.already_initialized;
-            return r;
+            sexception se = new sexception();
+            se.setMessage(system.label.already_initialized);
+            throw se;
         }
-        
-        //// Launch scheduler
-        // Start cron job for copy comment to feedItem. This should be merged into universal cron trigger but there is no way to kill existing job programatically.
-        /*
-        Datetime next = Datetime.now().addMinutes(1);
-        string sch = string.valueOf(next.second()) + ' ' + string.valueOf(next.minute()) + ' ' + string.valueOf(next.hour()) + ' ' + string.valueOf(next.day()) + ' ' + string.valueOf(next.month()) + ' ?';
-        if (config.initialized__c == false && config.need_re_initialization__c == false){
-            if (!Test.isRunningTest()){
-                system.schedule('Copy comment to feedItem - ' + sch, sch, new schedule_copy_comment_to_feedItem());
-            }
-        }
-        */
         
         // Start cron job for universal purpose. As of v4 1.13, chatter_notification.notify_guest_registration_for_pending_guest is the only method to invoke.
         Datetime next = Datetime.now().addMinutes(1);
@@ -159,11 +147,10 @@ public with sharing class jr_session {
         config.initialized__c = true;
         config.need_re_initialization__c = false;
         upsert config;
-        
-        r.status = true;
-        return r;
     }
 
+	// Deprecated
+	/*
     @remoteAction
     public static r close_survey(id session_id){
         r r = new r();
@@ -175,7 +162,7 @@ public with sharing class jr_session {
         try {
             session__c session = [select id, open__c from session__c where id = :session_id];   
             session.open__c = false;
-            update session;
+            scrud.supdate(session);
         } catch (Exception e){
             r.status = false;
             r.message = system.label.specified_session_does_not_exist;
@@ -190,41 +177,59 @@ public with sharing class jr_session {
         r.status = true;
         return r;
     }
+    */
     
     @remoteAction
-    public static r copy_comment_to_feedItem(id session_id){
-        r r = new r();
+    public static void copy_comment_to_feedItem(id session_id){
         list<comment__c> comments_to_copy;
         
-        if (session_id == null){
-            comments_to_copy = [select id, comment__c, guest__r.company__c, guest__r.title__c, guest__r.last_name__c, guest__r.first_name__c, guest__r.id, session__c, session__r.open__c from comment__c where session__r.open__c = true and copied_to_feedItem__c = false];
-        } else {
-            comments_to_copy = [select id, comment__c, guest__r.company__c, guest__r.title__c, guest__r.last_name__c, guest__r.first_name__c, guest__r.id, session__c from comment__c where session__c = :session_id and copied_to_feedItem__c = false];
+        // Define fields
+        list<string> comment_flds = new list<string>{'Id','sugoisurvey4__Comment__c','sugoisurvey4__Session__c'};
+        list<string> guest_flds = new list<string>{'Id','sugoisurvey4__Last_Name__c','sugoisurvey4__First_Name__c','sugoisurvey4__Title__c','sugoisurvey4__Company__c'};
+        
+        // check FLS
+        scrud.requireAccessible('sugoisurvey4__Comment__c', comment_flds);
+        scrud.requireAccessible('sugoisurvey4__Guest__c', guest_flds);
+
+        //// Dynamic SOQL
+        // fields for comment__c
+        string soql_comment_flds = '';
+        for (string comment_fld : comment_flds){
+            soql_comment_flds += comment_fld + ',';
         }
+        soql_comment_flds = soql_comment_flds.removeEnd(',');
+        // fields for guest__c
+        string soql_guest_flds = '';
+        for (string guest_fld : guest_flds){
+            soql_guest_flds += 'guest__r.' + guest_fld + ',';
+        }
+        soql_guest_flds = soql_guest_flds.removeEnd(',');
+        string soql_flds = soql_comment_flds + ',' + soql_guest_flds;
+        string soql;
+        if (session_id == null){
+            soql = 'select ' + soql_flds + ' from comment__c where session__r.post_comment_to_session_record_feed__c = true and session__r.open__c = true and copied_to_feedItem__c = false';
+        } else {
+            soql = 'select ' + soql_flds + ' from comment__c where session__c = :session_id and session__r.post_comment_to_session_record_feed__c = true and copied_to_feedItem__c = false';
+        }
+        comments_to_copy = Database.query(soql);
         
         for (comment__c c : comments_to_copy){
-            if(create_feedItem_from_comment(c.session__c, c.comment__c, c.guest__r)){
-                c.copied_to_feedItem__c = true;
-            } else {
-                r.status = false;
-                r.message = system.label.failed_to_create_feedItem;
-                return r;
-            }
+            create_feedItem_from_comment(c.session__c, c.comment__c, c.guest__r);
+            c.copied_to_feedItem__c = true;
         }
 
         if (comments_to_copy != null && comments_to_copy.size() > 0){
-            update comments_to_copy;
+            scrud.supdate(comments_to_copy);
         }
-        
-        r.status = true;
-        return r;
     }
     
-    public static boolean create_feedItem_from_comment(id parent_id, string body, guest__c guest){
+    public static void create_feedItem_from_comment(id parent_id, string body, guest__c guest){
         string url = '/' + guest.id;
         string title = '';
         if (guest == null){
-            return false;
+            sexception se = new sexception();
+            se.setMessage(system.label.required_parameter_is_missing);
+            throw se;
         }
         if (guest.company__c != null && guest.company__c != ''){
             title += guest.company__c + ' ';
@@ -257,58 +262,82 @@ public with sharing class jr_session {
         fi.body = body;
         fi.linkUrl = url;
         fi.title = title;
-        try {
-            insert fi;
-        } catch (Exception e) {
-            return false;
-        }
-        return true;
+        insert fi;
     }
     
     @remoteAction
-    public static r submit_survey(survey__c survey, comment__c comment, list<custom_survey_answer__c> csas, string guest_email){
-        r r = new r();
-        savepoint sp = Database.setSavepoint();
+    public static void submit_survey(survey__c survey, comment__c comment, list<custom_survey_answer__c> csas, string guest_email){
+        list<string> fls_flds;
         
         if (survey.session__c == null){
-            r.status = false;
-            r.message = system.label.session_id_is_not_set;
-            return r;
+            sexception se = new sexception();
+            se.setMessage(system.label.session_id_is_not_set);
+            throw se;   
         }
         
         session__c session;
-        try {
-            session = [
-            	select 
-            		enable_rate__c, label_for_rate__c, who_can_submit_survey__c, send_mail_on_submittion__c,
-            		(select id, required__c from custom_survey_question__r)
-            	from session__c where id = :survey.session__c
-        	];
-        } catch (Exception e){
-            r.status = false;
-            r.message = system.label.specified_session_does_not_exist;
-            return r;
+
+        // Define fields which is required for later logic
+        list<string> session_flds = new list<string>{'Id','sugoisurvey4__Enable_Rate__c','sugoisurvey4__Label_For_Rate__c','sugoisurvey4__Who_Can_Submit_Survey__c','sugoisurvey4__Mail_Handout_Subject__c','sugoisurvey4__Mail_Handout_To__c','sugoisurvey4__Mail_Handout_Body_L__c','sugoisurvey4__Mail_Handout_Sender__c','sugoisurvey4__Mail_Handout_Send_On_Submission__c'};
+        list<string> csq_flds = new list<string>{'Id','sugoisurvey4__Required__c'};
+
+        // check FLS
+        scrud.requireAccessible('sugoisurvey4__Session__c', session_flds);
+        scrud.requireAccessible('sugoisurvey4__Custom_Survey_Question__c', csq_flds);
+
+        // Dynamic SOQL
+        string soql_session_flds = '';
+        for (string session_fld : session_flds){
+            soql_session_flds += session_fld + ',';
         }
+        soql_session_flds = soql_session_flds.removeEnd(',');
+
+        string soql_csq_flds = '(select ';
+        for (string csq_fld : csq_flds){
+            soql_csq_flds += csq_fld + ',';
+        }
+        soql_csq_flds = soql_csq_flds.removeEnd(',');
+        soql_csq_flds += ' from custom_survey_question__r)';
+
+        string soql_flds = soql_session_flds + ',' + soql_csq_flds;
+        id session_id = survey.session__c;
+        string soql = 'select ' + soql_flds + ' from session__c where id = :session_id';
+        session = Database.query(soql);
         
         // check value of rate 
         if (session.enable_rate__c == true){
             if (survey.rate__c == null || !(1 <= survey.rate__c) || !(survey.rate__c <= 5)){
-                r.status = false;
                 string label_for_rate;
                 if (session.label_for_rate__c == null){
                     label_for_rate = system.label.xPointScale;
                 } else {
                     label_for_rate = session.label_for_rate__c;
                 }
-                r.message = system.label.pls_enter_required_field + ' ' + label_for_rate;
-                return r;         
+                sexception se = new sexception();
+                se.setMessage(system.label.pls_enter_required_field + ' ' + label_for_rate);
+                throw se;        
             }
         } else {
             survey.rate__c = null;
         }
         
-        // check if the guest fills required questions
-        for (custom_survey_question__c csq : [select id, question__c, (select id from custom_survey_option__r) from custom_survey_question__c where session__c = :session.id and required__c = true order by sort_order__c]){
+        //// check if the guest fills required questions
+        // defince fileds
+        csq_flds = new list<string>{'Id','sugoisurvey4__Question__c'};
+
+        // check FLS
+        scrud.requireAccessible('sugoisurvey4__Custom_Survey_Question__c', csq_flds);
+
+        // dynamic SOQL
+        soql_csq_flds = '';
+        for (string csq_fld: csq_flds){
+            soql_csq_flds += csq_fld + ',';
+        }
+        soql_csq_flds = soql_csq_flds.removeEnd(',');
+        soql_flds = soql_csq_flds + ',' + '(select id from custom_survey_option__r)';
+        soql = 'select ' + soql_flds + ' from custom_survey_question__c where session__c = :session_id and required__c = true order by sort_order__c';
+
+        for (custom_survey_question__c csq : Database.query(soql)){
         	set<string> opt_ids = new set<string>();
         	for (custom_survey_option__c opt : csq.custom_survey_option__r){
         		opt_ids.add(string.valueOf(opt.id));
@@ -320,9 +349,9 @@ public with sharing class jr_session {
     			}
     		}
     		if (!required_answer_found){
-    			r.status = false;
-    			r.message = system.label.pls_enter_required_field + ' ' + csq.question__c;
-    			return r;
+                sexception se = new sexception();
+                se.setMessage(system.label.pls_enter_required_field + ' ' + csq.question__c);
+                throw se;      
     		}
         }
         
@@ -336,62 +365,52 @@ public with sharing class jr_session {
             if (guest == null){
                 guest = createAnonymousGuest(session.id, guest_email);
             }
-            if (guest == null){
-                r.status = false;
-                r.message = system.label.invalid_email;
-                return r;
-            }
         } else if (session.who_can_submit_survey__c == 'Eメールの入力が必要' ||
                    session.who_can_submit_survey__c == 'Require Email'){
             if (guest_email == '' || guest_email == null){
-                r.status = false;
-                r.message = system.label.pls_input_email;
-                return r;
+                sexception se = new sexception();
+                se.setMessage(system.label.pls_input_email);
+                throw se;  
             }
             guest = identifyGuest(session.id, guest_email);
             if (guest == null){
                 guest = createAnonymousGuest(session.id, guest_email);
             }
-            if (guest == null){
-                r.status = false;
-                r.message = system.label.invalid_email;
-                return r;  
-            }
         } else if (session.who_can_submit_survey__c == '事前登録者のみ' || 
                    session.who_can_submit_survey__c == 'Registered Guests Only') {
             if (guest_email == '' || guest_email == null){
-                r.status = false;
-                r.message = system.label.pls_input_email;
-                return r;
+                sexception se = new sexception();
+                se.setMessage(system.label.pls_input_email);
+                throw se;  
             }
             guest = identifyGuest(session.id, guest_email);
             if (guest == null){
-                r.status = false;
-                r.message = system.label.email_not_registered;
-                return r;
+                sexception se = new sexception();
+                se.setMessage(system.label.email_not_registered);
+                throw se;  
             }
         } else {
-            r.status = false;
-            r.message = system.label.session_is_not_configured_correctly;
-            return r;
+            sexception se = new sexception();
+            se.setMessage(system.label.session_is_not_configured_correctly);
+            throw se;
         }
    
         // prevent duplicated submit
         List<Survey__c> existing_surveys = [select id from survey__c where session__c = :session.id and guest__c = :guest.id];
         if (!existing_surveys.isEmpty()){
-            r.status = false;
-            r.message = system.label.already_submitted;
-            return r;
+            sexception se = new sexception();
+            se.setMessage(system.label.already_submitted);
+            throw se;
         }
         
         // insert survey
         survey.guest__c = guest.id;
-        insert survey;
+        scrud.screate(survey);
         
         // insert comment__c and feedItem
         if (comment.comment__c != null && comment.comment__c != ''){
             // insert comment__c
-            insert(new comment__c(session__c = session.id, guest__c = guest.id, comment__c = comment.comment__c));
+            scrud.screate(new comment__c(session__c = session.id, guest__c = guest.id, comment__c = comment.comment__c));
         }
         
         // prepare custom_survey_answers to insert
@@ -410,22 +429,19 @@ public with sharing class jr_session {
         
         // insert custom_survey_asnwers
         if (csas_to_add.size() > 0){
-            insert csas_to_add;
+            scrud.screate(csas_to_add);
         }
         
         // update guest status to "submitted"
         guest.status__c = 'submitted';
-        update guest;
+        scrud.supdate(guest);
         
-        // send mail if Send_Mail_On_Submittion__c == true and guest__c.email__c is set.
-        if (session.send_mail_on_submittion__c == true && !String.isEmpty(guest.email__c)){
+        // send mail
+        if (session.mail_handout_send_on_submission__c == true && !String.isEmpty(guest.email__c) && guest.handout_delivered__c == false){
         	list<guest__c> guests = new list<guest__c>();
         	guests.add(guest);
-        	deliver_deck(session.id, guests);
+        	send_mail(session.id, 'handout', session.mail_handout_to__c, session.mail_handout_subject__c, session.mail_handout_body_l__c, session.mail_handout_sender__c, guests);
         }
-
-        r.status = true;
-        return r;
     }
     
     private static guest__c identifyGuest(id session_id, string guest_email){
@@ -433,10 +449,11 @@ public with sharing class jr_session {
         if (String.isEmpty(guest_email)){
             return guest;
         }
+        string soql_flds = scrud.getAccessibleFieldsInCSV('sugoisurvey4__Guest__c');
+        string soql = 'select ' + soql_flds + ' from guest__c where session__c = :session_id and email__c = :guest_email';
         try {
-            guest = [select id, name__c, session__c, last_name__c, first_name__c, email__c, title__c, company__c, status__c, handout_delivered__c from guest__c where session__c = :session_id AND email__c = :guest_email];
+            guest = Database.query(soql);
         } catch (Exception e){
-            return guest;
         }
         return guest;
     }
@@ -448,13 +465,22 @@ public with sharing class jr_session {
         guest.email__c = guest_email;
         guest.title__c = '';
         guest.company__c = '';
+
         try {
-            insert guest;
-            // reload guest since guest might be updated by link_to_contact trigger
-            guest = [select id, name, session__c, last_name__c, first_name__c, email__c, title__c, company__c, status__c, handout_delivered__c from guest__c where id = :guest.id];
-        } catch(Exception e){
-            guest = null;
+            scrud.screate(guest);
+        } catch (DmlException de){
+            if (de.getMessage().contains('INVALID_EMAIL_ADDRESS')){
+                sexception se = new sexception();
+                se.setMessage(system.label.invalid_email);
+                throw se;
+            } else {
+                throw de;
+            }
         }
+       
+        // reload guest since guest might be updated by link_to_contact trigger
+        guest = (guest__c)scrud.sread('sugoisurvey4__Guest__c', guest.id);
+
         return guest;
     }
     
@@ -466,81 +492,76 @@ public with sharing class jr_session {
             return null;
         }
         
-        try {
-            session = [
-                select
-                    id, 
-                    name,
-                    open__c, 
-                    date__c,
-                    hash_tag__c, 
-                    rate_avg__c,
-                    enable_rate__c,
-                    label_for_rate__c,
-                    survey_collection_rate__c,
-                    survey_sum__c,
-                    guest_sum__c,
-                    rate_5__c,
-                    rate_4__c,
-                    rate_3__c,
-                    rate_2__c,
-                    rate_1__c,
-                    toLabel(who_can_get_handout__c),
-                    toLabel(who_can_submit_survey__c),
-                    mass_mail_sender__c,
-                    mass_mail_title__c,
-                    mass_mail_additional_body__c,
-                    handout_url__c,
-                    handout_password__c,
-                    owner.email,
-                    presenter__r.name,
-                    presenter__r.title__c,
-                    presenter__r.company__c,
-                    (select id, name, question__c, survey_type__c, sort_order__c, required__c, enable_free_form__c, session__c from custom_survey_question__r order by sort_order__c, name),
-                    (select id, name, option__c, enable_free_form__c, dummy__c, sum__c, session__c, custom_survey_question__c from custom_survey_option__r order by name)
-                    //(select id, name__c, email__c, title__c, company__c, handout_delivered__c from guest__r order by handout_delivered__c, company__c),
-                    //(select id, name, guest__c, rate__c from survey__r order by name),
-                    //(select id, free_form__c from custom_survey_answer__r order by name desc),
-                    //(select id, name, comment__c from comment__r order by name desc),
-                    //(select id from lead__r),
-                    //(select id, name from attachments)
-                from Session__c where id = :session_id
-            ];
-        } catch (Exception e){
-            return null;
+        string soql_session_flds = scrud.getAccessibleFieldsInCSV('sugoisurvey4__Session__c');
+        string soql_csq_flds = '(select ' + scrud.getAccessibleFieldsInCSV('sugoisurvey4__Custom_Survey_Question__c') + ' from custom_survey_question__r order by sort_order__c, name)';
+        string soql_cso_flds = '(select ' + scrud.getAccessibleFieldsInCSV('sugoisurvey4__Custom_Survey_Option__c') + ' from custom_survey_option__r order by name)';
+        string soql_guest_flds = '(select ' + scrud.getAccessibleFieldsInCSV('sugoisurvey4__Guest__c') + ' from guest__r order by name)';
+        string soql_presenter_flds = '';
+        list<string> presenter_flds = scrud.getAccessibleFields('sugoisurvey4__Presenter__c');
+        for (string presenter_fld : presenter_flds){
+            soql_presenter_flds += 'presenter__r.' + presenter_fld + ',';
         }
-        
+        soql_presenter_flds = soql_presenter_flds.removeEnd(',');
+
+        string soql_flds = soql_session_flds + ',' + soql_csq_flds + ',' + soql_cso_flds + ',' + soql_guest_flds + ',' + soql_presenter_flds;
+        string soql = 'select ' + soql_flds + ' from session__c where id = :session_id';
+        session = Database.query(soql);
+
         return session;
+    }
+
+    @remoteAction
+    public static list<session__c> get_sessions(){
+        list<session__c> sessions;
+        
+        string soql_flds = scrud.getAccessibleFieldsInCSV('sugoisurvey4__Session__c');
+        string soql = 'select ' + soql_flds + ' from session__c order by open__c desc, date__c desc, createdDate desc';
+        sessions = Database.query(soql);
+        
+        return sessions;
     }
     
     @remoteAction
-    public static r reorder_question(id session_id, list<id> question_ids){
-        r r = new r();
-        
+    public static list<session__c> get_open_sessions(){
+        list<session__c> sessions = new list<session__c>();
+        for (session__c s : get_sessions()){
+            if (s.open__c == true){
+                sessions.add(s);
+            }
+        }
+        return sessions;
+    }
+
+    @remoteAction
+    public static void reorder_question(id session_id, list<id> question_ids){
         if (session_id == null){
-            r.status = false;
-            r.message = system.label.session_id_is_not_set;
-            return r;
+            sexception se = new sexception();
+            se.setMessage(system.label.session_id_is_not_set);
+            throw se;
         }
         
         if (question_ids.size() < 2){
-            r.status = false;
-            r.message = system.label.there_are_not_enough_number_of_question_to_sort;
-            return r;
+            sexception se = new sexception();
+            se.setMessage(system.label.there_are_not_enough_number_of_question_to_sort);
+            throw se;
         }
         
+        // check FLS
+        list<string> csq_flds = new list<string>{'Id','sugoisurvey4__Sort_Order__c'};
+        scrud.requireAccessible('sugoisurvey4__Custom_Survey_Question__c', csq_flds);
+
         list<custom_survey_question__c> csqs = [select id, sort_order__c from custom_survey_question__c where session__c = :session_id];
 
         if (csqs.size() < 2){
-            r.status = false;
-            r.message = system.label.there_are_not_enough_number_of_question_to_sort;
-            return r;
+            sexception se = new sexception();
+            se.setMessage(system.label.there_are_not_enough_number_of_question_to_sort);
+            throw se;
         }
         
         if (csqs.size() != question_ids.size()){
-            r.status = false;
-            r.message = system.label.requested_number_of_question_is_not_valid;
-            return r;
+            sexception se = new sexception();
+            se.setMessage(system.label.requested_number_of_question_is_not_valid);
+            throw se;
         }
         
         integer sort_order = 1;
@@ -554,57 +575,37 @@ public with sharing class jr_session {
                 }
             }
             if (found == false){
-                r.status = false;
-                r.message = system.label.specified_question_not_found;
-                return r;
+                sexception se = new sexception();
+                se.setMessage(system.label.specified_question_not_found);
+                throw se;
             }
             sort_order++;
             found = false;
         }
         
-        update csqs;
-        
-        r.status = true;
-        return r;
+        scrud.supdate(csqs);
     }
     
     @remoteAction
-    public static r clone_session(id session_id){
-        r r = new r();
-        
+    public static id clone_session(id session_id){
         if (session_id == null){
-            r.status = false;
-            r.message = system.label.session_id_is_not_set;
-            return r;
+            sexception se = new sexception();
+            se.setMessage(system.label.session_id_is_not_set);
+            throw se;
         }
         
         // clone session record
-        session__c old_session = [
-            select
-                id, 
-                name,
-                open__c, 
-                enable_rate__c,
-                label_for_rate__c,
-                survey_collection_rate__c,
-                who_can_get_handout__c,
-                who_can_submit_survey__c,
-                mass_mail_sender__c,
-                mass_mail_title__c,
-                mass_mail_additional_body__c,
-                handout_url__c,
-                handout_password__c,
-                Post_To_Account_Record_Feed__c,
-                Post_To_Contact_Record_Feed__c,
-                owner.email,
-                presenter__c,
-                (select id, name, question__c, survey_type__c, sort_order__c, required__c, enable_free_form__c, session__c from custom_survey_question__r),
-                (select id, name, option__c, enable_free_form__c, dummy__c, session__c, custom_survey_question__c from custom_survey_option__r),
-                (select id, name from attachments)
-            from Session__c where id = :session_id
-        ];
+        string session_fields = scrud.getCreateableFieldsInCSV('sugoisurvey4__Session__c');
+        string csq_fields = '(select ' + scrud.getCreateableFieldsInCSV('sugoisurvey4__Custom_Survey_Question__c') + ' from custom_survey_question__r order by sort_order__c, name)';
+        string cso_fields = '(select ' + scrud.getCreateableFieldsInCSV('sugoisurvey4__Custom_Survey_Option__c') + ' from custom_survey_option__r order by name)';
+
+        string soql_fields = session_fields + ',' + csq_fields + ',' + cso_fields + ',' + '(select id, name from attachments)';
+        string soql = 'select ' + soql_fields + ' from session__c where id = :session_id';
+        session__c old_session = Database.query(soql);
+        old_session.date__c = null;
+
         session__c new_session = old_session.clone(false, true, false, false);
-        insert new_session;
+        scrud.screate(new_session);
         
         // retrieve question records and clone
         list<custom_survey_question__c> old_csqs = old_session.custom_survey_question__r;
@@ -612,7 +613,7 @@ public with sharing class jr_session {
         for (custom_survey_question__c new_csq : new_csqs){
             new_csq.session__c = new_session.id;
         }
-        insert new_csqs;
+        scrud.screate(new_csqs);
         
         // create map between old question id and new question id
         map<string, string> csq_id_map = new map<string, string>();
@@ -629,154 +630,68 @@ public with sharing class jr_session {
             new_cso.session__c = new_session.id;
             new_cso.custom_survey_question__c = csq_id_map.get(new_cso.custom_survey_question__c);
         }
-        insert new_csos;
+        scrud.screate(new_csos);
         
-        r.status = true;
-        return r;
+        return new_session.Id;
     }
 
     @remoteAction
     public static list<custom_survey_answer__c> get_free_answers(id csq_id){
         list<custom_survey_answer__c> free_answers;
+        
         if (csq_id == null){
-            return null;
+            sexception se = new sexception();
+            se.setMessage(system.label.required_parameter_is_missing);
+            throw se;
         }
         
         string survey_type;
-        try {
-            survey_type = [select survey_type__c from custom_survey_question__c where id = :csq_id].survey_type__c;
-        } catch (Exception e){
-            return null;
+        survey_type = [select survey_type__c from custom_survey_question__c where id = :csq_id].survey_type__c;
+        
+        string soql_flds = scrud.getAccessibleFieldsInCSV('sugoisurvey4__Custom_Survey_Answer__c');
+        string soql;
+        if (survey_type == 'checkbox' || survey_type == 'radio'){
+        	soql = 'select ' + soql_flds + ' from custom_survey_answer__c where custom_survey_option__r.custom_survey_question__c = :csq_id AND custom_survey_option__r.enable_free_form__c = true AND free_form__c != null order by name desc';
+        } else {
+        	soql = 'select ' + soql_flds + ' from custom_survey_answer__c where custom_survey_option__r.custom_survey_question__c = :csq_id AND custom_survey_option__r.dummy__c = true AND free_form__c != null order by name desc';
         }
         
-        if (survey_type == 'checkbox' || survey_type == 'radio'){
-            // retrieve free answer in case of selectable survey
-            try {
-                free_answers =  [select id, name, session__c, guest__c, custom_survey_option__c, free_form__c from custom_survey_answer__c where custom_survey_option__r.custom_survey_question__c = :csq_id AND custom_survey_option__r.enable_free_form__c = true AND free_form__c != null order by name desc];
-            } catch (Exception e){
-                return null;
-            }
-        } else {
-            // retrieve free answers in case of non-selectable survey
-            try {
-                free_answers =  [select id, name, session__c, guest__c, custom_survey_option__c, free_form__c from custom_survey_answer__c where custom_survey_option__r.custom_survey_question__c = :csq_id AND custom_survey_option__r.dummy__c = true AND free_form__c != null order by name desc];
-            } catch (Exception e){
-                return null;
-            }
+        try {
+        	free_answers = Database.query(soql);
+        } catch (Exception e){
+            return null;
         }
         
         if (free_answers.size() == 0){
             return null;
         }
+        
         return free_answers;
     }
 
     @remoteAction
-    public static r add_session(string session_name){
-        r r = new r();
-        
-        if (session_name == null || session_name == ''){
-            r.status = false;
-            r.message = system.label.pls_enter_session_name;
-            return r;
-        }
-        session__c new_session = new session__c();
-        new_session.name = session_name;
-        insert new_session;
-        
-        r.status = true;
-        r.message = new_session.id;
-        return r;
-    }
-    
-    @remoteAction
-    public static r delete_session(id session_id){
-        r r = new r();
-        
-        if (session_id == null){
-            r.status = false;
-            r.message = system.label.session_id_is_not_set;
-            return r;
-        }
-        
-        session__c session = get_session(session_id);
-        if (session == null){
-            r.status = false;
-            r.message = system.label.specified_session_does_not_exist;
-            return r;
-        }
-
-        delete session;
-
-        // delete custom_survey_option__c
-        try {
-            delete session.custom_survey_option__r;
-        } catch (Exception e){
-        }
-        
-        // delete custom_survey_answer__s
-        try {
-            delete session.custom_survey_answer__r;
-        } catch (Exception e){
-        }
-        
-        // delete lead
-        try {
-            delete session.lead__r;
-        } catch (Exception e){
-        }
-        
-        r.status = true;
-        r.message = session.id;
-        return r;
-    }
-    
-    @remoteAction
-    public static r delete_survey(id survey_id){
-        r r = new r();
-        if (survey_id == null){
-            r.status = false;
-            r.message = system.label.survey_id_is_not_set;
-            return r;           
-        }
-        
-        custom_survey_question__c csq;
-        try {
-            csq = [select id from custom_survey_question__c where id = :survey_id];
-        } catch (Exception e){
-            r.status = false;
-            r.message = system.label.specified_survey_does_not_exist;
-            return r;
-        }
-        
-        delete csq;
-        
-        r.status = true;
-        r.message = survey_id;
-        return r;
-    }
-
-    @remoteAction
-    public static r create_survey(custom_survey_question__c csq, list<custom_survey_option__c> csos){
-        r r = new r();
-        
+    public static id create_survey(custom_survey_question__c csq, list<custom_survey_option__c> csos){
+        // Check if session id is set
         if (csq.session__c == null){
-            r.status = false;
-            r.message = system.label.session_id_is_not_set;
-            return r;           
+            sexception e = new sexception();
+            e.setMessage(system.label.session_id_is_not_set);
+            throw e;        
         }
+
+        // Check if session exists
         try {
             string session_id_for_test = [select id from session__c where id = :csq.session__c].id;
         } catch (Exception e){
-            r.status = false;
-            r.message = system.label.specified_session_does_not_exist;
-            return r;
+            sexception se = new sexception();
+            se.setMessage(system.label.specified_session_does_not_exist);
+            throw se;   
         }
         
+        // Check if question is set
         if (csq.question__c == null || csq.question__c == '') {
-            r.status = false;
-            r.message = system.label.pls_enter_question;
-            return r;
+            sexception se = new sexception();
+            se.setMessage(system.label.pls_enter_question);
+            throw se;  
         }
         
         if (csq.survey_type__c == 'free'){
@@ -786,11 +701,15 @@ public with sharing class jr_session {
         // add sort order if it has been set in existing questions
         list<custom_survey_question__c> existing_csqs;
         integer sort_order;
+
+        // check FLS
+        scrud.requireAccessible('sugoisurvey4__Custom_Survey_Question__c', new list<string>{'sugoisurvey4__Sort_Order__c'});
+
         existing_csqs = [select sort_order__c from custom_survey_question__c where session__c = :csq.session__c and sort_order__c != null order by sort_order__c desc];
         if(existing_csqs.size() > 0){
             csq.sort_order__c = existing_csqs[0].sort_order__c + 1;
         }
-        insert csq;
+        scrud.screate(csq);
         
         // prepare options to insert
         list<custom_survey_option__c> csos_to_add = new list<custom_survey_option__c>();
@@ -826,55 +745,63 @@ public with sharing class jr_session {
             ));
         }
         
-        insert csos_to_add;
-        
-        r.message = csq.id;
-        r.status = true;
-        return r;
+        scrud.screate(csos_to_add);
+        return csq.id;
     }
 
     @remoteAction
-    public static r edit_survey(custom_survey_question__c csq, list<custom_survey_option__c> csos){
-        r r = new r();
-
+    public static void edit_survey(custom_survey_question__c csq, list<custom_survey_option__c> csos){
         // Check if custom_survey_question__c.session__c is not empty.
         if (csq.session__c == null){
-            r.status = false;
-            r.message = system.label.session_id_is_not_set;
-            return r;
+            sexception se = new sexception();
+            se.setMessage(system.label.session_id_is_not_set);
+            throw se;
         }
         
         // Check if custom_survey_question__c.id is not empty.
         if (csq.id == null){
-            r.status = false;
-            r.message = system.label.survey_id_is_not_set;
-            return r;   
+            sexception se = new sexception();
+            se.setMessage(system.label.survey_id_is_not_set);
+            throw se;
         }
         
         // Check if custom_survey_question__c.question__c is not empty.
         if (csq.question__c == null || csq.question__c == ''){
-            r.status = false;
-            r.message = system.label.pls_enter_question;
-            return r;   
+            sexception se = new sexception();
+            se.setMessage(system.label.pls_enter_question);
+            throw se;
         }
 
         // Check if session exists.
         try {
             string session_id_for_test = [select id from session__c where id = :csq.session__c].id;
         } catch (Exception e){
-            r.status = false;
-            r.message = system.label.specified_session_does_not_exist;
-            return r;
+            sexception se = new sexception();
+            se.setMessage(system.label.specified_session_does_not_exist);
+            throw se;
         }
         
-        // Check if custom_survey_question__c exists.
+        //// Check if custom_survey_question__c exists.
         custom_survey_question__c existing_csq;
+        // define fields
+        list<string> csq_flds = new list<string>{'Id','sugoisurvey4__Question__c','sugoisurvey4__Survey_Type__c','sugoisurvey4__Required__c','sugoisurvey4__Enable_Free_Form__c','sugoisurvey4__Session__c'};
+        // check FLS
+        scrud.requireAccessible('sugoisurvey4__Custom_Survey_Question__c', csq_flds);
+        // dynamic SOQL
+        string soql_flds = '';
+        for (string csq_fld : csq_flds){
+            soql_flds += csq_fld + ',';
+        }
+        soql_flds = soql_flds.removeEnd(',');
+        id csq_id = csq.id;
+        id session_id = csq.session__c;
+        string soql = 'select ' + soql_flds + ' from custom_survey_question__c where id = :csq_id AND session__c = :session_id';
         try {
-            existing_csq = [select id, question__c, survey_type__c, required__c, enable_free_form__c, session__c from custom_survey_question__c where id = :csq.id AND session__c = :csq.session__c];
+            existing_csq = Database.query(soql);
         } catch (Exception e){
-            r.status = false;
-            r.message = system.label.specified_survey_does_not_exist;
-            return r;
+            sexception se = new sexception();
+            se.setMessage(system.label.specified_survey_does_not_exist);
+            throw se;
         }
         
         // Check if enable_free_form should be enabled/disabled.
@@ -906,7 +833,7 @@ public with sharing class jr_session {
             	existing_csq.enable_free_form__c = csq.enable_free_form__c;
             }
             existing_csq.required__c = csq.required__c;
-            update existing_csq;
+            scrud.supdate(existing_csq);
         }
         
         // return if survey is non-selectable since there should be no option
@@ -918,8 +845,19 @@ public with sharing class jr_session {
         }
         */
         
-        // Retrieve existing list of custom_survey_option__c
-        list<custom_survey_option__c> existing_csos = [select id, option__c, session__c, custom_survey_question__c, enable_free_form__c, dummy__c from custom_survey_option__c where custom_survey_question__c = :existing_csq.id];
+        //// Retrieve existing list of custom_survey_option__c
+        // define fields
+        list<string> cso_flds = new list<string>{'Id','sugoisurvey4__Option__c','sugoisurvey4__Custom_Survey_Question__c','sugoisurvey4__Enable_Free_Form__c','sugoisurvey4__Dummy__c','sugoisurvey4__Session__c'};
+        // check FLS
+        scrud.requireAccessible('sugoisurvey4__Custom_Survey_Option__c', cso_flds);
+        // dynamic SOQL
+        soql_flds = '';
+        for (string cso_fld : cso_flds){
+            soql_flds += cso_fld + ',';
+        }
+        soql_flds = soql_flds.removeEnd(',');
+        soql = 'select ' + soql_flds + ' from custom_survey_option__c where custom_survey_question__c = :csq_id';
+        list<custom_survey_option__c> existing_csos = Database.query(soql);
         
         // Prepare options to be added.
         list<custom_survey_option__c> csos_to_add = new list<custom_survey_option__c>();
@@ -954,7 +892,7 @@ public with sharing class jr_session {
         
         // add options
         if (csos_to_add.size() > 0){
-            insert csos_to_add;
+        	scrud.screate(csos_to_add);
         }
         
         // Prepare options to be updated.
@@ -972,7 +910,7 @@ public with sharing class jr_session {
         
         // update options
         if (csos_to_update.size() > 0){
-            update csos_to_update;
+            scrud.supdate(csos_to_update);
         }
         
         // Prepare options to be deleted.
@@ -994,12 +932,12 @@ public with sharing class jr_session {
         }
         
         // delete options
-        delete csos_to_delete;
+        scrud.sdelete(csos_to_delete);
 
         // delete option for enable free form
         if (action_for_enable_free_form == 'disable'){
             try {
-                delete [select id from custom_survey_option__c where session__c = :existing_csq.session__c AND custom_survey_question__c = :existing_csq.id AND enable_free_form__c = true];
+                scrud.sdelete([select id from custom_survey_option__c where session__c = :existing_csq.session__c AND custom_survey_question__c = :existing_csq.id AND enable_free_form__c = true]);
             } catch (Exception e){
             }
         }
@@ -1007,207 +945,76 @@ public with sharing class jr_session {
         // delete option
         if (action_for_survey_type == 'tofree'){
         	try {
-                delete [select id from custom_survey_option__c where session__c = :existing_csq.session__c AND custom_survey_question__c = :existing_csq.id AND dummy__c != true];
+                scrud.sdelete([select id from custom_survey_option__c where session__c = :existing_csq.session__c AND custom_survey_question__c = :existing_csq.id AND dummy__c != true]);
             } catch (Exception e){
             }
         }
         if (action_for_survey_type == 'fromfree'){
         	try {
-                delete [select id from custom_survey_option__c where session__c = :existing_csq.session__c AND custom_survey_question__c = :existing_csq.id AND dummy__c = true];
+                scrud.sdelete([select id from custom_survey_option__c where session__c = :existing_csq.session__c AND custom_survey_question__c = :existing_csq.id AND dummy__c = true]);
             } catch (Exception e){
             }
         }
-        
-        r.status = true;
-        r.message = existing_csq.id;
-        return r;
-    }
-    
-    @remoteAction 
-    public static r clear_delivered_flag(id session_id){
-    	r r = new r();
-		list<guest__c> guests = new list<guest__c>();
-		
-        if (session_id == null){
-            r.status = false;
-            r.message = system.label.session_id_is_not_set;
-            return r;
-        }
-        
-        guests = [select id, handout_delivered__c from guest__c where session__c = :session_id];
-		for (guest__c g : guests){
-			g.handout_delivered__c = false;
-		}
-		
-        if (guests.size() > 0){
-        	update guests;
-        }
-        
-        r.status = true;
-        return r;
     }
     
     @remoteAction
-    public static r deliver_guest_pass(id session_id){
-    	r r = new r();
+    public static integer send_mail(id session_id, string template, string to, string subject, string body, string sender, list<guest__c> guests){
         session__c session;
         
+        // Check for session id
         if (session_id == null){
-            r.status = false;
-            r.message = system.label.session_id_is_not_set;
-            return r;
+            sexception se = new sexception();
+            se.setMessage(system.label.session_id_is_not_set);
+            throw se;
+        }
+
+        // Define fields
+        list<string> session_flds = new list<string>{'Id','Name','Date__c'};
+
+        // Check FLS
+        scrud.requireAccessible('sugoisurvey4__Session__c', session_flds);
+
+        // Dynamic SOQL
+        string soql_session_flds = '';
+        for (string session_fld : session_flds){
+            soql_session_flds += session_fld + ',';
+        }
+        soql_session_flds = soql_session_flds.removeEnd(',');
+        string soql_flds = soql_session_flds + ',' + '(select id, name from attachments)';
+        string soql = 'select ' + soql_flds + ' from session__c where id = :session_id';
+        session = Database.query(soql);
+        
+        // Check for template value
+        if (String.isEmpty(template)){
+            sexception se = new sexception();
+            se.setMessage(system.label.required_parameter_is_missing + ' : template');
+            throw se;
+        }
+        set<string> templates = new set<string>{'free', 'guest_pass', 'survey_link', 'handout'};
+        if (!templates.contains(template)){
+            sexception se = new sexception();
+            se.setMessage(system.label.invalid_value + ' : ' + template + ' for template');
+            throw se;
         }
         
-        try {
-            session = [
-                select
-                    id, 
-                    name,
-					date__c,
-					mass_mail_sender__c,
-                    owner.email,
-                    (select id, name__c, company__c, title__c, email__c, guest_pass_delivered__c from guest__r where guest_pass_delivered__c = false and email__c <> null and email__c <> '')
-                from Session__c where id = :session_id
-            ];
-        } catch (Exception e){
-            r.status = false;
-            r.message = system.label.specified_session_does_not_exist;
-            return r;
+        // Check for to value
+        if (String.isEmpty(to)){
+            sexception se = new sexception();
+            se.setMessage(system.label.required_parameter_is_missing + ' : to');
+            throw se;
         }
-        
-        // set sender & reply-to address
-        string sender_address = string.isEmpty(session.mass_mail_sender__c) ? session.owner.email : session.mass_mail_sender__c;
-        
-        // reserve single email resource
-        try {
-        	Messaging.reserveSingleEmailCapacity(session.guest__r.size());
-        } catch (System.Limitexception e){
-        	system.debug(e);
-        	r.status = false;
-        	r.message = system.label.mail_limit_exceeds;
-        	return r;
+        set<string> tos = new set<string>{'anyone', 'attendees', 'who_have_submitted_survey'};
+        if (!tos.contains(to)){
+            sexception se = new sexception();
+            se.setMessage(system.label.invalid_value + ' : ' + to + ' for to');
+            throw se;
         }
-        
-        List<Messaging.singleEmailMessage> mails = new List<Messaging.singleEmailMessage>();
-        for (guest__c g : session.guest__r){
-            //Initialize Messaging Object.
-            Messaging.singleEmailMessage mail = new Messaging.singleEmailMessage();
-                
-            //Set To:
-            list<string> to_addresses = new list<string>();
-            to_addresses.add(g.email__c);
-            mail.setToAddresses(to_addresses);
-                
-            //Set Sender:
-            mail.setSenderDisplayName(sender_address);
-                
-            //Set Reply-To:
-            mail.setReplyTo(sender_address);
-                
-            //Set Subject:
-            mail.setSubject(system.label.guest_pass_mail_subject + ': ' + session.name);
-            
-            //Set Message Body:
-            string g_date = session.date__c == null ? '' : session.date__c.format();
-            string g_name = g.name__c == null ? '' : g.name__c;
-            string g_company = g.company__c == null ? '' : g.company__c;
-            string mail_body = '<div style="text-align:center;"><img src="https://chart.googleapis.com/chart?cht=qr&chs=150x150&chl=' + g.id + '"></img></div><div>' + system.label.event + ': ' + session.name + '</div><div>' + system.label.event_date + ': ' + g_date + '</div><div>' + system.label.your_company + ': ' + g_company + '</div><div>' + system.label.your_name + ': ' + g_name + '</div>';
-            mail.setHtmlBody(mail_body);
-                
-            //Add to list
-            mails.add(mail);
-        }
-        
-        if (mails.size() > 0){
-        	// send
-            Messaging.SendEmailResult[] sers = Messaging.sendEmail(mails);
-            
-            for (Messaging.SendEmailResult ser : sers){
-                if (!ser.isSuccess()){
-                    r.status = false;
-                    Messaging.SendEmailError[] sees = ser.getErrors();
-                    for (Messaging.SendEmailError see : sees){
-                        r.message += see.getMessage() + ' ';
-                    }
-                    return r;
-                }
-            }
-            
-            // mark guest as delivered
-	        for (guest__c g : session.guest__r){
-	        	g.guest_pass_delivered__c = true;
-	        }
-	        update session.guest__r;
-        }
-        
-        r.status = true;
-        r.message = string.valueOf(mails.size());
-        return r;
-    }
-    
-    @remoteAction
-    public static r deliver_deck(id session_id, list<guest__c> guests){
-        r r = new r();
-        session__c session;
-        
-        if (session_id == null){
-            r.status = false;
-            r.message = system.label.session_id_is_not_set;
-            return r;
-        }
-        
-        try {
-            session = [
-                select
-                    id, 
-                    name,
-                    who_can_get_handout__c,
-                    mass_mail_sender__c,
-                    mass_mail_title__c,
-                    mass_mail_additional_body__c,
-                    handout_url__c,
-                    handout_password__c,
-                    owner.email,
-                    (select id, name from attachments)
-                from Session__c where id = :session_id
-            ];
-        } catch (Exception e){
-            r.status = false;
-            r.message = system.label.specified_session_does_not_exist;
-            return r;
-        }
-        
-        ApexPages.StandardController sc = new ApexPages.StandardController(session);
-        session_v2 i_session = new session_v2(sc);
-        
-        // set common address for sender and reply-to.
-        string sender_address;
-        if (session.mass_mail_sender__c == null || session.mass_mail_sender__c == ''){
-            sender_address = session.owner.email;
-        } else {
-            sender_address = session.mass_mail_sender__c;
-        }
-        
-        // get guests to be delivered.
-        // already delivered guests will be excluded.
-        // If guests are specified in advance, check if email__c has been set.
+
+        // retrive guest list to be delivered
         if (guests == null){
-        	guests = new list<guest__c>();
-	        for (guest__c g : i_session.getDeliveryDestinations()){
-	        	if (g.handout_delivered__c == false){
-	        		guests.add(g);
-	        	}
-	        }
-        } else {
-        	integer i = 0;
-        	for (guest__c g : guests){
-        		if (String.isEmpty(g.email__c) || g.handout_delivered__c == true){
-        			guests.remove(i);
-        		}
-        		i++;
-        	}
+        	guests = retrieve_guests_to_be_delivered(session.id, template, to);
         }
- 
+        
         // retrieve attachment:
         List<Messaging.emailFileAttachment> efas = new List<Messaging.emailFileAttachment>();
         for (attachment a : session.attachments){
@@ -1235,17 +1042,32 @@ public with sharing class jr_session {
             mail.setToAddresses(to_addresses);
                 
             //Set Sender:
-            mail.setSenderDisplayName(sender_address);
+            mail.setSenderDisplayName(sender);
                 
             //Set Reply-To:
-            mail.setReplyTo(sender_address);
-                
+            mail.setReplyTo(sender);
+            
             //Set Subject:
-            string mail_subject = session.mass_mail_title__c == null ? '' : session.mass_mail_title__c;
-            mail.setSubject(mail_subject);
+            subject = String.isEmpty(subject) ? '' : subject;
+            mail.setSubject(subject);
             
             //Set Message Body:
-            mail.setHtmlBody(i_session.getMailBody());
+            if (template == 'free'){
+            	mail.setPlainTextBody(body);
+            } else if (template == 'guest_pass'){
+            	string g_date = session.date__c == null ? '' : session.date__c.format();
+            	string g_name = g.name__c == null ? '' : g.name__c;
+            	string g_company = g.company__c == null ? '' : g.company__c;
+            	body = '<div style="text-align:center;"><img src="https://chart.googleapis.com/chart?cht=qr&chs=150x150&chl=' + g.id + '"></img></div><div>' + system.label.event + ': ' + session.name + '</div><div>' + system.label.event_date + ': ' + g_date + '</div><div>' + system.label.your_company + ': ' + g_company + '</div><div>' + system.label.your_name + ': ' + g_name + '</div>';
+            	mail.setHtmlBody(body);
+            } else if (template == 'survey_link'){
+            	config__c config = config__c.getOrgDefaults();
+            	body = '<p>' + system.label.survey + ' : ' + session.name + '</p><a href="' + config.survey_sites_url__c + '?id=' + session.Id + '">' + config.survey_sites_url__c + '?id=' + session.Id + '</a>';
+            	mail.setHtmlBody(body);
+            } else if (template == 'handout'){
+            	body = String.isEmpty(body) ? '' : body;
+            	mail.setPlainTextBody(body);
+            }
                 
             //Set Attachment:
             if (efas.size() >= 1){
@@ -1261,24 +1083,270 @@ public with sharing class jr_session {
             Messaging.SendEmailResult[] sers = Messaging.sendEmail(mails);
             for (Messaging.SendEmailResult ser : sers){
                 if (!ser.isSuccess()){
-                    r.status = false;
+                    sexception se = new sexception();
                     Messaging.SendEmailError[] sees = ser.getErrors();
                     for (Messaging.SendEmailError see : sees){
-                        r.message += see.getMessage() + ' ';
+                        se.setMessage(see.getMessage() + ' ');
                     }
-                    return r;
+                    throw se;
                 }
             }
             
 	        // mark guest as delivered
 	        for (guest__c g : guests){
-	        	g.handout_delivered__c = true;
+	        	if (template == 'free'){
+	        		g.mail_delivered__c = true;
+	        	} else if (template == 'guest_pass'){
+	        		g.guest_pass_delivered__c = true;
+	        	} else if (template == 'survey_link'){
+	        		g.survey_link_delivered__c = true;
+	        	} else if (template == 'handout'){
+	        		g.handout_delivered__c = true;
+	        	}
 	        }
-	        update guests;
+	        scrud.supdate(guests);
         }
         
-        r.status = true;
-        r.message = string.valueOf(mails.size());
-        return r;
+        return mails.size();
+    }
+    
+    @remoteAction
+    public static list<guest__c> retrieve_guests_to_be_delivered(id session_id, string template, string to){
+    	list<guest__c> guests = new list<guest__c>();
+    	
+    	if (session_id == null || String.isEmpty(template) || String.isEmpty(to)){
+            sexception se = new sexception();
+            se.setMessage(system.label.required_parameter_is_missing);
+            throw se;
+    	}
+    	
+        string soql_flds = scrud.getAccessibleFieldsInCSV('sugoisurvey4__Guest__c');
+        string soql = 'select ' + soql_flds + ' from guest__c where session__c = :session_id and email__c <> null and email__c <> \'\'';
+        for (guest__c g : Database.query(soql)){
+        	if (template == 'free'){
+        		if (to == 'anyone'){
+        			if (g.mail_delivered__c == false){
+        				guests.add(g);
+        			}
+        		} else if (to == 'attendees'){
+        			if (g.mail_delivered__c == false && g.checkin__c == true){
+        				guests.add(g);
+        			}
+        		} else if (to == 'who_have_submitted_survey'){
+        			if (g.mail_delivered__c == false && g.status__c == 'submitted'){
+        				guests.add(g);
+        			}
+        		}
+        	} else if (template == 'guest_pass'){
+        		if (to == 'anyone'){
+        			if (g.guest_pass_delivered__c == false){
+        				guests.add(g);
+        			}
+        		} else if (to == 'attendees'){
+        			if (g.guest_pass_delivered__c == false && g.checkin__c == true){
+        				guests.add(g);
+        			}
+        		} else if (to == 'who_have_submitted_survey'){
+        			if (g.guest_pass_delivered__c == false && g.status__c == 'submitted'){
+        				guests.add(g);
+        			}
+        		}
+        	} else if (template == 'survey_link'){
+        		if (to == 'anyone'){
+        			if (g.survey_link_delivered__c == false){
+        				guests.add(g);
+        			}
+        		} else if (to == 'attendees'){
+        			if (g.survey_link_delivered__c == false && g.checkin__c == true){
+        				guests.add(g);
+        			}
+        		} else if (to == 'who_have_submitted_survey'){
+        			if (g.survey_link_delivered__c == false && g.status__c == 'submitted'){
+        				guests.add(g);
+        			}
+        		}
+        	} else if (template == 'handout'){
+    			if (to == 'anyone'){
+        			if (g.handout_delivered__c == false){
+        				guests.add(g);
+        			}
+        		} else if (to == 'attendees'){
+        			if (g.handout_delivered__c == false && g.checkin__c == true){
+        				guests.add(g);
+        			}
+        		} else if (to == 'who_have_submitted_survey'){
+        			if (g.handout_delivered__c == false && g.status__c == 'submitted'){
+        				guests.add(g);
+        			}
+        		}
+        	}
+        }
+        return guests;
+    }
+    
+    @remoteAction 
+    public static void clear_delivered_flag(id session_id, string template){
+		list<guest__c> guests;
+		
+        if (session_id == null){
+            sexception se = new sexception();
+            se.setMessage(system.label.session_id_is_not_set);
+            throw se;
+        }
+        
+        // retrieve all guest related to the session
+        guests = [select id from guest__c where session__c = :session_id];
+        
+        if (guests.size() == 0){
+        	return;
+        }
+        
+        for (guest__c g : guests){
+	        if (template == 'free'){
+	        	g.mail_delivered__c = false;
+	        } else if (template == 'guest_pass'){
+	        	g.guest_pass_delivered__c = false;
+	        } else if (template == 'survey_link'){
+	        	g.survey_link_delivered__c = false;
+	        } else if (template == 'handout'){
+	        	g.handout_delivered__c = false;
+	        } else {
+                sexception se = new sexception();
+                se.setMessage(system.label.invalid_value + ' : ' + template + ' for template');
+                throw se;
+	        }
+        }
+        scrud.supdate(guests);
+    }
+
+    @remoteAction
+    public static list<guest__c> get_guests_by_condition(id session_id, string search_by, string search_value){
+        list<guest__c> guests;
+
+        if (session_id == null || String.isEmpty(search_by) || String.isEmpty(search_value)){
+            sexception se = new sexception();
+            se.setMessage(system.label.required_parameter_is_missing);
+            throw se;
+        }
+
+        if (search_by == 'rate'){
+            guests = get_guests_by_rate(session_id, Integer.valueOf(search_value));
+        } else if (search_by == 'cso_id') {
+            guests = get_guests_by_cso_id(session_id, Id.valueOf(search_value));
+        } else if (search_by == 'guest_id') {
+            guests = get_guests_by_guest_id(session_id, Id.valueOf(search_value));
+        } else {
+            sexception se = new sexception();
+            se.setMessage('Invalid value for search_by');
+            throw se;
+        }
+
+        return guests;
+    }
+
+    private static list<guest__c> get_guests_by_rate(id session_id, integer rate){
+        list<guest__c> guests = new list<guest__c>();
+
+        if (session_id == null || rate == null){
+            sexception se = new sexception();
+            se.setMessage(system.label.required_parameter_is_missing);
+            throw se;
+        }
+        
+        // Check FLS
+        list<string> flds = scrud.getAccessibleFields('sugoisurvey4__Guest__c');
+
+        // Dynamic SOQL
+        string soql_flds = '';
+        for (string fld : flds){
+            soql_flds += 'guest__r.' + fld + ',';
+        }
+        soql_flds = soql_flds.removeEnd(',');
+        string soql = 'select ' + soql_flds + ' from survey__c where session__c = :session_id and rate__c = :rate order by guest__r.company__c';
+        list<survey__c> surveys = Database.query(soql);
+        
+        // Generate guests
+        for (survey__c survey : surveys){
+            guests.add(survey.guest__r);
+        }
+
+        return guests;
+    }
+
+    private static list<guest__c> get_guests_by_cso_id(id session_id, id cso_id){
+        list<guest__c> guests = new list<guest__c>();
+
+        if (session_id == null || cso_id == null){
+            sexception se = new sexception();
+            se.setMessage(system.label.required_parameter_is_missing);
+            throw se;
+        }
+
+        // Check FLS
+        list<string> flds = scrud.getAccessibleFields('sugoisurvey4__Guest__c');
+
+        // Dynamic SOQL
+        string soql_flds = '';
+        for (string fld : flds){
+            soql_flds += 'guest__r.' + fld + ',';
+        }
+        soql_flds = soql_flds.removeEnd(',');
+        string soql = 'select ' + soql_flds + ' from custom_survey_answer__c where session__c = :session_id and custom_survey_option__r.id = :cso_id order by guest__r.company__c';
+        list<custom_survey_answer__c> csas = Database.query(soql);
+        
+        // Generate guests
+        for (custom_survey_answer__c csa : csas){
+            guests.add(csa.guest__r);
+        }
+
+        return guests;
+    }
+
+    /*
+    private static list<guest__c> get_guests_by_csa_id(id session_id, id csa_id){
+        list<guest__c> guests = new list<guest__c>();
+
+        if (session_id == null || csa_id == null){
+            sexception e = new sexception();
+            e.setMessage(system.label.required_parameter_is_missing);
+            throw e;
+        }
+
+        // Check FLS
+        list<string> flds = scrud.getAccessibleFields('sugoisurvey4__Guest__c');
+
+        // Dynamic SOQL
+        string soql_flds = '';
+        for (string fld : flds){
+            soql_flds += 'guest__r.' + fld + ',';
+        }
+        soql_flds = soql_flds.removeEnd(',');
+        string soql = 'select ' + soql_flds + ' from custom_survey_answer__c where session__c = :session_id and id = :csa_id order by guest__r.company__c';
+        list<custom_survey_answer__c> csas = Database.query(soql);
+
+        // Generate guests
+        for (custom_survey_answer__c csa : csas){
+            guests.add(csa.guest__r);
+        }
+
+        return guests;
+    }
+    */
+
+    private static list<guest__c> get_guests_by_guest_id(id session_id, id guest_id){
+        list<guest__c> guests = new list<guest__c>();
+
+        if (session_id == null || guest_id == null){
+            sexception se = new sexception();
+            se.setMessage(system.label.required_parameter_is_missing);
+            throw se;
+        }
+
+        // Check FLS
+        string soql_flds = scrud.getAccessibleFieldsInCSV('sugoisurvey4__Guest__c');
+        string soql = 'select ' + soql_flds + ' from guest__c where session__c = :session_id and id = :guest_id';
+        guests = Database.query(soql);
+
+        return guests;
     }
 }

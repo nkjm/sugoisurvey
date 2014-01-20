@@ -19,6 +19,8 @@ global class schedule_copy_comment_to_feedItem implements Schedulable{
     
     private static testmethod void validate_execute(){
         session__c session = validate_session.createDummySession('irjffiejdjhjkf', system.label.picklist_require_email, system.label.picklist_require_survey_submission);
+        session.Post_Comment_To_Session_Record_Feed__c = true;
+        scrud.supdate(session);
         string sch = '0 0 * * * ?';
         Test.startTest();
         System.schedule('Cron Trigger v1.3', sch, new schedule_copy_comment_to_feedItem());

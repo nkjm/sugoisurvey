@@ -1,20 +1,3 @@
-<apex:page readOnly="true" standardController="Session__c" extensions="session_v2" standardStyleSheets="false" sidebar="false" showheader="false" doctype="html-5.0">
-<apex:styleSheet value="https://fonts.googleapis.com/css?family=Cuprum&subset=latin" />
-
-<apex:outputPanel style="text-align:center;" layout="block" rendered="{! !ISNULL(config.survey_sites_url__c) }">
-    <div>
-        <img src="https://chart.googleapis.com/chart?cht=qr&chs=200x200&chl={!HTMLENCODE(config.survey_sites_url__c + '?id=' + session.id)}" />
-    </div>
-    <div style="margin-top:20px; font-family:'Cuprum'; font-size: 12pt;">
-        <a href="{!HTMLENCODE(config.survey_sites_url__c + '?id=' + session.id)}" target="_blank">{!HTMLENCODE(config.survey_sites_url__c + '?id=' + session.id)}</a>
-    </div>
-    <!--
-    <div>
-        <img src="https://chart.googleapis.com/chart?cht=qr&chs=200x200&chl={!HTMLENCODE(config.survey_sites_url__c + '?id=' + session.id + '#page_session_detail_' + session.id)}" />
-    </div>
-    <div style="margin-top:20px; font-family:'Cuprum'; font-size: 12pt;">
-        <a href="{!HTMLENCODE(config.survey_sites_url__c + '?id=' + session.id + '#page_session_detail_' + session.id)}" target="_blank">{!HTMLENCODE(config.survey_sites_url__c + '?id=' + session.id + '#page_session_detail_' + session.id)}</a>
-    </div>
-    -->
-</apex:outputPanel>
+<apex:page standardController="Session__c">
+deprecated
 </apex:page>

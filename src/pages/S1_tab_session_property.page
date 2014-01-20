@@ -1,4 +1,5 @@
 <apex:page readOnly="true" standardController="Session__c" extensions="session_v2" standardStyleSheets="false" showheader="false" applyBodyTag="false" applyHtmlTag="false" doctype="html-5.0" cache="false">
+
 <style>
 #tab_session_property .submit-complete, .submit-inprogress {
 	display: none;
@@ -10,41 +11,65 @@
 <script>
 j$ = jQuery.noConflict();
 
-function start_submit(){
-	j$("#tab_session_property .submit-complete").hide();
-	j$("#tab_session_property .submit-button").hide();
-	j$("#tab_session_property .submit-inprogress").show();
-}
-
-function stop_submit(){
-	j$("#tab_session_property .submit-inprogress").hide();
-	j$("#tab_session_property .submit-complete").show();
-	j$("#tab_session_property .submit-button").show();
+function session_property($scope){
+	$scope.init = function(){
+		$scope.rtk = {};
+		$scope.rtk.submitting = false;
+		$scope.rtk.action = null;
+		$scope.rtk.message = null;
+		$scope.rtk.result = null;
+	};
+	
+	$scope.show_modal = function(type, title, button_label, button_class, action, action_param){
+		$scope.rtk.submitting = false;
+		$scope.rtk.result = null;
+		$scope.rtk.message = null;
+		$scope.modal = {};
+		$scope.modal.title = title;
+		$scope.modal.button_label = button_label;
+        $scope.modal.button_class = button_class;
+		$scope.modal.action = action;
+		$scope.modal.action_param = action_param;
+		j$("#tab_session_property .modal_" + type).modal();
+		if (type == 'progress'){
+			action(action_param);
+		}
+	};
+	
+	$scope.init();
 }
 </script>
 
-<apex:form >
-<apex:messages styleClass="alert alert-danger" />
-<apex:actionStatus id="session_report_status" onstart="start_submit()" onstop="stop_submit()" />
+<form name="form_update_session">
 
-<div class="submit-complete alert alert-success">
-	{!$Label.update_has_been_saved}
-</div>
-
+<!-- Clone & Save Button -->
 <div class="row">
 	<div class="col-md-12">
-		<div class="submit-inprogress progress progress-striped active" style="height: 35px;">
+		<div ng-show="rtk.action == 'update_session' && rtk.submitting == false && rtk.result == 'error'" class="alert alert-danger">
+			<a href="#" class="close" data-dismiss="alert">&times;</a>
+			{{rtk.message}}
+		</div>
+		<div ng-show="rtk.action == 'update_session' && rtk.submitting == false && rtk.result == 'success'" class="alert alert-success">
+			<a href="#" class="close" data-dismiss="alert">&times;</a>
+			{{rtk.message}}
+		</div>
+		<div ng-show="rtk.action == 'update_session' && rtk.submitting == true" class="progress progress-striped active" style="height: 35px;">
 		    <div class="progress-bar progress-bar-success"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%;"></div>
 		</div>
-		<apex:commandButton status="session_report_status" styleClass="submit-button btn btn-success pull-right" rerender="tab_session_report" action="{!quicksave}" value="{!$Label.save}"></apex:commandButton>
+		<div ng-show="rtk.action != 'update_session' || rtk.submitting == false" style="text-align:right;">
+			<button ng-click="show_modal('confirm', '{!$label.cloning_survey}', '{!$label.clone}', 'success', clone_session, rtk)" type="button" class="btn btn-success"><span class="glyphicon glyphicon-plus-sign"></span>&nbsp;{!$label.clone}</button>&nbsp;
+			<button ng-click="update_session(rtk)" class="btn btn-success" value="{!$Label.save}"><span class="glyphicon glyphicon-ok-sign"></span>&nbsp;{!$label.save}</button>
+		</div>
 	</div>
-</div>
+</div><!-- Clone & Save Button -->
 
+<!-- Survey Link, Basic Config, Chatter Config -->
 <div class="row">
     <div class="col-md-12">
-    
+    	
+    	<!-- Survey Link -->
         <div class="config_container">
-            <h3>{!$Label.survey_url}</h3>
+            <h2>{!$Label.survey_url}</h2>
             <apex:outputText rendered="{! !ISNULL(config.survey_sites_url__c) }">
                 <div style="text-align: center;">
                     <img src="https://chart.googleapis.com/chart?cht=qr&chs=200x200&chl={!HTMLENCODE(config.survey_sites_url__c + '?id=' + session.id)}" />
@@ -54,56 +79,43 @@ function stop_submit(){
                 </div>
             </apex:outputText>
         </div>
-    
+    	
+    	<!-- Basic Config -->
         <div class="config_container">
-        	<h3>{!$Label.basic_config}</h3>
+        	<h2>{!$Label.basic_config}</h2>
 			<div class="form-horizontal" role="form">
 				<apex:repeat value="{!$ObjectType.Session__c.FieldSets.Base_Info}" var="f">
-					<div class="form-group">
-						<label class="col-sm-4 control-label">{!f.Label}</label>
-						<div class="col-sm-8">
-							<apex:inputField styleClass="form-control" value="{!Session__c[f]}" rendered="{!f.Type != 'date' && f.Type != 'boolean'}"></apex:inputField>
-							<apex:inputField styleClass="form-control" type="date" value="{!Session__c[f]}" rendered="{!f.Type == 'date'}"></apex:inputField>
-							<apex:inputField value="{!Session__c[f]}" rendered="{!f.Type == 'boolean'}"></apex:inputField>
-						</div>
-					</div>
-				</apex:repeat>
-			</div>
-        </div>
-             
-        <div class="config_container">
-            <h3>{!$Label.chatter_config}</h3>
-			<div class="form-horizontal" role="form">
-				<apex:repeat value="{!$ObjectType.Session__c.FieldSets.Chatter_Setting}" var="f">
-					<div class="form-group">
-						<label class="col-sm-4 control-label">{!f.Label}</label>
-						<div class="col-sm-8">
-							<apex:inputField styleClass="form-control" value="{!Session__c[f]}" rendered="{!f.Type != 'date' && f.Type != 'boolean'}"></apex:inputField>
-							<apex:inputField styleClass="form-control" type="date" value="{!Session__c[f]}" rendered="{!f.Type == 'date'}"></apex:inputField>
-							<apex:inputField value="{!Session__c[f]}" rendered="{!f.Type == 'boolean'}"></apex:inputField>
-						</div>
-					</div>
+					<c:ng_form_element field="{!f}" value="{!session[f]}" object="sugoisurvey4__Session__c" ngInstance="session" ngModel="session.{!f}" />
 				</apex:repeat>
 			</div>
         </div>
         
+        <!-- Chatter Config -->
         <div class="config_container">
-            <h3>{!$Label.mail_config}</h3>
+            <h2>{!$Label.chatter_config}</h2>
 			<div class="form-horizontal" role="form">
-				<apex:repeat value="{!$ObjectType.Session__c.FieldSets.Mail_Setting}" var="f">
-					<div class="form-group">
-						<label class="col-sm-4 control-label">{!f.Label}</label>
-						<div class="col-sm-8">
-							<apex:inputField styleClass="form-control" value="{!Session__c[f]}" rendered="{!f.Type != 'date' && f.Type != 'boolean'}"></apex:inputField>
-							<apex:inputField styleClass="form-control" type="date" value="{!Session__c[f]}" rendered="{!f.Type == 'date'}"></apex:inputField>
-							<apex:inputField value="{!Session__c[f]}" rendered="{!f.Type == 'boolean'}"></apex:inputField>
-						</div>
-					</div>
+				<apex:repeat value="{!$ObjectType.Session__c.FieldSets.Chatter_Setting}" var="f">
+					<c:ng_form_element field="{!f}" value="{!session[f]}" object="sugoisurvey4__Session__c" ngInstance="session" ngModel="session.{!f}" />
 				</apex:repeat>
 			</div>
         </div>
         
     </div>
+</div><!-- Survey Link, Basic Config, Chatter Config -->
+
+<!-- Delete Button -->
+<div class="row" style="margin-bottom: 40px;">
+	<div class="col-md-12">
+		<div ng-show="rtk.action != 'delete_session' || rtk.submitting == false" style="text-align:right;">
+			<button ng-click="show_modal('confirm', '{!$label.deleting_survey}', '{!$label.delete}', 'danger', delete_session, rtk)" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove-sign"></span>&nbsp;{!$label.delete}</button>
+		</div>
+	</div>
 </div>
-</apex:form>
+
+</form>
+
+<!-- Modal Dialog -->
+<c:S1_modal_confirm />
+<c:S1_modal_progress />
+
 </apex:page>

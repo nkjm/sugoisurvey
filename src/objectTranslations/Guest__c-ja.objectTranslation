@@ -34,12 +34,16 @@
         <name>Guest_Pass_Delivered__c</name>
     </fields>
     <fields>
-        <label><!-- メール配信済み --></label>
+        <label><!-- 資料配信済み --></label>
         <name>Handout_Delivered__c</name>
     </fields>
     <fields>
         <label><!-- 姓 --></label>
         <name>Last_Name__c</name>
+    </fields>
+    <fields>
+        <label><!-- メール配信済み --></label>
+        <name>Mail_Delivered__c</name>
     </fields>
     <fields>
         <label><!-- 複数の取引先責任者に該当 --></label>
@@ -79,6 +83,10 @@
         </picklistValues>
     </fields>
     <fields>
+        <label><!-- アンケートリンク配信済み --></label>
+        <name>Survey_Link_Delivered__c</name>
+    </fields>
+    <fields>
         <label><!-- 役職 --></label>
         <name>Title__c</name>
     </fields>
@@ -91,6 +99,10 @@
         <sections>
             <label><!-- カスタムリンク --></label>
             <section>カスタムリンク</section>
+        </sections>
+        <sections>
+            <label><!-- メール配信状況 --></label>
+            <section>メール配信状況</section>
         </sections>
     </layouts>
 </CustomObjectTranslation>

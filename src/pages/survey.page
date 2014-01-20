@@ -1,0 +1,95 @@
+<apex:page standardController="Session__c" extensions="session_v2" readOnly="true" showHeader="false" standardStylesheets="false" applyhtmlTag="false" applyBodyTag="false" docType="html-5.0">
+
+<html ng-app="sugoisurvey4">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+    <meta charset="utf-8"></meta>
+    <title>{!$label.sugoisurvey}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.2/css/bootstrap.min.css"></link>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.jqueryui_1_9_2_custom_zip, 'jquery-ui-1.9.2.custom/js/jquery-ui-1.9.2.custom.min.js')}"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.2/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.1/angular.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.9.0/ui-bootstrap-tpls.min.js"></script>
+    <script type="text/javascript" src="{!$Resource.sortable_js}"></script>
+    <c:RemoteTK />
+    <apex:outputText rendered="{! (Config.initialized__c == false || Config.need_re_initialization__c == true) }">
+        <script>
+            window.location = '/apex/sugoisurvey4__init';
+        </script>
+    </apex:outputText>
+<style>
+@media screen and (min-width: 320px) {
+    h1 {
+        color: #666666;
+        font-size: 14pt;
+        border-bottom: solid 1px #999999;
+        padding-bottom: 10px;
+    }
+    .tab_label {
+        font-size: 0.8em;
+        padding: 7px;
+    }
+}
+@media screen and (min-width: 768px) {
+    h1 {
+        color: #666666;
+        font-size: 16pt;
+        border-bottom: solid 1px #999999;
+        padding-bottom: 10px;
+    }
+    .tab_label {
+        font-size: 1.0em;
+        padding: 12px;
+    }
+}
+h2 {
+    color: #666666;
+    font-size: 14pt;
+    border-bottom: solid 1px #999999;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+h3 {
+    color: #333333;
+    font-size: 12pt;
+}
+h4, h5 {
+    color: #333333;
+    font-size: 10pt;
+}
+</style>
+
+<script>
+angular.module('sugoisurvey4', ['ui.bootstrap','ui.sortable']);
+</script>
+
+</head>
+<body>
+
+<div class="navbar navbar-default navbar-static-top" role="navigation">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+        <ul class="nav navbar-nav">
+            <li class="active"><a href="/apex/sugoisurvey4__survey">{!$label.survey}</a></li>
+            <li><a href="/apex/sugoisurvey4__presenter">{!$label.presenter}</a></li>
+        </ul>
+    </div>
+    <p class="navbar-text navbar-right"><a href="/ui/setup/Setup"><span class="glyphicon glyphicon-cloud"></span></a></p>
+</div>
+
+<div class="container" style="margin-bottom: 40px;">
+    <div class="row">
+        <div class="col-sm-4">
+            <h1>{!$Label.survey_list}</h1>
+            <apex:include pageName="S1_session_list" />
+        </div>
+        <div class="col-sm-8">
+            <apex:include pageName="S1_session_detail" rendered="{! !ISNULL(session__c.Id) }" />
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+</apex:page>

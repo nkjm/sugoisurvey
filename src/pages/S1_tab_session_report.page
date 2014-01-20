@@ -1,5 +1,8 @@
-<apex:page readOnly="true" standardController="Session__c" standardStyleSheets="false" showheader="false" applyBodyTag="false" applyHtmlTag="false" doctype="html-5.0" cache="false">
+<apex:page readOnly="true" standardController="Session__c" extensions="session_v2" standardStyleSheets="false" showheader="false" applyBodyTag="false" applyHtmlTag="false" doctype="html-5.0" cache="false">
 <style>
+#tab_session_report .row_comment_selected {
+	background-color: #eeeeee;
+}
 #tab_session_report .custom_survey_section {
     margin-bottom: 40px;
 }
@@ -14,6 +17,10 @@
     }
 }
 </style>
+<!--
+<script type="text/javascript" src="{!$Resource.ng_google_chart_js}"></script>
+-->
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
 <script>
 google.load('visualization', '1.0', {'packages':['corechart']});
 
@@ -30,7 +37,7 @@ function session_report($scope){
             'height':280,
             'chartArea':{width:'90%',height:'80%'},
             'legend':{position:'top'},
-            'is3D':true
+            'is3D':false
         };
         var chart = new google.visualization.PieChart(document.getElementById('rating_chart'));
         chart.draw(data, options);
@@ -38,22 +45,12 @@ function session_report($scope){
         google.visualization.events.addListener(chart, 'select', function(){
             var selectedData = chart.getSelection(), row, item;
             row = selectedData[0].row;
-            if (row == 0){
-                rate = 5;
-            } else if (row == 1){
-                rate = 4;
-            } else if (row == 2){
-                rate = 3;
-            } else if (row == 3){
-                rate = 2;
-            } else if (row == 4){
-                rate = 1;
-            }
+            rate = 5 - row;
             
 			if (typeof sforce == "undefined"){
-				window.location = "/apex/sugoisurvey4__S1_guest_list?session_id=" + $scope.session.Id + "&search_by=rate&rate=" + rate;
+				window.location = "/apex/sugoisurvey4__guest?session_id=" + $scope.session.Id + "&search_by=rate&search_value=" + rate;
 			} else {
-				sforce.one.navigateToURL("/apex/sugoisurvey4__S1_guest_list?session_id=" + $scope.session.Id + "&search_by=rate&rate=" + rate);
+				sforce.one.navigateToURL("/apex/sugoisurvey4__S1_guest?session_id=" + $scope.session.Id + "&search_by=rate&search_value=" + rate);
 			}
         });
     };
@@ -64,7 +61,11 @@ function session_report($scope){
         data.addColumn('number', '{!$Label.sum}');
         data.addRows(custom_survey_data);
         var height = custom_survey_option_ids.length * 70;
-        var width = Math.round(j$("body").width() * 0.85);
+        if (typeof sforce == 'undefined'){
+        	var width = Math.round(j$("body").width() * 0.5);
+        } else {
+        	var width = Math.round(j$("body").width() * 0.85);
+       	}
         var options = {
             'width':width,
             'height':height,
@@ -82,17 +83,17 @@ function session_report($scope){
             row = selectedData[0].row;
             
 			if (typeof sforce == "undefined"){
-				window.location = "/apex/sugoisurvey4__S1_guest_list?session_id=" + $scope.session.Id + "&search_by=option_id&option_id=" + custom_survey_option_ids[row];
+				window.location = "/apex/sugoisurvey4__guest?session_id=" + $scope.session.Id + "&search_by=cso_id&search_value=" + custom_survey_option_ids[row];
 			} else {
-				sforce.one.navigateToURL("/apex/sugoisurvey4__S1_guest_list?session_id=" + $scope.session.Id + "&search_by=option_id&option_id=" + custom_survey_option_ids[row]);
+				sforce.one.navigateToURL("/apex/sugoisurvey4__S1_guest?session_id=" + $scope.session.Id + "&search_by=cso_id&search_value=" + custom_survey_option_ids[row]);
 			}
         });
     };
 
     $scope.get_custom_survey_option_ids = function(csq_id){
         var custom_survey_option_ids = [];
-        if (typeof($scope.session.sugoisurvey4__Custom_Survey_Option__r.records) == 'object'){
-            j$.each($scope.session.sugoisurvey4__Custom_Survey_Option__r.records, function(i, cso){
+        if (typeof($scope.session.sugoisurvey4__Custom_Survey_Option__r) != 'undefined'){
+            j$.each($scope.session.sugoisurvey4__Custom_Survey_Option__r, function(i, cso){
                 if (cso.sugoisurvey4__Custom_Survey_Question__c == csq_id){
                     custom_survey_option_ids.push(cso.Id);
                 }
@@ -103,15 +104,15 @@ function session_report($scope){
     
     $scope.get_custom_survey_data = function(csq_id){
         var custom_survey_data = [];
-        if (typeof($scope.session.sugoisurvey4__Custom_Survey_Option__r.records) == 'object'){
-            j$.each($scope.session.sugoisurvey4__Custom_Survey_Option__r.records, function(i, cso){
+        if (typeof($scope.session.sugoisurvey4__Custom_Survey_Option__r) != 'undefined'){
+            j$.each($scope.session.sugoisurvey4__Custom_Survey_Option__r, function(i, cso){
                 if (cso.sugoisurvey4__Custom_Survey_Question__c == csq_id){
                     custom_survey_data.push([cso.sugoisurvey4__Option__c, cso.sugoisurvey4__Sum__c]);
                 }
             });
         }
         return(custom_survey_data);
-    }
+    };
     
     $scope.generate_report_survey = function(csq_id){
         var custom_survey_data = $scope.get_custom_survey_data(csq_id);
@@ -137,70 +138,40 @@ function session_report($scope){
         
         // Draw Bar Chart for Custom Surveys
         if ($scope.session.sugoisurvey4__Custom_Survey_Question__r != null && $scope.session.sugoisurvey4__Custom_Survey_Option__r != null){
-            j$.each($scope.session.sugoisurvey4__Custom_Survey_Question__r.records, function(i, csq){
+            j$.each($scope.session.sugoisurvey4__Custom_Survey_Question__r, function(i, csq){
                 if (csq.sugoisurvey4__Survey_Type__c != 'free'){
                     $scope.generate_report_survey(csq.Id);
                 }
             });
         }
-        
-        $scope.$apply();
     };
     
-    $scope.retrieve_session = function(callback){
-        var update_view = function(){
-            $scope.$apply();
-        };
-        
-        var soql = "select Id, Name, sugoisurvey4__Rate_1__c, sugoisurvey4__Rate_2__c, sugoisurvey4__Rate_3__c, sugoisurvey4__Rate_4__c, sugoisurvey4__Rate_5__c, sugoisurvey4__Rate_Avg__c, sugoisurvey4__Survey_Sum__c, sugoisurvey4__Guest_Sum__c, sugoisurvey4__Attending_Guest_Sum__c, sugoisurvey4__Enable_Rate__c, sugoisurvey4__Survey_Collection_Rate__c, \
-                    (select Id, Name, sugoisurvey4__Survey_Type__c, sugoisurvey4__Session__c, sugoisurvey4__Enable_Free_Form__c, sugoisurvey4__Question__c, sugoisurvey4__Sort_Order__c from sugoisurvey4__Custom_Survey_Question__r order by sugoisurvey4__Sort_Order__c, Name), \
-                    (select Id, Name, sugoisurvey4__Option__c, sugoisurvey4__Enable_Free_Form__c, sugoisurvey4__Sum__c, sugoisurvey4__Dummy__c, sugoisurvey4__Custom_Survey_Question__c, sugoisurvey4__Session__c from sugoisurvey4__Custom_Survey_Option__r order by Name) \
-                    from sugoisurvey4__Session__c where Id = '" + $scope.session.Id + "'";
-        $scope.force.query(
-            soql,
-            function(result){
-                $scope.rtk.submitting = false;
-                $scope.session = result.records[0];
-                if (callback == null){
-                    update_view();
-                } else {
-                    callback();
-                }
-            },
-            function(result){
-                console.log(result);
-                $scope.rtk.submitting = false;
-                $scope.rtk.result = 'error';
-                $scope.rtk.message = result;
-                update_view();
-            }
-        );
-    };
+	$scope.navigate_to_guest_detail = function(guest_id){
+		j$("#tab_session_report .row_comment_" + guest_id).addClass("row_comment_selected");
+		
+		if (typeof sforce == "undefined"){
+			window.location = '/apex/sugoisurvey4__guest?id=' + guest_id + '&session_id=' + $scope.session.Id + '&search_by=guest_id&search_value=' + guest_id;
+		} else {
+			sforce.one.navigateToURL('/apex/sugoisurvey4__S1_guest?id=' + guest_id + '&session_id=' + $scope.session.Id + '&search_by=guest_id&search_value=' + guest_id);
+		}
+	};
     
     $scope.reload = function(){
         $scope.rtk.submitting = true;
-        $scope.retrieve_session($scope.update_chart);
+        $scope.retrieve_session($scope.rtk);
     };
     
     $scope.init = function(){
-        $scope.session = {};
-        $scope.session.Id = '{!session__c.Id}';
         $scope.rtk = {};
-        $scope.rtk.submitting = true;
-        $scope.retrieve_session($scope.update_chart);
+        $scope.rtk.submitting = false;
+        $scope.$watch('session', function(new_value, old_value){
+            if (new_value !== old_value){
+                $scope.update_chart();
+            }
+        });
     }
     
-    $scope.force = new remotetk.Client();
     $scope.init();
-}
-
-// Called from S1_session_report_free_answer
-function navigate_to_guest_detail(guest_id){
-	if (typeof sforce == "undefined"){
-		window.location = '/apex/sugoisurvey4__S1_guest_detail?id=' + guest_id;
-	} else {
-		sforce.one.navigateToURL('/apex/sugoisurvey4__S1_guest_detail?id=' + guest_id);
-	}
 }
 </script>
 
@@ -231,7 +202,7 @@ function navigate_to_guest_detail(guest_id){
 <apex:outputText rendered="{!Session__c.Enable_Rate__c}">
     <div class="row">
         <div class="col-sm-12">
-            <h3>{!$Label.rating}</h3>
+            <h2>{!$Label.rating}</h2>
             
             <!-- NO DATA for Rating -->
 			<div class="row" ng-show="session.sugoisurvey4__Rate_Avg__c == null || session.sugoisurvey4__Rate_Avg__c == 0.00">
@@ -264,17 +235,16 @@ function navigate_to_guest_detail(guest_id){
 </apex:outputText>
 
 <!-- Custom Surveys -->
-<apex:outputText rendered="{! session__c.Custom_Survey_Question__r != null }">
+<apex:outputText rendered="{! session.Custom_Survey_Question__r != null }">
     <div class="row">
         <div class="col-sm-12">
             <div>
-                <h3>{!$Label.survey}</h3>
+                <h2>{!$Label.survey}</h2>
             </div>
-
             <apex:param name="is_csq" value="true" />
-            <apex:repeat value="{!Session__c.Custom_Survey_Question__r}" var="csq">
+            <apex:repeat value="{!Session.Custom_Survey_Question__r}" var="csq">
                 <div class="custom_survey_section">
-                    <h4>{!csq.Question__c}</h4>
+                    <h3>{!csq.Question__c}</h3>
                     <apex:outputText rendered="{!csq.Survey_Type__c != 'free'}">
                         <div id="barchart_{!csq.id}">
                             <!-- Custom Survey Chart will be inserted here -->
@@ -282,7 +252,7 @@ function navigate_to_guest_detail(guest_id){
                     </apex:outputText>
                     <apex:outputText rendered="{!csq.Enable_Free_Form__c}">
                         <div style="width:90%; margin: 0 auto;">
-                            <h5>{!$Label.free_answers}</h5>
+                            <h4>{!$Label.free_answers}</h4>
                             <!-- Free Answer will be inserted here -->
                             <c:S1_session_report_free_answer session_id="{!Session__c.id}" csq_id="{!csq.id}" />
                         </div>
@@ -304,7 +274,7 @@ function navigate_to_guest_detail(guest_id){
     <div class="row">
         <div class="col-sm-12">
             <div>
-                <h3>{!$Label.comment}</h3>
+                <h2>{!$Label.comment}</h2>
             </div>
             <table class="table table-hover">
                 <thead>
@@ -315,8 +285,8 @@ function navigate_to_guest_detail(guest_id){
                 </thead>
                 <tbody>
                     <apex:repeat value="{!Session__c.Comment__r}" var="comment">
-                        <tr>
-                            <td style="white-space:nowrap;"><a href="#" onclick="navigate_to_guest_detail('{!comment.guest__r.Id}')">{!comment.guest__r.Name__c}</a></td>
+                        <tr class="row_comment row_comment_{!comment.guest__r.Id}" ng-click="navigate_to_guest_detail('{!comment.guest__r.Id}')">
+                            <td style="white-space:nowrap;">{!comment.guest__r.Name__c}</td>
                             <td>{!comment.Comment__c}</td>
                         </tr>
                     </apex:repeat>

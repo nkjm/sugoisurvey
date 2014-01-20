@@ -1,101 +1,219 @@
-<apex:page readOnly="true" standardController="Session__c" standardStyleSheets="false" showheader="false" applyBodyTag="false" applyHtmlTag="false" doctype="html-5.0" cache="false">
+<apex:page readOnly="true" standardController="Session__c" extensions="jr_session" standardStyleSheets="false" showheader="false" applyBodyTag="false" applyHtmlTag="false" doctype="html-5.0" cache="false">
 
-<html class="ng-app" id="ng-app">
-<head>
-	<meta charset="utf-8"></meta>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
-    <title>{!$label.sugoisurvey}</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.2/css/bootstrap.min.css"></link>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.2/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.1/angular.min.js"></script>
-    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 <style>
-h1, h2 {
-    color: #999999;
-}
-h3 {
-	padding-bottom: 10px;
-	color: #999999;
-    border-bottom: solid 1px #999999;
-}
-h4, h5 {
-    color: #666666;
-}
-a {
-    color: #000000;
-    text-decolation: none;
-}
-.config_container {
-    margin-bottom: 60px;
-}
-.btn-selected {
-	background-color: #F6EDF2;
-	border-color: #f4a4d4;
-}
 @media screen and (min-width: 320px) {
-    #root_container h1 {
-    	font-size: 16pt;
-    }
-    
-    #root_container .tab_label {
-        font-size: 0.9em;
-        padding: 8px;
+    #session_detail .tab_label {
+        padding: 7px;
     }
 }
 @media screen and (min-width: 768px) {
-    #root_container h1 {
-    	font-size: 24pt;
-    }
-    #root_container .tab_label {
-        font-size: 1.0em;
+    #session_detail .tab_label {
         padding: 12px;
     }
 }
 </style>
 
-<c:RemoteTK />
 <script>
+j$ = jQuery.noConflict();
 
-</script>
-</head>
+function session_detail($scope, $filter){
+    $scope.retrieve_session = function(rtk, session_id){
+        session_id = session_id === undefined || session_id == null ? '{!Session__c.Id}' : session_id;
+        rtk = rtk === undefined || rtk == null ? $scope.rtk : rtk;
 
-<body>
+        rtk.action = 'retrieve_session';
+        rtk.result = null;
+        rtk.message = null;
+        rtk.submitting = true;
 
-<div class="container" id="root_container">
-	<!-- Survey Title -->
-    <div class="row" style="margin-bottom: 20px;">
-        <div class="col-sm-12">
-        	<h1>{!Session__c.Name}</h1>
-        </div>
-    </div>
-    
-    <!--  Tab Bar -->
-    <div class="row" style="margin-bottom: 20px;" id="tab_bar">
-        <div class="col-sm-12">
-            <ul class="nav nav-tabs">
-                <li class="active"><a href="#tab_edit_survey" data-toggle="tab" class="tab_label">{!$label.edit_survey}</a></li>
-                <li><a href="#tab_session_report" data-toggle="tab" class="tab_label">{!$label.report}</a></li>
-                <li><a href="#tab_session_property" data-toggle="tab" class="tab_label">{!$label.property}</a></li>
-            </ul>
-        </div>
-    </div>
+        sugoisurvey4.jr_session.get_session(
+            session_id,
+            function(result, event){
+                if (event.status){
+                    rtk.submitting = false;
+                    rtk.result = 'success';
+                    $scope.session = result;
+                    if (typeof $scope.session.sugoisurvey4__Presenter__r == 'undefined'){
+                        $scope.session.sugoisurvey4__Presenter__r = {};
+                    }
+                    if (typeof $scope.session.sugoisurvey4__Date__c != 'undefined'){
+                        $scope.session.sugoisurvey4__Date__c = $filter('date')($scope.session.sugoisurvey4__Date__c, 'yyyy-MM-dd'); 
+                    }
+                    $scope.session.sugoisurvey4__Mail_Guest_Pass_Body_L__c = '{!$label.auto_generated}';
+                    $scope.session.sugoisurvey4__Mail_Survey_Link_Body_L__c = '{!$label.auto_generated}';
+                    $scope.$apply();
+                    j$("#session_detail").show();
+                } else {
+                    rtk.submitting = false;
+                    rtk.result = 'error';
+                    rtk.message = event.message;
+                    $scope.$apply();
+                }
+            },{escape:true}
+        );
+    };
 
-    <!--  Tab Content -->
-    <div class="row tab-content" style="margin: 0 auto;">
-        <div id="tab_edit_survey" class="col-sm-12 tab-pane active" style="padding:0 5px; display:none;" ng-controller="survey" >
-            <apex:include pageName="S1_tab_edit_survey" />
-        </div>
-    
-        <div id="tab_session_report" class="col-sm-12 tab-pane" style="padding:0 5px;" ng-controller="session_report">
-            <apex:include pageName="S1_tab_session_report" />
-        </div>
+    $scope.update_session = function(rtk, session_id){
+        session_id = session_id === undefined || session_id == null ? '{!Session__c.Id}' : session_id;
+        rtk = rtk === undefined || rtk == null ? $scope.rtk : rtk;
         
-        <div id="tab_session_property" class="col-sm-12 tab-pane" style="padding:0 5px;">
-            <apex:include pageName="S1_tab_session_property" />
-        </div>
+        var session = j$.extend(true, {}, $scope.session);
+        session.sugoisurvey4__Date__c = !session.sugoisurvey4__Date__c || /^\s*$/.test(session.sugoisurvey4__Date__c) ? null : session.sugoisurvey4__Date__c;
+        if (typeof session.sugoisurvey4__Date__c != 'undefined' && session.sugoisurvey4__Date__c != null){
+            session.sugoisurvey4__Date__c = $filter('date')(session.sugoisurvey4__Date__c, 'yyyy-MM-dd'); 
+        }
+        delete session.attributes;
+        delete session.sugoisurvey4__Presenter__r;
+        delete session.sugoisurvey4__Custom_Survey_Question__r;
+        delete session.sugoisurvey4__Custom_Survey_Option__r;
+        delete session.sugoisurvey4__Guest__r;
+
+        rtk.action = 'update_session';
+        rtk.result = null;
+        rtk.message = null;
+        rtk.submitting = true;
+        $scope.force.update(
+            'sugoisurvey4__Session__c',
+            $scope.session.Id,
+            session,
+            function(result){
+                rtk.submitting = false;
+                rtk.result = 'success';
+                rtk.message = '{!$label.config_has_been_updated}';
+                $scope.$apply();
+            },
+            function(result){
+                rtk.submitting = false;
+                rtk.result = 'error';
+                rtk.message = result[0].message;
+                $scope.$apply();
+            }
+        );
+    };
+
+    $scope.delete_session = function(rtk, session_id){  
+        var update_view = function(){
+            if (typeof sforce == 'undefined'){
+                window.location = '/apex/sugoisurvey4__survey';
+            } else {
+                sforce.one.navigateToURL('/apex/sugoisurvey4__S1_survey');
+            }
+        };
+
+        session_id = session_id === undefined || session_id == null ? '{!Session__c.Id}' : session_id;
+        rtk = rtk === undefined || rtk == null ? $scope.rtk : rtk;
+
+        rtk.action = 'delete_session';
+        rtk.message = null;
+        rtk.result = null;
+        rtk.submitting = true;
+        $scope.force.del(
+            'sugoisurvey4__Session__c',
+            $scope.session.Id,
+            function(result){
+                rtk.submitting = false;
+                rtk.result = 'success';
+                rtk.message = '{!$label.survey_has_been_deleted}';
+                update_view();
+            },
+            function(result){
+                rtk.submitting = false;
+                rtk.result = 'error';
+                rtk.message = result[0].message;
+                $scope.$apply();
+            }
+        );
+    };
+
+    $scope.clone_session = function(rtk, session_id){
+        var update_view = function(session_id){
+            if (typeof sforce == 'undefined'){
+                window.location = '/apex/sugoisurvey4__survey?id=' + session_id;
+            } else {
+                sforce.one.navigateToURL('/apex/sugoisurvey4__S1_survey?id=' + session_id);
+            }
+        };
+
+        session_id = session_id === undefined || session_id == null ? '{!Session__c.Id}' : session_id;
+        rtk = rtk === undefined || rtk == null ? $scope.rtk : rtk;
+
+        rtk.action = 'clone_session';
+        rtk.result = null;
+        rtk.message = null;
+        rtk.submitting = true;
+        sugoisurvey4.jr_session.clone_session(
+            $scope.session.Id,
+            function(result, event){
+                rtk.submitting = false;
+                if (event.status){
+                    rtk.result = 'success';
+                    rtk.message = '{!$label.survey_has_been_cloned}';
+                    update_view(result);
+                } else {
+                    rtk.result = 'error';
+                    rtk.message = event.message;
+                    $scope.$apply();
+                }
+            },{escape:true}
+        );
+    };
+    
+    $scope.init = function(){
+        if (typeof sforce == 'undefined'){
+            $scope.is_s1 = false;
+        } else {
+            $scope.is_s1 = true;
+        }
+	    $scope.rtk = {};
+	    $scope.rtk.submitting = false;
+        $scope.session = {};
+        $scope.retrieve_session($scope.rtk, '{!Session__c.Id}');
+    };
+    
+ 	$scope.force = new remotetk.Client();
+    $scope.init();
+}
+</script>
+
+<div id="session_detail" ng-controller="session_detail" style="display:none;">
+
+<!-- Survey Title -->
+<div class="row" style="margin-bottom: 20px;">
+    <div class="col-sm-12">
+    	<h1>{{session.Name}}</h1>
     </div>
 </div>
-</body>
-</html>
+
+<!--  Tab Bar -->
+<div class="row" style="margin-bottom: 20px;" id="tab_bar">
+    <div class="col-sm-12">
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="#tab_session_property" data-toggle="tab" class="tab_label">{!$label.property}</a></li>
+            <li><a href="#tab_edit_survey" data-toggle="tab" class="tab_label">{!$label.edit_survey}</a></li>
+            <li><a href="#tab_session_report" data-toggle="tab" class="tab_label">{!$label.report}</a></li>
+            <li><a href="#tab_guest_list" data-toggle="tab" class="tab_label">{!$label.guest}</a></li>
+        </ul>
+    </div>
+</div>
+
+<!--  Tab Content -->
+<div class="row tab-content" style="margin: 0 auto;">
+    <div id="tab_session_property" class="col-sm-12 tab-pane active" style="padding:0 5px;" ng-controller="session_property">
+        <apex:include pageName="S1_tab_session_property" />
+    </div>
+    
+    <div id="tab_edit_survey" class="col-sm-12 tab-pane" style="padding:0 5px;" ng-controller="survey" >
+        <apex:include pageName="S1_tab_edit_survey" />
+    </div>
+
+    <div id="tab_session_report" class="col-sm-12 tab-pane" style="padding:0 5px;" ng-controller="session_report">
+        <apex:include pageName="S1_tab_session_report" />
+    </div>
+    
+    <div id="tab_guest_list" class="col-sm-12 tab-pane" style="padding:0 5px;" ng-controller="guest_list">
+    	<apex:include pageName="S1_tab_guest_list" />
+    </div>
+</div>
+
+</div><!-- ng-controller: session_detail -->
 </apex:page>
